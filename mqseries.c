@@ -109,7 +109,6 @@ PHP_MINIT_FUNCTION(mqseries)
 	le_mqseries_obj = zend_register_list_destructors_ex(_mqseries_close, NULL, "mqseries_obj", module_number);
 	le_mqseries_conn = zend_register_list_destructors_ex(_mqseries_disc, NULL, "mqseries_conn", module_number);
 
-
 #include "mqseries_init_const.h"
 
 	MAKE_STD_ZVAL(z_reason_texts);
@@ -176,7 +175,7 @@ PHP_FUNCTION(mqseries_open)
 {
 	mqseries_descriptor *mqdesc;
 	mqseries_obj *mqobj;
-	zval *z_mqdesc, *z_array, **option_val, *key;
+	zval *z_mqdesc, *z_array, **option_val;
 	char  *string_key;
 	uint  string_key_len;
 	ulong  num_key;
@@ -193,14 +192,10 @@ PHP_FUNCTION(mqseries_open)
 	ZEND_FETCH_RESOURCE(mqdesc, mqseries_descriptor *, &z_mqdesc, -1, "mqseries_conn", le_mqseries_conn);
 
 	zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(z_array), &pos);
-	/* Iterate through hash */
 	while (zend_hash_get_current_data_ex(Z_ARRVAL_P(z_array), (void **)&option_val, &pos) == SUCCESS) {
-		/* Allocate space for key */
-		MAKE_STD_ZVAL(key);
 
 		/* Set up the key */
 		if (zend_hash_get_current_key_ex(Z_ARRVAL_P(z_array), &string_key, &string_key_len, &num_key, 0, &pos) == HASH_KEY_IS_STRING) {
-			ZVAL_STRINGL(key, string_key, string_key_len-1, 1);
     		if (!strcmp(string_key, "ObjectQMgrName")) {
 				strncpy(obj_desc.ObjectQMgrName, Z_STRVAL_PP(option_val), MQ_Q_NAME_LENGTH);
 			} else if (!strcmp(string_key, "ObjectName")) {
@@ -210,7 +205,6 @@ PHP_FUNCTION(mqseries_open)
 			}
 		}
 
-		zval_ptr_dtor(&key);
 		zend_hash_move_forward_ex(Z_ARRVAL_P(z_array), &pos);
 	}
 
@@ -239,7 +233,7 @@ PHP_FUNCTION(mqseries_get)
 {
 	mqseries_descriptor *mqdesc;
 	mqseries_obj *mqobj;
-	zval *z_mqdesc, *z_mqobj, *z_msg_desc, *z_get_msg_opts, **option_val, *key;
+	zval *z_mqdesc, *z_mqobj, *z_msg_desc, *z_get_msg_opts, **option_val;
 	char  *string_key;
 	uint  string_key_len;
 	ulong  num_key;
@@ -262,13 +256,9 @@ PHP_FUNCTION(mqseries_get)
 	set_msg_desc_from_array(z_msg_desc, &msg_desc);
 
 	zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(z_get_msg_opts), &pos);
-	/* Iterate through hash */
 	while (zend_hash_get_current_data_ex(Z_ARRVAL_P(z_get_msg_opts), (void **)&option_val, &pos) == SUCCESS) {
-		/* Allocate space for key */
-		MAKE_STD_ZVAL(key);
 
 		if (zend_hash_get_current_key_ex(Z_ARRVAL_P(z_get_msg_opts), &string_key, &string_key_len, &num_key, 0, &pos) == HASH_KEY_IS_STRING) {
-			ZVAL_STRINGL(key, string_key, string_key_len-1, 1);
 			if (!strcmp(string_key, "Options")) {
 				get_msg_opts.Options = Z_LVAL_PP(option_val);
 			} else if (!strcmp(string_key, "WaitInterval") > 0) {
@@ -276,7 +266,6 @@ PHP_FUNCTION(mqseries_get)
 			}
 		}
 
-		zval_ptr_dtor(&key);
 		zend_hash_move_forward_ex(Z_ARRVAL_P(z_get_msg_opts), &pos);
 	}
 
@@ -308,7 +297,7 @@ PHP_FUNCTION(mqseries_put)
 {
 	mqseries_descriptor *mqdesc;
 	mqseries_obj *mqobj;
-	zval *z_mqdesc, *z_mqobj, *z_msg_desc, *z_put_msg_opts, **option_val, *key;
+	zval *z_mqdesc, *z_mqobj, *z_msg_desc, *z_put_msg_opts, **option_val;
 	char  *string_key, *msg;
 	uint  string_key_len;
 	ulong  num_key;
@@ -332,13 +321,9 @@ PHP_FUNCTION(mqseries_put)
 
 	memset(&put_msg_opts, '\0', sizeof(put_msg_opts));
 	zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(z_put_msg_opts), &pos);
-	/* Iterate through hash */
 	while (zend_hash_get_current_data_ex(Z_ARRVAL_P(z_put_msg_opts), (void **)&option_val, &pos) == SUCCESS) {
-		/* Allocate space for key */
-		MAKE_STD_ZVAL(key);
 
 		if (zend_hash_get_current_key_ex(Z_ARRVAL_P(z_put_msg_opts), &string_key, &string_key_len, &num_key, 0, &pos) == HASH_KEY_IS_STRING) {
-			ZVAL_STRINGL(key, string_key, string_key_len-1, 1);
 			if (!strcmp(string_key, "Options")) {
 				put_msg_opts.Options = Z_LVAL_PP(option_val);
 			} else if (!strcmp(string_key, "Version")) {
@@ -348,7 +333,6 @@ PHP_FUNCTION(mqseries_put)
 			}
 		}
 
-		zval_ptr_dtor(&key);
 		zend_hash_move_forward_ex(Z_ARRVAL_P(z_put_msg_opts), &pos);
 	}
 
@@ -363,9 +347,9 @@ PHP_FUNCTION(mqseries_put)
 		&mqdesc->reason);
 
 	if (mqdesc->comp_code == MQCC_OK) {
- 		RETURN_TRUE;
+		RETURN_TRUE;
 	} else {
- 		RETURN_FALSE;
+		RETURN_FALSE;
 	}
 }
 /* }}} */
@@ -415,9 +399,9 @@ PHP_FUNCTION(mqseries_begin)
 		&mqdesc->reason);
 
 	if (mqdesc->comp_code == MQCC_OK) {
- 		RETURN_TRUE;
+		RETURN_TRUE;
 	} else {
- 		RETURN_FALSE;
+		RETURN_FALSE;
 	}
 }
 /* }}} */
@@ -444,7 +428,7 @@ PHP_FUNCTION(mqseries_cmit)
 	if (mqdesc->comp_code == MQCC_OK) {
 		RETURN_TRUE;
 	} else {
- 		RETURN_FALSE;
+		RETURN_FALSE;
 	}
 }
 /* }}} */
@@ -471,7 +455,7 @@ PHP_FUNCTION(mqseries_back)
 	if (mqdesc->comp_code == MQCC_OK) {
 		RETVAL_TRUE;
 	} else {
- 		RETURN_FALSE;
+		RETURN_FALSE;
 	}
 }
 /* }}} */
@@ -555,7 +539,7 @@ PHP_FUNCTION(mqseries_strerror)
 	Put options from the given array into the MQMD structure. */
 static void set_msg_desc_from_array(zval *array, MQMD *msg_desc)
 {
-	zval **option_val, *key;
+	zval **option_val;
 	char *string_key;
 	uint  string_key_len;
 	ulong  num_key;
@@ -563,10 +547,8 @@ static void set_msg_desc_from_array(zval *array, MQMD *msg_desc)
 
 	zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(array), &pos);
 	while (zend_hash_get_current_data_ex(Z_ARRVAL_P(array), (void **)&option_val, &pos) == SUCCESS) {
-		MAKE_STD_ZVAL(key);
 
 		if (zend_hash_get_current_key_ex(Z_ARRVAL_P(array), &string_key, &string_key_len, &num_key, 0, &pos) == HASH_KEY_IS_STRING) {
-			ZVAL_STRINGL(key, string_key, string_key_len-1, 1);
 			if (!strcmp(string_key, "CorrelId")) {
 				strncpy(msg_desc->CorrelId, Z_STRVAL_PP(option_val), sizeof(msg_desc->CorrelId));
 			} else if (!strcmp(string_key, "StrucId")) {
@@ -591,7 +573,6 @@ static void set_msg_desc_from_array(zval *array, MQMD *msg_desc)
 
 		}
 
-		zval_ptr_dtor(&key);
 		zend_hash_move_forward_ex(Z_ARRVAL_P(array), &pos);
 	}
 
@@ -611,6 +592,7 @@ static void _mqseries_close(zend_rsrc_list_entry *rsrc TSRMLS_DC)
 		MQCO_NONE,
 		&comp_code,
 		&reason);
+
 	if ((comp_code != MQCC_OK) || (reason != MQRC_NONE && reason)) {
 		switch(reason) {
 			case MQRC_CONNECTION_BROKEN:

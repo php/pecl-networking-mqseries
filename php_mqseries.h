@@ -69,6 +69,8 @@ typedef struct {
 
 PHP_MINIT_FUNCTION(mqseries);
 PHP_MSHUTDOWN_FUNCTION(mqseries);
+PHP_RINIT_FUNCTION(mqseries);
+PHP_RSHUTDOWN_FUNCTION(mqseries);
 PHP_MINFO_FUNCTION(mqseries);
 
 PHP_FUNCTION(mqseries_conn);
@@ -82,6 +84,7 @@ PHP_FUNCTION(mqseries_back);
 PHP_FUNCTION(mqseries_close);
 PHP_FUNCTION(mqseries_disc);
 PHP_FUNCTION(mqseries_error);
+PHP_FUNCTION(mqseries_strerror);
 
 #ifdef ZTS
 #define MQSERIES_G(v) TSRMG(mqseries_globals_id, zend_mqseries_globals *, v)

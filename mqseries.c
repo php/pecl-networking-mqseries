@@ -42,18 +42,11 @@ Author: Michael Bretterklieber <mbretter@jawa.at>
 #include "php_network.h"
 #include "ext/standard/info.h"
 #include "php_mqseries.h"
-#include "mqseries_reason_texts.h"
-
-#ifndef PHP_WIN32
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#endif
 
 static void _mqseries_disc(zend_rsrc_list_entry *rsrc TSRMLS_DC);
 static void _mqseries_close(zend_rsrc_list_entry *rsrc TSRMLS_DC);
 
-static void _set_msg_desc_from_array(zval *array, MQMD *msg_desc);
+static void set_msg_desc_from_array(zval *array, MQMD *msg_desc);
 
 /* If you declare any globals in php_mqseries.h uncomment this:
 ZEND_DECLARE_MODULE_GLOBALS(mqseries)
@@ -62,6 +55,7 @@ ZEND_DECLARE_MODULE_GLOBALS(mqseries)
 /* True global resources - no need for thread safety here */
 static int le_mqseries_conn;
 static int le_mqseries_obj;
+static zval *z_reason_texts;
 
 /* {{{ mqseries_functions[]
  *
@@ -78,6 +72,7 @@ function_entry mqseries_functions[] = {
 	PHP_FE(mqseries_back,	NULL)
 	PHP_FE(mqseries_close,	NULL)
 	PHP_FE(mqseries_error,	NULL)
+	PHP_FE(mqseries_strerror,	NULL)
 	{NULL, NULL, NULL}	/* Must be the last line in mqseries_functions[] */
 };
 /* }}} */
@@ -110,21 +105,16 @@ ZEND_GET_MODULE(mqseries)
  */
 PHP_MINIT_FUNCTION(mqseries)
 {
-	char *compiled_string_description;
-	char *myeval = MQSERIES_REASON_TEXTS;
-
 	/* don't change the order of these, objects must be freed before connections */
 	le_mqseries_obj = zend_register_list_destructors_ex(_mqseries_close, NULL, "mqseries_obj", module_number);
 	le_mqseries_conn = zend_register_list_destructors_ex(_mqseries_disc, NULL, "mqseries_conn", module_number);
+
+
 #include "mqseries_init_const.h"
 
-	compiled_string_description = zend_make_compiled_string_description("mqseries.c mqseries_minit" TSRMLS_CC);
-	if (zend_eval_string(myeval, NULL, compiled_string_description TSRMLS_CC) == FAILURE) {
-		efree(compiled_string_description);
-		zend_error(E_ERROR, "Failure evaluating code:\n%s", myeval);
-		return FAILURE;
-	}
-	efree(compiled_string_description);
+	MAKE_STD_ZVAL(z_reason_texts);
+	array_init(z_reason_texts);
+#include "mqseries_reason_texts.h"
 
 	return SUCCESS;
 }
@@ -269,7 +259,7 @@ PHP_FUNCTION(mqseries_get)
 	ZEND_FETCH_RESOURCE(mqdesc, mqseries_descriptor *, &z_mqdesc, -1, "mqseries_conn", le_mqseries_conn);
 	ZEND_FETCH_RESOURCE(mqobj, mqseries_obj *, &z_mqobj, -1, "mqseries_obj", le_mqseries_obj);
 
-	_set_msg_desc_from_array(z_msg_desc, &msg_desc);
+	set_msg_desc_from_array(z_msg_desc, &msg_desc);
 
 	zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(z_get_msg_opts), &pos);
 	/* Iterate through hash */
@@ -539,9 +529,31 @@ PHP_FUNCTION(mqseries_error)
 }
 /* }}} */
 
+/* {{{ proto bool mqseries_strerror(reason_code)
+	Return the detailed error text for the given reason_code. */
+PHP_FUNCTION(mqseries_strerror)
+{
+	zval **text;
+	int reason_code;
+	HashTable *target_hash;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l", &reason_code) == FAILURE) {
+		return;
+	}
+
+	RETVAL_NULL();
+
+	target_hash = HASH_OF(z_reason_texts);
+	if (zend_hash_index_find(target_hash, reason_code, (void **) &text) == SUCCESS) {
+		RETVAL_STRING(Z_STRVAL_PP(text), 0);
+	}
+
+}
+/* }}} */
+
 /* {{{ proto static void set_msg_desc_from_array()
 	Put options from the given array into the MQMD structure. */
-static void _set_msg_desc_from_array(zval *array, MQMD *msg_desc)
+static void set_msg_desc_from_array(zval *array, MQMD *msg_desc)
 {
 	zval **option_val, *key;
 	char *string_key;

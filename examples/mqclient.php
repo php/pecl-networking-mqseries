@@ -50,11 +50,12 @@ foreach($functions as $func) echo $func . "<br>\n";
 //export MQSERVER=S_donald/TCP/donald
 
 echo 'mqseries_conn ';
-$conn = mqseries_conn("QM_donald");
+$conn = mqseries_conn('QM_donald');
 if (is_resource($conn)) {
 	echo "mqseries_conn ok $conn\n";
 } else {
-	printf("Reason: %d CompCode: %d\n", $conn['reason'], $conn['comp_code']);
+	printf("CompCode:%d Reason:%d Text:%s\n", $conn['comp_code'], $conn['reason'], mqseries_strerror($conn['reason']));
+	exit;
 }
 
 echo 'mqseries_open ';
@@ -66,7 +67,7 @@ if (is_resource($obj)) {
 	echo "mqseries_open ok $obj\n";
 } else {
 	$err = mqseries_error($conn);
-	printf("Reason: %d CompCode: %d\n", $err['reason'], $err['comp_code']);
+	printf("CompCode:%d Reason:%d Text:%s\n", $err['comp_code'], $err['reason'], mqseries_strerror($err['reason']));
 	exit;
 }
 
@@ -91,7 +92,7 @@ $msg = mqseries_put(
 	'Hallo alter fuchs');
 if ($msg === false) {
 	$err = mqseries_error($conn);
-	printf("Reason: %d CompCode: %d\n", $err['reason'], $err['comp_code']);
+	printf("CompCode:%d Reason:%d Text:%s\n", $err['comp_code'], $err['reason'], mqseries_strerror($err['reason']));
 } else {
 	echo "ok\n";
 }
@@ -106,7 +107,7 @@ $msg = mqseries_get(
 	65535);
 if ($msg === false) {
 	$err = mqseries_error($conn);
-	printf("Reason: %d CompCode: %d\n", $err['reason'], $err['comp_code']);
+	printf("CompCode:%d Reason:%d Text:%s\n", $err['comp_code'], $err['reason'], mqseries_strerror($err['reason']));
 } else {
 	echo "$msg\n";
 }

@@ -1,0 +1,7 @@
+Wrap these MQClient functions:
+- MQCONNX
+- MQPUT1
+- MQINQ
+- MQSET
+
+Import all missing constant/defines

@@ -31,6 +31,7 @@ any other GPL-like (LGPL, GPL2) License.
     $Id$
 
 Author: Michael Bretterklieber <mbretter@jawa.at>    
+		philippe Tjon A Hen <tjonahen@zonnet.nl>
 */
 
 #ifndef PHP_MQSERIES_H
@@ -39,6 +40,7 @@ Author: Michael Bretterklieber <mbretter@jawa.at>
 #include "cmqc.h"                          /* MQI                             */
 #include "cmqcfc.h"                        /* PCF                             */
 #include "cmqbc.h"                         /* MQAI                            */
+#include "cmqxc.h"                         /* MQCD                            */
 
 #define phpext_mqseries_ptr &mqseries_module_entry
 
@@ -57,8 +59,6 @@ extern zend_module_entry mqseries_module_entry;
 typedef struct {
 	int id;
 	MQHCONN conn;
-	MQLONG comp_code;  /* Completion code	*/
-	MQLONG reason;     /* Qualifying reason */
 } mqseries_descriptor;
 
 typedef struct {
@@ -67,22 +67,34 @@ typedef struct {
 	MQHCONN *conn;
 } mqseries_obj;
 
+typedef struct {
+	int id;
+	PMQBYTE bytes;
+} mqseries_bytes;
+
+#define ZEND_FETCH_RESOURCE_HELPER(rsrc, rsrc_type, passed_id, default_id, resource_type_name, resource_type)	\
+	rsrc = (rsrc_type) zend_fetch_resource(passed_id TSRMLS_CC, default_id, resource_type_name, NULL, 1, resource_type);
+
+
 PHP_MINIT_FUNCTION(mqseries);
 PHP_MSHUTDOWN_FUNCTION(mqseries);
 PHP_RINIT_FUNCTION(mqseries);
 PHP_RSHUTDOWN_FUNCTION(mqseries);
 PHP_MINFO_FUNCTION(mqseries);
 
-PHP_FUNCTION(mqseries_conn);
-PHP_FUNCTION(mqseries_disc);
-PHP_FUNCTION(mqseries_open);
-PHP_FUNCTION(mqseries_get);
-PHP_FUNCTION(mqseries_put);
-PHP_FUNCTION(mqseries_begin);
-PHP_FUNCTION(mqseries_cmit);
 PHP_FUNCTION(mqseries_back);
+PHP_FUNCTION(mqseries_begin);
 PHP_FUNCTION(mqseries_close);
+PHP_FUNCTION(mqseries_cmit);
+PHP_FUNCTION(mqseries_conn);
+PHP_FUNCTION(mqseries_connx);
 PHP_FUNCTION(mqseries_disc);
+PHP_FUNCTION(mqseries_get);
+PHP_FUNCTION(mqseries_inq);
+PHP_FUNCTION(mqseries_open);
+PHP_FUNCTION(mqseries_put);
+PHP_FUNCTION(mqseries_put1);
+PHP_FUNCTION(mqseries_set);
 PHP_FUNCTION(mqseries_error);
 PHP_FUNCTION(mqseries_strerror);
 

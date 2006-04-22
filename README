@@ -1,0 +1,32 @@
+MQSERIES
+
+
+COMPILATION
+-----------
+
+To compile the extension in your PHP, do as follows:
+
+- Uncompress the tarball
+- Run phpize
+- Run ./configure 
+- Run make.
+- Either load the extension dynamically into your scripts (with dl()) or add
+  an extension= entry for it in your php.ini
+
+NOTE
+----
+By default the MQ Client Interface library is used. When building in a server only environment change te config.m4 file. 
+
+USAGE
+-----
+
+See the PHP scripts in the examples directory for an example of this 
+library's usage
+
+
+REPORTING BUGS
+--------------
+
+THIS EXTENSION IS HIGHLY EXPERIMENTAL (read: untested and unsupported). Please
+report all bugs and send all request/suggestions/quips/complaints to the 
+PECL website

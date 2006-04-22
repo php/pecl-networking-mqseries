@@ -8,9 +8,9 @@ if test "$PHP_MQSERIES" != "no"; then
   dnl Write more examples of tests here...
 
   dnl # --with-mqseries -> check with-path
-  SEARCH_PATH="/usr/local /usr /opt /opt/mqm"     # you might want to change this
-  SEARCH_FOR="/inc/cmqcfc.h"  # you most likely want to change this
-  if test -r $PHP_MQSERIES/; then # path given as parameter
+  SEARCH_PATH="/usr/local /usr /opt /opt/mqm"   # you might want to change this
+  SEARCH_FOR="/inc/cmqcfc.h" 			# you most likely want to change this
+  if test -r $PHP_MQSERIES/; then 		# path given as parameter
      MQSERIES_DIR=$PHP_MQSERIES
   else # search default path list
      AC_MSG_CHECKING([for mqseries files in default path])
@@ -31,7 +31,9 @@ if test "$PHP_MQSERIES" != "no"; then
   PHP_ADD_INCLUDE($MQSERIES_DIR/inc)
 
   dnl # --with-mqseries -> chech for lib and symbol presence
-  LIBNAME=mqic # you may want to change this
+  # when using server only
+  #LIBNAME=mqm
+  LIBNAME=mqic     # you may want to change this
   LIBSYMBOL=MQCONN # you most likely want to change this
 
   PHP_CHECK_LIBRARY($LIBNAME,$LIBSYMBOL,
@@ -43,6 +45,7 @@ if test "$PHP_MQSERIES" != "no"; then
   ],[
      -L$MQSERIES_DIR/lib
   ])
+
   PHP_SUBST(MQSERIES_SHARED_LIBADD)
 
   PHP_NEW_EXTENSION(mqseries, mqseries.c, $ext_shared)

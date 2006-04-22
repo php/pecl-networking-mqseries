@@ -444,3 +444,5 @@ add_assoc_string(z_reason_texts, "4087", "Batch interval parameter not allowed f
 add_assoc_string(z_reason_texts, "4088", "Network priority value is not valid.", 1);
 add_assoc_string(z_reason_texts, "4089", "Network priority parameter not allowed for this channel type.", 1);
 add_assoc_string(z_reason_texts, "6117", "Length is negative.", 1);
+
+

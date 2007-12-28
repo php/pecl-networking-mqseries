@@ -14,22 +14,19 @@ http://pear.php.net/dtd/package-2.0.xsd">
   <email>tjonahen@php.net</email>
   <active>yes</active>
  </lead>
- <date>2006-04-20</date>
-<time>21:25:00</time>
+ <date>2007-12-23</date>
+ <time>21:25:00</time>
  <version>
-  <release>0.10.0</release>
-  <api>0.10.0</api>
+  <release>0.11.0</release>
+  <api>0.11.0</api>
  </version>
  <stability>
   <release>alpha</release>
   <api>alpha</api>
  </stability>
  <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
-		 <notes>Made some changes to the config.m4 configuration file.
-			 It shoud now be possible to build the extention without the MQ Client libraries.
-			 This would enable the transaction posibilities of MQ.
-			 The MQBegin, MQCMit and MQBack function wil now work.
-			 Check the README file for additional build instructions. 
+		 <notes>Fixed php function calling deprication warnings.
+		 tested agains MQ6.
 		 </notes>
  <contents>
   <dir name="/">
@@ -65,6 +62,20 @@ http://pear.php.net/dtd/package-2.0.xsd">
  <extsrcrelease />
  <changelog>
 	 <release>
+		 <version>
+			 <release>0.11.0</release>
+			 <api>0.11.0</api>
+		 </version>
+		 <stability>
+			 <release>alpha</release>
+			 <api>alpha</api>
+		 </stability>
+		 <date>2007-12-23</date>
+		 <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
+		 <notes>Fixed php function calling deprication warnings.
+		 tested agains MQ6. </notes>
+	 </release>
+  	 <release>
 		 <version>
 			 <release>0.10.0</release>
 			 <api>0.10.0</api>

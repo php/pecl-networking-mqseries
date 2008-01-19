@@ -14,7 +14,7 @@ http://pear.php.net/dtd/package-2.0.xsd">
   <email>tjonahen@php.net</email>
   <active>yes</active>
  </lead>
- <date>2007-12-23</date>
+ <date>2008-01-19</date>
  <time>21:25:00</time>
  <version>
   <release>0.11.0</release>
@@ -70,10 +70,10 @@ http://pear.php.net/dtd/package-2.0.xsd">
 			 <release>alpha</release>
 			 <api>alpha</api>
 		 </stability>
-		 <date>2007-12-23</date>
+		 <date>2008-01-19</date>
 		 <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
 		 <notes>Fixed php function calling deprication warnings.
-		 tested agains MQ6. </notes>
+		 tested agains MQ6. Fixed some ZTS issues while compiling.</notes>
 	 </release>
   	 <release>
 		 <version>

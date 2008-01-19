@@ -60,21 +60,20 @@ typedef struct {
 	int id;
 	MQHCONN conn;
 } mqseries_descriptor;
+#define PHP_MQSERIES_DESCRIPTOR_RES_NAME "mqseries_conn"
 
 typedef struct {
 	int id;
 	MQHOBJ obj;
 	MQHCONN *conn;
 } mqseries_obj;
+#define PHP_MQSERIES_OBJ_RES_NAME "mqseries_obj"
 
 typedef struct {
 	int id;
 	PMQBYTE bytes;
 } mqseries_bytes;
-
-#define ZEND_FETCH_RESOURCE_HELPER(rsrc, rsrc_type, passed_id, default_id, resource_type_name, resource_type)	\
-	rsrc = (rsrc_type) zend_fetch_resource(passed_id TSRMLS_CC, default_id, resource_type_name, NULL, 1, resource_type);
-
+#define PHP_MQSERIES_BYTES_RES_NAME "mqseries_bytes"
 
 PHP_MINIT_FUNCTION(mqseries);
 PHP_MSHUTDOWN_FUNCTION(mqseries);

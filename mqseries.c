@@ -230,7 +230,7 @@ ZEND_END_ARG_INFO()
  *
  * Every user visible function must have an entry in mqseries_functions[].
  */
-function_entry mqseries_functions[] = {
+zend_function_entry mqseries_functions[] = {
 	PHP_FE(mqseries_back,	arginfo_mqseries_back)
 	PHP_FE(mqseries_begin,	arginfo_mqseries_begin)
 	PHP_FE(mqseries_close,	arginfo_mqseries_close)

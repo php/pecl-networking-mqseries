@@ -95,14 +95,12 @@ static zval *z_reason_texts;
 
 
 /* {{{ arginfo */
-static
 ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_back, 0 ,0, 3)
 	ZEND_ARG_INFO(0, hconn)
 	ZEND_ARG_INFO(1, compCode)
 	ZEND_ARG_INFO(1, reason)
 ZEND_END_ARG_INFO()
 
-static
 ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_begin,0 ,0, 4)
 	ZEND_ARG_INFO(0, hconn)
 	ZEND_ARG_INFO(0, beginOptions)
@@ -110,7 +108,6 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_begin,0 ,0, 4)
 	ZEND_ARG_INFO(1, reason)
 ZEND_END_ARG_INFO()
 
-static
 ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_close,0 ,0, 5)
 	ZEND_ARG_INFO(0, hconn)
 	ZEND_ARG_INFO(1, hobj)
@@ -119,14 +116,12 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_close,0 ,0, 5)
 	ZEND_ARG_INFO(1, reason)
 ZEND_END_ARG_INFO()
 
-static
 ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_cmit,0 ,0, 3)
 	ZEND_ARG_INFO(0, hconn)
 	ZEND_ARG_INFO(1, compCode)
 	ZEND_ARG_INFO(1, reason)
 ZEND_END_ARG_INFO()
 
-static		
 ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_conn, 0, 0, 4)
          ZEND_ARG_INFO(0, qMgrName)
          ZEND_ARG_INFO(1, hconn)
@@ -134,7 +129,6 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_conn, 0, 0, 4)
          ZEND_ARG_INFO(1, reason)
 ZEND_END_ARG_INFO()
 
-static		
 ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_connx, 0, 0, 5)
          ZEND_ARG_INFO(0, qMgrName)
          ZEND_ARG_INFO(1, connectOpts)
@@ -143,14 +137,12 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_connx, 0, 0, 5)
          ZEND_ARG_INFO(1, reason)
 ZEND_END_ARG_INFO()
       
-static
 ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_disc,0 ,0, 3)
 	ZEND_ARG_INFO(0, hconn)
 	ZEND_ARG_INFO(1, compCode)
 	ZEND_ARG_INFO(1, reason)
 ZEND_END_ARG_INFO()
 
-static
 ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_get,0 ,0, 9)
 	ZEND_ARG_INFO(0, hconn)
 	ZEND_ARG_INFO(0, hobj)
@@ -163,7 +155,6 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_get,0 ,0, 9)
 	ZEND_ARG_INFO(1, reason)
 ZEND_END_ARG_INFO()
 
-static
 ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_inq,0 ,0, 10)
 	ZEND_ARG_INFO(0, hconn)
 	ZEND_ARG_INFO(0, hobj)
@@ -177,7 +168,6 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_inq,0 ,0, 10)
 	ZEND_ARG_INFO(1, reason)
 ZEND_END_ARG_INFO()
 
-static
 ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_open,0 ,0, 6)
 	ZEND_ARG_INFO(0, hconn)
 	ZEND_ARG_INFO(1, objDesc)
@@ -187,7 +177,6 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_open,0 ,0, 6)
 	ZEND_ARG_INFO(1, reason)
 ZEND_END_ARG_INFO()
 
-static 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_put,0 ,0, 7)
 	ZEND_ARG_INFO(0, hconn)
 	ZEND_ARG_INFO(0, hobj)
@@ -198,7 +187,6 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_put,0 ,0, 7)
 	ZEND_ARG_INFO(1, reason)
 ZEND_END_ARG_INFO()
 
-static 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_put1,0 ,0, 7)
 	ZEND_ARG_INFO(0, hconn)
 	ZEND_ARG_INFO(0, objDesc)
@@ -210,7 +198,6 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_put1,0 ,0, 7)
 ZEND_END_ARG_INFO()
 	
 	
-static 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_set,0 ,0, 10)
 	ZEND_ARG_INFO(0, hconn)
 	ZEND_ARG_INFO(0, hobj)

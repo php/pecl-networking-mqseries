@@ -1678,7 +1678,7 @@ static zval* make_reference(PMQBYTE bytes, MQLONG size) {
 	pBytes->bytes = (PMQBYTE) emalloc(size*sizeof(MQBYTE));
 	memcpy(pBytes->bytes, bytes, size);
 	ZEND_REGISTER_RESOURCE(z_byte24, pBytes, le_mqseries_bytes);
-	pBytes->id = Z_LVAL_P(z_byte24);
+	pBytes->id = Z_RESVAL_P(z_byte24);
 	
 	return z_byte24;
 }

@@ -91,7 +91,7 @@ static int le_mqseries_conn;
 static int le_mqseries_obj;
 static int le_mqseries_bytes;
 
-static zval *z_reason_texts;
+static HashTable *ht_reason_texts;
 
 
 /* {{{ arginfo */
@@ -260,10 +260,13 @@ zend_module_entry mqseries_module_entry = {
 ZEND_GET_MODULE(mqseries)
 #endif
 
+
 /* {{{ PHP_MINIT_FUNCTION
  */
 PHP_MINIT_FUNCTION(mqseries)
 {
+	char *vp = NULL;
+
 	/* don't change the order of these, objects must be freed before connections */
 	le_mqseries_obj = zend_register_list_destructors_ex(_mqseries_close, NULL, PHP_MQSERIES_OBJ_RES_NAME, module_number);
 	
@@ -272,9 +275,11 @@ PHP_MINIT_FUNCTION(mqseries)
 	le_mqseries_bytes = zend_register_list_destructors_ex(_mqseries_bytes, NULL, PHP_MQSERIES_BYTES_RES_NAME, module_number);
 
 #include "mqseries_init_const.h"
+	
+	ht_reason_texts = (HashTable *) malloc(sizeof(HashTable));
+	zend_hash_init(ht_reason_texts, 0, NULL, NULL, 1);
 
-	MAKE_STD_ZVAL(z_reason_texts);
-	array_init(z_reason_texts);
+#define ADD_MQ_REASON_TXT(key, value) { vp = value; zend_hash_index_update(ht_reason_texts, key, &vp, sizeof(char*), NULL); }
 #include "mqseries_reason_texts.h"
 
 	return SUCCESS;
@@ -285,6 +290,8 @@ PHP_MINIT_FUNCTION(mqseries)
  */
 PHP_MSHUTDOWN_FUNCTION(mqseries)
 {
+	zend_hash_destroy(ht_reason_texts);
+	free(ht_reason_texts);
 	return SUCCESS;
 }
 /* }}} */
@@ -1028,9 +1035,8 @@ static void _mqseries_disc(zend_rsrc_list_entry *rsrc TSRMLS_DC)
 	Returns the detailed error text for the given reason code. */
 PHP_FUNCTION(mqseries_strerror)
 {
-	zval **text;
+	char **text;
 	int reason_code;
-	HashTable *target_hash;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l", &reason_code) == FAILURE) {
 		return;
@@ -1038,9 +1044,8 @@ PHP_FUNCTION(mqseries_strerror)
 
 	RETVAL_NULL();
 
-	target_hash = HASH_OF(z_reason_texts);
-	if (zend_hash_index_find(target_hash, reason_code, (void **) &text) == SUCCESS) {
-		RETVAL_STRING(Z_STRVAL_PP(text), 0);
+	if (zend_hash_index_find(ht_reason_texts, reason_code, (void **) &text) == SUCCESS) {
+		RETVAL_STRING(*text, 1);
 	}
 
 }

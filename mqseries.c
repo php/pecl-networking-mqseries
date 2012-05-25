@@ -361,7 +361,7 @@ PHP_FUNCTION(mqseries_conn)
 	
 	if (comp_code == MQCC_OK) {
 		ZEND_REGISTER_RESOURCE(z_conn, mqdesc, le_mqseries_conn);
-		mqdesc->id = Z_LVAL_P(z_conn);
+		mqdesc->id = Z_RESVAL_P(z_conn);
 	} else {
 		efree(mqdesc);
 	}
@@ -444,7 +444,7 @@ PHP_FUNCTION(mqseries_connx)
 
 	if (comp_code == MQCC_OK) {
 		ZEND_REGISTER_RESOURCE(z_conn, mqdesc, le_mqseries_conn);
-		mqdesc->id = Z_LVAL_P(z_conn);
+		mqdesc->id = Z_RESVAL_P(z_conn);
 	} else {
 		efree(mqdesc);
 	}
@@ -514,7 +514,7 @@ PHP_FUNCTION(mqseries_open)
 	if (comp_code == MQCC_OK) {
 		mqobj->conn = &mqdesc->conn;
 		ZEND_REGISTER_RESOURCE(z_obj, mqobj, le_mqseries_obj);
-		mqobj->id = Z_LVAL_P(z_obj);
+		mqobj->id = Z_RESVAL_P(z_obj);
 	} else {
 		/* So we don't register the ref. But we already allocated some memory lets free that */
 		efree(mqobj);		

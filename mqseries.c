@@ -352,7 +352,7 @@ PHP_FUNCTION(mqseries_conn)
 	
 	strncpy(qManagerName, name, sizeof(MQCHAR48));
 
-	mqdesc = emalloc(sizeof(mqseries_descriptor));
+	mqdesc = (mqseries_descriptor *) emalloc(sizeof(mqseries_descriptor));
 	MQCONN(qManagerName, &mqdesc->conn, &comp_code, &reason);
 
 	ZVAL_LONG(z_comp_code, comp_code);
@@ -430,7 +430,7 @@ PHP_FUNCTION(mqseries_connx)
 	
 	set_connect_opts_from_array(z_connect_opts, &connect_opts, &channel_definition, &ssl_configuration, &authentication_information_record, LDAPUserName);
 		
-	mqdesc = emalloc(sizeof(mqseries_descriptor));
+	mqdesc = (mqseries_descriptor *) emalloc(sizeof(mqseries_descriptor));
 	
 	MQCONNX(name, &connect_opts, &mqdesc->conn, &comp_code, &reason);
 
@@ -501,7 +501,7 @@ PHP_FUNCTION(mqseries_open)
 	
 	set_obj_desc_from_array(z_obj_desc, &obj_desc);
 
-	mqobj = emalloc(sizeof(mqseries_obj));
+	mqobj = (mqseries_obj *) emalloc(sizeof(mqseries_obj));
 	
 	MQOPEN(	mqdesc->conn, &obj_desc, open_options, &mqobj->obj, &comp_code, &reason);
 
@@ -943,7 +943,11 @@ static void _mqseries_close(zend_rsrc_list_entry *rsrc TSRMLS_DC)
 						break;
 		
 					default:
+#if defined(MQ_64_BIT)						
+						zend_error(E_WARNING, "_mqseries_close Error %d %d\n", comp_code, reason);
+#else 
 						zend_error(E_WARNING, "_mqseries_close Error %ld %ld\n", comp_code, reason);
+#endif
 				}
 		    }
 		}
@@ -1024,7 +1028,11 @@ static void _mqseries_disc(zend_rsrc_list_entry *rsrc TSRMLS_DC)
 					break;
 	
 				default:
+#if defined(MQ_64_BIT)                      
+					zend_error(E_WARNING, "_mqseries_disc Error %d %d\n", comp_code, reason);
+#else
 					zend_error(E_WARNING, "_mqseries_disc Error %ld %ld\n", comp_code, reason);
+#endif
 			}
 	    }
 	}
@@ -1786,8 +1794,8 @@ static zval* make_reference(PMQBYTE bytes, MQLONG size) {
 
 	MAKE_STD_ZVAL(z_byte24);
 	
-	pBytes = emalloc(sizeof(mqseries_bytes));
-	pBytes->bytes = emalloc(size*sizeof(MQBYTE));
+	pBytes = (mqseries_bytes *) emalloc(sizeof(mqseries_bytes));
+	pBytes->bytes = (PMQBYTE) emalloc(size*sizeof(MQBYTE));
 	memcpy(pBytes->bytes, bytes, size);
 	ZEND_REGISTER_RESOURCE(z_byte24, pBytes, le_mqseries_bytes);
 	pBytes->id = Z_LVAL_P(z_byte24);

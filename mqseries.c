@@ -1895,9 +1895,9 @@ static void set_obj_desc_from_array(zval *array, PMQOD obj_desc)
  * Set array from MQOD  Object Descriptor
  */
 static void set_array_from_obj_desc(zval *array, PMQOD obj_desc) {
+	zval_dtor(array);
 	array_init(array);
 
-	
 	add_assoc_string(array, "ObjectQMgrName",obj_desc->ObjectQMgrName, sizeof(obj_desc->ObjectQMgrName));
 	add_assoc_string(array, "ObjectName",obj_desc->ObjectName, sizeof(obj_desc->ObjectName));
 	add_assoc_long(array, "KnownDestCount",obj_desc->KnownDestCount);

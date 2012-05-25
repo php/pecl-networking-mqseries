@@ -94,6 +94,18 @@ static int le_mqseries_bytes;
 
 static HashTable *ht_reason_texts;
 
+/* {{{ Macros */
+#define MQSERIES_SETOPT_LONG(s,m) \
+    if (zend_hash_find(ht, #m, sizeof(#m), (void**)&tmp) == SUCCESS) {\
+        convert_to_long(*tmp); \
+        s->m = Z_LVAL_PP(tmp); \
+    }
+#define MQSERIES_SETOPT_STRING(s,m) \
+    if (zend_hash_find(ht, #m, sizeof(#m), (void**)&tmp) == SUCCESS && \
+        Z_TYPE_PP(tmp) == IS_STRING) { \
+        strncpy(s->m, Z_STRVAL_PP(tmp), sizeof(s->m)); \
+    }
+/* }}} */
 
 /* {{{ arginfo */
 ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_back, 0 ,0, 3)
@@ -1357,7 +1369,6 @@ PHP_FUNCTION(mqseries_set)
 /* Following are methods to make structs from arrays and vice verse           */
 /* TODO Check if all fields are specified (hopefully the MQ API will not      */
 /* change verry soon as we have to do this all over again). 'zucht'.          */
-/* TODO These if else contructs, we should do better                          */
 /******************************************************************************/
 /* {{{ set_authentication_information_record_from_array
  * set authenication information from an array
@@ -1366,35 +1377,24 @@ static void set_authentication_information_record_from_array(zval *array,
 								PMQAIR authentication_information_record, 
 								PMQCHAR LDAPUserName)
 {
-	zval **option_val;
-	char *string_key;
-	uint  string_key_len;
-	ulong  num_key;
-	HashPosition pos;
-	
-	zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(array), &pos);
-	while (zend_hash_get_current_data_ex(Z_ARRVAL_P(array), (void **)&option_val, &pos) == SUCCESS) {
-		if (zend_hash_get_current_key_ex(Z_ARRVAL_P(array), &string_key, &string_key_len, &num_key, 0, &pos) == HASH_KEY_IS_STRING) {
-			if (!strcmp(string_key, "Version")) {
-				authentication_information_record->Version = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "AuthInfoType")) {
-				authentication_information_record->AuthInfoType = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "AuthInfoConnName")) {
-				strncpy(authentication_information_record->AuthInfoConnName, Z_STRVAL_PP(option_val), sizeof(authentication_information_record->AuthInfoConnName));
-			} else if (!strcmp(string_key, "LDAPPassword")) {
-				strncpy(authentication_information_record->LDAPPassword, Z_STRVAL_PP(option_val), sizeof(authentication_information_record->LDAPPassword));
-			} else if (!strcmp(string_key, "LDAPUserName")) {
-				strncpy(LDAPUserName, Z_STRVAL_PP(option_val), sizeof(LDAPUserName));
-				authentication_information_record->LDAPUserNamePtr = LDAPUserName;
-				authentication_information_record->LDAPUserNameLength = strlen(LDAPUserName);
-			}
-		}
-		zend_hash_move_forward_ex(Z_ARRVAL_P(array), &pos);
-	} 
+	HashTable *ht = Z_ARRVAL_P(array);
+	zval **tmp;
+
+	MQSERIES_SETOPT_LONG(authentication_information_record, Version);
+	MQSERIES_SETOPT_LONG(authentication_information_record, AuthInfoType);
+	MQSERIES_SETOPT_STRING(authentication_information_record, AuthInfoConnName);
+	MQSERIES_SETOPT_STRING(authentication_information_record, LDAPPassword);
+
+	if (zend_hash_find(ht, "LDAPUserName", sizeof("LDAPUserName"), (void**)&tmp) == SUCCESS &&
+		Z_TYPE_PP(tmp) == IS_STRING) {
+		strncpy(LDAPUserName, Z_STRVAL_PP(tmp), sizeof(LDAPUserName));
+		authentication_information_record->LDAPUserNamePtr = LDAPUserName;
+		authentication_information_record->LDAPUserNameLength = strlen(LDAPUserName);
+	}
 }
 /* }}} */
 
-/* {{{ 
+/* {{{ set_ssl_configuration_from_array 
  * sets the ssl configuration from an array
  */
 static void set_ssl_configuration_from_array(zval *array, 
@@ -1402,35 +1402,23 @@ static void set_ssl_configuration_from_array(zval *array,
 									PMQAIR authentication_information_record, 
 									PMQCHAR LDAPUserName)
 {
-	zval **option_val;
-	char *string_key;
-	uint  string_key_len;
-	ulong  num_key;
-	HashPosition pos;
-	
-	zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(array), &pos);
-	while (zend_hash_get_current_data_ex(Z_ARRVAL_P(array), (void **)&option_val, &pos) == SUCCESS) {
+	HashTable *ht = Z_ARRVAL_P(array);
+	zval **tmp;
 
-		if (zend_hash_get_current_key_ex(Z_ARRVAL_P(array), &string_key, &string_key_len, &num_key, 0, &pos) == HASH_KEY_IS_STRING) {
-			if (!strcmp(string_key, "Version")) {
-				ssl_configuration->Version = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "KeyRepository")) {
-				strncpy(ssl_configuration->KeyRepository, Z_STRVAL_PP(option_val), sizeof(ssl_configuration->KeyRepository));
-			} else if (!strcmp(string_key, "CryptoHardware")) {
-				strncpy(ssl_configuration->CryptoHardware, Z_STRVAL_PP(option_val), sizeof(ssl_configuration->CryptoHardware));
-			} else if (!strcmp(string_key, "MQAIR")) {			
-				set_authentication_information_record_from_array(*option_val, authentication_information_record, LDAPUserName);
-				ssl_configuration->AuthInfoRecCount = 1;
-				ssl_configuration->AuthInfoRecPtr = authentication_information_record;
-			}
-		}
-		zend_hash_move_forward_ex(Z_ARRVAL_P(array), &pos);
+	MQSERIES_SETOPT_LONG(ssl_configuration, Version);
+	MQSERIES_SETOPT_STRING(ssl_configuration, KeyRepository);
+	MQSERIES_SETOPT_STRING(ssl_configuration, CryptoHardware);
+
+	if (zend_hash_find(ht, "MQAIR", sizeof("MQAIR"), (void**)&tmp) == SUCCESS &&
+		Z_TYPE_PP(tmp) == IS_ARRAY) {
+		set_authentication_information_record_from_array(*tmp, authentication_information_record, LDAPUserName);
+		ssl_configuration->AuthInfoRecCount = 1;
+		ssl_configuration->AuthInfoRecPtr = authentication_information_record;
 	}
-
 }
 /* }}} */
 
-/* {{{ 
+/* {{{ set_channel_definition_from_array
  * Set the MQCD struct from array.
  * TODO: Findout whether all fields are needed. Do thay all have meaning during a
  * connx call?
@@ -1438,116 +1426,59 @@ static void set_ssl_configuration_from_array(zval *array,
  */
 static void set_channel_definition_from_array(zval *array, PMQCD channel_definition)
 {
-	zval **option_val;
-	char *string_key;
-	uint  string_key_len;
-	ulong  num_key;
-	HashPosition pos;
-	
-	zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(array), &pos);
-	while (zend_hash_get_current_data_ex(Z_ARRVAL_P(array), (void **)&option_val, &pos) == SUCCESS) {
+	HashTable *ht = Z_ARRVAL_P(array);
+	zval **tmp;
 
-		if (zend_hash_get_current_key_ex(Z_ARRVAL_P(array), &string_key, &string_key_len, &num_key, 0, &pos) == HASH_KEY_IS_STRING) {
-			if (!strcmp(string_key, "Version")) {
-				channel_definition->Version = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "ChannelName")) {
-				strncpy(channel_definition->ChannelName, Z_STRVAL_PP(option_val), sizeof(channel_definition->ChannelName));
-			} else if (!strcmp(string_key, "ConnectionName")) {
-				strncpy(channel_definition->ConnectionName, Z_STRVAL_PP(option_val), sizeof(channel_definition->ConnectionName));
-			} else if (!strcmp(string_key, "TransportType")) {
-				channel_definition->TransportType = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "ChannelType")) {
-				channel_definition->ChannelType = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "Desc")) {
-				strncpy(channel_definition->Desc, Z_STRVAL_PP(option_val), sizeof(channel_definition->Desc));
-			} else if (!strcmp(string_key, "QMgrName")) {
-				strncpy(channel_definition->QMgrName, Z_STRVAL_PP(option_val), sizeof(channel_definition->QMgrName));
-			} else if (!strcmp(string_key, "XmitQName")) {
-				strncpy(channel_definition->XmitQName, Z_STRVAL_PP(option_val), sizeof(channel_definition->XmitQName));
-			} else if (!strcmp(string_key, "ShortConnectionName")) {
-				strncpy(channel_definition->ShortConnectionName, Z_STRVAL_PP(option_val), sizeof(channel_definition->ShortConnectionName));
-			} else if (!strcmp(string_key, "MCAName")) {
-				strncpy(channel_definition->MCAName, Z_STRVAL_PP(option_val), sizeof(channel_definition->MCAName));
-			} else if (!strcmp(string_key, "ModeName")) {
-				strncpy(channel_definition->ModeName, Z_STRVAL_PP(option_val), sizeof(channel_definition->ModeName));
-			} else if (!strcmp(string_key, "ModeName")) {
-				strncpy(channel_definition->ModeName, Z_STRVAL_PP(option_val), sizeof(channel_definition->ModeName));
-			} else if (!strcmp(string_key, "TpName")) {
-				strncpy(channel_definition->TpName, Z_STRVAL_PP(option_val), sizeof(channel_definition->TpName));
-			} else if (!strcmp(string_key, "BatchSize")) {
-				channel_definition->BatchSize = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "DiscInterval")) {
-				channel_definition->DiscInterval = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "ShortRetryCount")) {
-				channel_definition->ShortRetryCount = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "ShortRetryInterval")) {
-				channel_definition->ShortRetryInterval = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "LongRetryCount")) {
-				channel_definition->LongRetryCount = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "LongRetryInterval")) {
-				channel_definition->LongRetryInterval = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "SecurityExit")) {
-				strncpy(channel_definition->SecurityExit, Z_STRVAL_PP(option_val), sizeof(channel_definition->SecurityExit));
-			} else if (!strcmp(string_key, "MsgExit")) {
-				strncpy(channel_definition->MsgExit, Z_STRVAL_PP(option_val), sizeof(channel_definition->MsgExit));
-			} else if (!strcmp(string_key, "SendExit")) {
-				strncpy(channel_definition->SendExit, Z_STRVAL_PP(option_val), sizeof(channel_definition->SendExit));
-			} else if (!strcmp(string_key, "ReceiveExit")) {
-				strncpy(channel_definition->ReceiveExit, Z_STRVAL_PP(option_val), sizeof(channel_definition->ReceiveExit));
-			} else if (!strcmp(string_key, "SeqNumberWrap")) {
-				channel_definition->SeqNumberWrap = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "MaxMsgLength")) {
-				channel_definition->MaxMsgLength = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "PutAuthority")) {
-				channel_definition->PutAuthority = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "DataConversion")) {
-				channel_definition->DataConversion = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "SecurityUserData")) {
-				strncpy(channel_definition->SecurityUserData, Z_STRVAL_PP(option_val), sizeof(channel_definition->SecurityUserData));
-			} else if (!strcmp(string_key, "MsgUserData")) {
-				strncpy(channel_definition->MsgUserData, Z_STRVAL_PP(option_val), sizeof(channel_definition->MsgUserData));
-			} else if (!strcmp(string_key, "SendUserData")) {
-				strncpy(channel_definition->SendUserData, Z_STRVAL_PP(option_val), sizeof(channel_definition->SendUserData));
-			} else if (!strcmp(string_key, "ReceiveUserData")) {
-				strncpy(channel_definition->ReceiveUserData, Z_STRVAL_PP(option_val), sizeof(channel_definition->ReceiveUserData));
-			} else if (!strcmp(string_key, "UserIdentifier")) {
-				strncpy(channel_definition->UserIdentifier, Z_STRVAL_PP(option_val), sizeof(channel_definition->UserIdentifier));
-			} else if (!strcmp(string_key, "Password")) {
-				strncpy(channel_definition->Password, Z_STRVAL_PP(option_val), sizeof(channel_definition->Password));
-			} else if (!strcmp(string_key, "MCAUserIdentifier")) {
-				strncpy(channel_definition->MCAUserIdentifier, Z_STRVAL_PP(option_val), sizeof(channel_definition->MCAUserIdentifier));
-			} else if (!strcmp(string_key, "MCAType")) {
-				channel_definition->MCAType = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "RemoteUserIdentifier")) {
-				strncpy(channel_definition->RemoteUserIdentifier, Z_STRVAL_PP(option_val), sizeof(channel_definition->RemoteUserIdentifier));
-			} else if (!strcmp(string_key, "RemotePassword")) {
-				strncpy(channel_definition->RemotePassword, Z_STRVAL_PP(option_val), sizeof(channel_definition->RemotePassword));
-			} else if (!strcmp(string_key, "MsgRetryExit")) {
-				strncpy(channel_definition->MsgRetryExit, Z_STRVAL_PP(option_val), sizeof(channel_definition->MsgRetryExit));
-			} else if (!strcmp(string_key, "MsgRetryUserData")) {
-				strncpy(channel_definition->MsgRetryUserData, Z_STRVAL_PP(option_val), sizeof(channel_definition->MsgRetryUserData));
-			} else if (!strcmp(string_key, "MsgRetryCount")) {
-				channel_definition->MsgRetryCount = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "MsgRetryInterval")) {
-				channel_definition->MsgRetryInterval = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "HeartbeatInterval")) {
-				channel_definition->HeartbeatInterval = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "BatchInterval")) {
-				channel_definition->BatchInterval = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "NonPersistentMsgSpeed")) {
-				channel_definition->NonPersistentMsgSpeed = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "StrucLength")) {
-				channel_definition->StrucLength = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "ExitNameLength")) {
-				channel_definition->ExitNameLength = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "ExitDataLength")) {
-				channel_definition->ExitDataLength = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "MsgExitsDefined")) {
-				channel_definition->MsgExitsDefined = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "SendExitsDefined")) {
-				channel_definition->SendExitsDefined = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "ReceiveExitsDefined")) {
-				channel_definition->ReceiveExitsDefined = Z_LVAL_PP(option_val);
+	MQSERIES_SETOPT_LONG(channel_definition, Version);
+	MQSERIES_SETOPT_STRING(channel_definition, ChannelName);
+	MQSERIES_SETOPT_STRING(channel_definition, ConnectionName);
+	MQSERIES_SETOPT_LONG(channel_definition, TransportType);
+	MQSERIES_SETOPT_LONG(channel_definition, ChannelType);
+	MQSERIES_SETOPT_STRING(channel_definition, Desc);
+	MQSERIES_SETOPT_STRING(channel_definition, QMgrName);
+	MQSERIES_SETOPT_STRING(channel_definition, XmitQName);
+	MQSERIES_SETOPT_STRING(channel_definition, ShortConnectionName);
+	MQSERIES_SETOPT_STRING(channel_definition, MCAName);
+	MQSERIES_SETOPT_STRING(channel_definition, ModeName);
+	MQSERIES_SETOPT_STRING(channel_definition, TpName);
+	MQSERIES_SETOPT_LONG(channel_definition, BatchSize);
+	MQSERIES_SETOPT_LONG(channel_definition, DiscInterval);
+	MQSERIES_SETOPT_LONG(channel_definition, ShortRetryCount);
+	MQSERIES_SETOPT_LONG(channel_definition, ShortRetryInterval);
+	MQSERIES_SETOPT_LONG(channel_definition, LongRetryCount);
+	MQSERIES_SETOPT_LONG(channel_definition, LongRetryInterval);
+	MQSERIES_SETOPT_STRING(channel_definition, SecurityExit);
+	MQSERIES_SETOPT_STRING(channel_definition, MsgExit);
+	MQSERIES_SETOPT_STRING(channel_definition, SendExit);
+	MQSERIES_SETOPT_STRING(channel_definition, ReceiveExit);
+	MQSERIES_SETOPT_LONG(channel_definition, SeqNumberWrap);
+	MQSERIES_SETOPT_LONG(channel_definition, MaxMsgLength);
+	MQSERIES_SETOPT_LONG(channel_definition, PutAuthority);
+	MQSERIES_SETOPT_LONG(channel_definition, DataConversion);
+	MQSERIES_SETOPT_STRING(channel_definition, SecurityUserData);
+	MQSERIES_SETOPT_STRING(channel_definition, MsgUserData);
+	MQSERIES_SETOPT_STRING(channel_definition, SendUserData);
+	MQSERIES_SETOPT_STRING(channel_definition, ReceiveUserData);
+	MQSERIES_SETOPT_STRING(channel_definition, UserIdentifier);	
+	MQSERIES_SETOPT_STRING(channel_definition, Password);
+	MQSERIES_SETOPT_STRING(channel_definition, MCAUserIdentifier);
+	MQSERIES_SETOPT_LONG(channel_definition, MCAType);
+	MQSERIES_SETOPT_STRING(channel_definition, RemoteUserIdentifier);
+	MQSERIES_SETOPT_STRING(channel_definition, RemotePassword);
+	MQSERIES_SETOPT_STRING(channel_definition, MsgRetryExit);
+	MQSERIES_SETOPT_STRING(channel_definition, MsgRetryUserData);
+	MQSERIES_SETOPT_LONG(channel_definition, MsgRetryCount);
+	MQSERIES_SETOPT_LONG(channel_definition, MsgRetryInterval);
+	MQSERIES_SETOPT_LONG(channel_definition, HeartbeatInterval);
+	MQSERIES_SETOPT_LONG(channel_definition, BatchInterval);
+	MQSERIES_SETOPT_LONG(channel_definition, NonPersistentMsgSpeed);
+	MQSERIES_SETOPT_LONG(channel_definition, StrucLength);
+	MQSERIES_SETOPT_LONG(channel_definition, ExitNameLength);
+	MQSERIES_SETOPT_LONG(channel_definition, ExitDataLength);
+	MQSERIES_SETOPT_LONG(channel_definition, MsgExitsDefined);
+	MQSERIES_SETOPT_LONG(channel_definition, SendExitsDefined);
+	MQSERIES_SETOPT_LONG(channel_definition, ReceiveExitsDefined);
+
 /* TODO: Do we need these? Or are they only needed during the creation of a channel?				
    MQPTR     MsgExitPtr;                 Address of first MsgExit field 
    MQPTR     MsgUserDataPtr;             Address of first MsgUserData field 
@@ -1557,14 +1488,12 @@ static void set_channel_definition_from_array(zval *array, PMQCD channel_definit
    MQPTR     ReceiveUserDataPtr;         Address of first ReceiveUserData field 
    MQPTR     ClusterPtr;                 Address of a list of cluster names 
  */
-			} else if (!strcmp(string_key, "ClustersDefined")) {
-				channel_definition->ClustersDefined = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "NetworkPriority")) {
-				channel_definition->NetworkPriority = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "LongMCAUserIdLength")) {
-				channel_definition->LongMCAUserIdLength = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "LongRemoteUserIdLength")) {
-				channel_definition->LongRemoteUserIdLength = Z_LVAL_PP(option_val);
+
+	MQSERIES_SETOPT_LONG(channel_definition, ClustersDefined);
+	MQSERIES_SETOPT_LONG(channel_definition, NetworkPriority);
+	MQSERIES_SETOPT_LONG(channel_definition, LongMCAUserIdLength);
+	MQSERIES_SETOPT_LONG(channel_definition, LongRemoteUserIdLength);
+
 /*   MQPTR     LongMCAUserIdPtr;           Address of long MCA user identifier 
    MQPTR     LongRemoteUserIdPtr;        Address of long remote user identifier 
    MQBYTE40  MCASecurityId;              MCA security identifier 
@@ -1573,27 +1502,16 @@ static void set_channel_definition_from_array(zval *array, PMQCD channel_definit
 				strncpy(channel_definition->SSLCipherSpec, Z_STRVAL_PP(option_val), sizeof(channel_definition->SSLCipherSpec));
    MQPTR     SSLPeerNamePtr;             Address of SSL peer name 
  */
-			} else if (!strcmp(string_key, "SSLPeerNameLength")) {
-				channel_definition->SSLPeerNameLength = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "SSLClientAuth")) {
-				channel_definition->SSLClientAuth = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "KeepAliveInterval")) {
-				channel_definition->KeepAliveInterval = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "LocalAddress")) {
-				strncpy(channel_definition->LocalAddress, Z_STRVAL_PP(option_val), sizeof(channel_definition->LocalAddress));
-			} else if (!strcmp(string_key, "BatchHeartbeat")) {
-				channel_definition->BatchHeartbeat = Z_LVAL_PP(option_val);
-			}
 
-
-		}
-
-		zend_hash_move_forward_ex(Z_ARRVAL_P(array), &pos);
-	}
+	MQSERIES_SETOPT_LONG(channel_definition, SSLPeerNameLength);
+	MQSERIES_SETOPT_LONG(channel_definition, SSLClientAuth);
+	MQSERIES_SETOPT_LONG(channel_definition, KeepAliveInterval);
+	MQSERIES_SETOPT_STRING(channel_definition, LocalAddress);
+	MQSERIES_SETOPT_LONG(channel_definition, BatchHeartbeat);
 }
 /* }}} */
 
-/* {{{ 
+/* {{{ set_connect_opts_from_array
  * Set MQCNO connect options from array.
  * The MQCD struct is part of the connect options. Fields for this struct are
  * prefixed with MQCD.
@@ -1606,67 +1524,50 @@ static void set_connect_opts_from_array(zval *array,
 				PMQAIR authentication_information_record,
 				PMQCHAR LDAPUserName)
 {
-	zval **option_val;
-	char *string_key;
-	uint  string_key_len;
-	ulong  num_key;
-	HashPosition pos;
-	
-	zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(array), &pos);
-	while (zend_hash_get_current_data_ex(Z_ARRVAL_P(array), (void **)&option_val, &pos) == SUCCESS) {
-		if (zend_hash_get_current_key_ex(Z_ARRVAL_P(array), &string_key, &string_key_len, &num_key, 0, &pos) == HASH_KEY_IS_STRING) {
-			if (!strcmp(string_key, "Options")) {
-				connect_opts->Options = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "Version")) {
-				connect_opts->Version = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "MQCD")) {
-				set_channel_definition_from_array(*option_val, channel_definition);
-				connect_opts->ClientConnPtr = channel_definition;
-			} else if (!strcmp(string_key, "MQSCO")) {
-				set_ssl_configuration_from_array(*option_val, ssl_configuration, authentication_information_record, LDAPUserName);
-				connect_opts->SSLConfigPtr = ssl_configuration;
-			}
+	HashTable *ht = Z_ARRVAL_P(array);
+	zval **tmp;
+
+	MQSERIES_SETOPT_LONG(connect_opts, Options);
+	MQSERIES_SETOPT_LONG(connect_opts, Version);
+
+	if (zend_hash_find(ht, "MQCD", sizeof("MQCD"), (void**)&tmp) == SUCCESS &&
+		Z_TYPE_PP(tmp) == IS_ARRAY) {
+		set_channel_definition_from_array(*tmp, channel_definition);
+		connect_opts->ClientConnPtr = channel_definition;
+	}
+
+	if (zend_hash_find(ht, "MQSCO", sizeof("MQSCO"), (void**)&tmp) == SUCCESS &&
+		Z_TYPE_PP(tmp) == IS_ARRAY) {
+		set_ssl_configuration_from_array(*tmp, ssl_configuration, authentication_information_record, LDAPUserName);
+		connect_opts->SSLConfigPtr = ssl_configuration;
+	}
 /*
    QManager connection Tag
    This field is used only on z/OS. In other environments, the value MQCT_NONE should be specified. |
    MQBYTE128  ConnTag;          Queue-manager connection tag 
 */
-		}
-
-		zend_hash_move_forward_ex(Z_ARRVAL_P(array), &pos);
-	}
 }
 /* }}} */
 
-/* {{{ 
+/* {{{ set_put_msg_opts_from_array
  * fills the put message options struct from an array
  */
 static void set_put_msg_opts_from_array(zval *array, PMQPMO put_msg_opts TSRMLS_DC)
 {
-	zval **option_val;
-	char *string_key;
-	uint  string_key_len;
-	ulong  num_key;
-	HashPosition pos;
+	HashTable *ht = Z_ARRVAL_P(array);
+	zval **tmp;
 	mqseries_obj *mqobj;
-	
-	zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(array), &pos);
-	while (zend_hash_get_current_data_ex(Z_ARRVAL_P(array), (void **)&option_val, &pos) == SUCCESS) {
 
-		if (zend_hash_get_current_key_ex(Z_ARRVAL_P(array), &string_key, &string_key_len, &num_key, 0, &pos) == HASH_KEY_IS_STRING) {
-			if (!strcmp(string_key, "Options")) {
-				put_msg_opts->Options = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "Version")) {
-				put_msg_opts->Version = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "Context")) {
-				/*
-				 * option_val should contain the resource reference
-				 */
-				mqobj = (mqseries_obj *) zend_fetch_resource(option_val TSRMLS_CC, -1, PHP_MQSERIES_OBJ_RES_NAME, NULL, 1, le_mqseries_obj);
-				if (mqobj != NULL) {
-					put_msg_opts->Context = mqobj->obj;
-				}
-			}
+	MQSERIES_SETOPT_LONG(put_msg_opts, Options); 
+	MQSERIES_SETOPT_LONG(put_msg_opts, Version);
+
+	if (zend_hash_find(ht, "Context", sizeof("Context"), (void**)&tmp) == SUCCESS &&
+		Z_TYPE_PP(tmp) == IS_RESOURCE) {
+		mqobj = (mqseries_obj *) zend_fetch_resource(tmp TSRMLS_CC, -1, PHP_MQSERIES_OBJ_RES_NAME, NULL, 1, le_mqseries_obj);
+		if (mqobj != NULL) {
+			put_msg_opts->Context = mqobj->obj;
+		}
+	}
 
 /* input fields not supported yet
    MQLONG    RecsPresent;        
@@ -1676,14 +1577,10 @@ static void set_put_msg_opts_from_array(zval *array, PMQPMO put_msg_opts TSRMLS_
    MQLONG    ResponseRecOffset;  
    MQPTR     ResponseRecPtr;     
 */			
-		}
-
-		zend_hash_move_forward_ex(Z_ARRVAL_P(array), &pos);
-	}
 }
 /* }}} */
 
-/* {{{ 
+/* {{{ set_array_from_put_msg_opts
  * makes an array from the put message options struct for output
  */
 static void set_array_from_put_msg_opts(zval *array, PMQPMO put_msg_opts) {
@@ -1701,7 +1598,7 @@ static void set_array_from_put_msg_opts(zval *array, PMQPMO put_msg_opts) {
 }
 /* }}} */
 
-/* {{{ 
+/* {{{ set_msg_desc_from_array
 	Put options from the given array into the MQMD structure.
 	Only version_1 of the MQMD is supported.
 
@@ -1711,81 +1608,63 @@ Not supported:
 */
 static void set_msg_desc_from_array(zval *array, PMQMD msg_desc, int put_get TSRMLS_DC)
 {
-	zval **option_val;
-	char *string_key;
-	uint  string_key_len;
-	ulong  num_key;
-	HashPosition pos;
+	HashTable *ht = Z_ARRVAL_P(array);
+	zval **tmp;
 	mqseries_bytes *byte24;
 
-	zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(array), &pos);
-	while (zend_hash_get_current_data_ex(Z_ARRVAL_P(array), (void **)&option_val, &pos) == SUCCESS) {
+	MQSERIES_SETOPT_LONG(msg_desc, Report);
+	MQSERIES_SETOPT_LONG(msg_desc, MsgType);
+	MQSERIES_SETOPT_LONG(msg_desc, Expiry);
+	MQSERIES_SETOPT_STRING(msg_desc, Format);
+	MQSERIES_SETOPT_LONG(msg_desc, Priority);
+	MQSERIES_SETOPT_LONG(msg_desc, Persistence);
+	MQSERIES_SETOPT_STRING(msg_desc, ReplyToQ);
+	MQSERIES_SETOPT_LONG(msg_desc, Feedback);
+	MQSERIES_SETOPT_LONG(msg_desc, Encoding);
+	MQSERIES_SETOPT_LONG(msg_desc, CodedCharSetId);
 
-		if (zend_hash_get_current_key_ex(Z_ARRVAL_P(array), &string_key, &string_key_len, &num_key, 0, &pos) == HASH_KEY_IS_STRING) {
-			if (!strcmp(string_key, "Report")) {
-				msg_desc->Report = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "MsgType")) {
-				msg_desc->MsgType = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "Expiry")) {
-				msg_desc->Expiry = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "Format")) {
-				strncpy(msg_desc->Format, Z_STRVAL_PP(option_val),sizeof(msg_desc->Format));
-			} else if (!strcmp(string_key, "Priority")) {
-				msg_desc->Priority = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "Persistence")) {
-				msg_desc->Persistence = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "ReplyToQ")) {
-				strncpy(msg_desc->ReplyToQ, Z_STRVAL_PP(option_val), sizeof(msg_desc->ReplyToQ));
-			} else if (!strcmp(string_key, "Feedback")) {
-				msg_desc->Feedback = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "Encoding")) {
-				msg_desc->Encoding = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "CodedCharSetId")) {
-				msg_desc->CodedCharSetId = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "MsgId")) {
-				if (put_get == MQMD_GET) { 
-/* The messageID of the MQGet call should be the one specified by the MQPut either generated or user supplied*/
-					/*
-					 * option_val should contain the resource reference
-					 */
-					byte24 = (mqseries_bytes *) zend_fetch_resource(option_val TSRMLS_CC, -1, PHP_MQSERIES_BYTES_RES_NAME, NULL, 1, le_mqseries_bytes);
-					if (byte24 != NULL) {
-						memcpy(msg_desc->MsgId, byte24->bytes, sizeof(msg_desc->MsgId));
-					}
-				} else {
-					strncpy((MQCHAR *) msg_desc->MsgId,Z_STRVAL_PP(option_val), sizeof(msg_desc->MsgId));
+	if (zend_hash_find(ht, "MsgId", sizeof("MsgId"), (void**)&tmp) == SUCCESS) {
+		if (put_get == MQMD_GET) {
+			/* The messageID of the MQGet call should be the one specified by the MQPut either generated or user supplied*/
+			/*
+			 * tmp should contain the resource reference
+			 */
+			if (Z_TYPE_PP(tmp) == IS_RESOURCE) {
+				byte24 = (mqseries_bytes *) zend_fetch_resource(tmp TSRMLS_CC, -1, PHP_MQSERIES_BYTES_RES_NAME, NULL, 1, le_mqseries_bytes);
+				if (byte24 != NULL) {
+					memcpy(msg_desc->MsgId, byte24->bytes, sizeof(msg_desc->MsgId));
 				}
-			} else if (!strcmp(string_key, "CorrelId")) {
-				if (put_get == MQMD_GET) {
-/*See mesgId comments*/
-					/*
-					 * option_val should contain the resource reference
-					 */
-					byte24 = (mqseries_bytes *) zend_fetch_resource(option_val TSRMLS_CC, -1, PHP_MQSERIES_BYTES_RES_NAME, NULL, 1, le_mqseries_bytes);
-					if (byte24 != NULL) {
-						memcpy(msg_desc->CorrelId, byte24->bytes, sizeof(msg_desc->CorrelId));
-					}
-				} else {
-					strncpy((MQCHAR *) msg_desc->CorrelId, Z_STRVAL_PP(option_val), sizeof(msg_desc->CorrelId));
-				}
-			} else if (!strcmp(string_key, "ReplyToQMgr")) {
-				strncpy(msg_desc->ReplyToQMgr, Z_STRVAL_PP(option_val), sizeof(msg_desc->ReplyToQMgr));
-			} else if (!strcmp(string_key, "PutApplType")) {
-				msg_desc->PutApplType = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "MsgSeqNumber")) {
-				msg_desc->MsgSeqNumber = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "MsgFlags")) {
-				msg_desc->MsgFlags = Z_LVAL_PP(option_val);
 			}
+		} else {
+			strncpy((MQCHAR *) msg_desc->MsgId,Z_STRVAL_PP(tmp), sizeof(msg_desc->MsgId));
 		}
-
-		zend_hash_move_forward_ex(Z_ARRVAL_P(array), &pos);
 	}
 
+	if (zend_hash_find(ht, "CorrelId", sizeof("CorrelId"), (void**)&tmp) == SUCCESS) {
+		if (put_get == MQMD_GET) {
+			/*See mesgId comments*/
+			/*
+			 * tmp should contain the resource reference
+			 */
+			if (Z_TYPE_PP(tmp) == IS_RESOURCE) {
+				byte24 = (mqseries_bytes *) zend_fetch_resource(tmp TSRMLS_CC, -1, PHP_MQSERIES_BYTES_RES_NAME, NULL, 1, le_mqseries_bytes);
+				if (byte24 != NULL) {
+					memcpy(msg_desc->CorrelId, byte24->bytes, sizeof(msg_desc->CorrelId));
+				}
+			}
+		} else {
+			strncpy((MQCHAR *) msg_desc->CorrelId, Z_STRVAL_PP(tmp), sizeof(msg_desc->CorrelId));
+		}
+	}
+
+	MQSERIES_SETOPT_STRING(msg_desc, ReplyToQMgr);
+	MQSERIES_SETOPT_LONG(msg_desc, PutApplType);
+	MQSERIES_SETOPT_LONG(msg_desc, MsgSeqNumber);
+	MQSERIES_SETOPT_LONG(msg_desc, MsgFlags);
 }
 /* }}} */
 
-/* {{{ 
+/* {{{ make_reference
  * makes an mqseries_bytes reference, needed when returning message and correlation id's
  */
 static zval* make_reference(PMQBYTE bytes, MQLONG size) {
@@ -1805,7 +1684,7 @@ static zval* make_reference(PMQBYTE bytes, MQLONG size) {
 }
 /* }}} */
 
-/* {{{ 
+/* {{{ set_array_from_msg_desc
  * makes an array from the message descriptor struct for output.
  */
 static  void set_array_from_msg_desc(zval *array, PMQMD msg_desc TSRMLS_DC) {
@@ -1870,35 +1749,21 @@ static  void set_array_from_msg_desc(zval *array, PMQMD msg_desc TSRMLS_DC) {
 }
 /* }}} */
 
-/* {{{ 
+/* {{{ set_obj_desc_from_array
  * Set the MQOD Object Descriptor from array
  */
 static void set_obj_desc_from_array(zval *array, PMQOD obj_desc)
 {
-	zval **option_val;
-	char *string_key;
-	uint  string_key_len;
-	ulong  num_key;
-	HashPosition pos;
+	HashTable *ht = Z_ARRVAL_P(array);
+	zval **tmp;
 
-	zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(array), &pos);
-	while (zend_hash_get_current_data_ex(Z_ARRVAL_P(array), (void **)&option_val, &pos) == SUCCESS) {
+	MQSERIES_SETOPT_LONG(obj_desc, Version);
+	MQSERIES_SETOPT_LONG(obj_desc, ObjectType);
+	MQSERIES_SETOPT_STRING(obj_desc, ObjectName);
+	MQSERIES_SETOPT_STRING(obj_desc, ObjectQMgrName);
+	MQSERIES_SETOPT_STRING(obj_desc, DynamicQName);
+	MQSERIES_SETOPT_STRING(obj_desc, AlternateUserId);
 
-		if (zend_hash_get_current_key_ex(Z_ARRVAL_P(array), &string_key, &string_key_len, &num_key, 0, &pos) == HASH_KEY_IS_STRING) {
-			
-			if (!strcmp(string_key, "Version")) {
-				obj_desc->Version = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key,"ObjectType")) {
-				obj_desc->ObjectType = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "ObjectName")) {
-				strncpy(obj_desc->ObjectName, Z_STRVAL_PP(option_val), sizeof(obj_desc->ObjectName));
-			} else if (!strcmp(string_key, "ObjectQMgrName")) {
-				strncpy(obj_desc->ObjectQMgrName, Z_STRVAL_PP(option_val),sizeof(obj_desc->ObjectQMgrName));
-			} else if (!strcmp(string_key, "DynamicQName")) {
-				strncpy(obj_desc->DynamicQName, Z_STRVAL_PP(option_val), sizeof(obj_desc->DynamicQName));
-			} else if (!strcmp(string_key, "AlternateUserId")) {
-				strncpy(obj_desc->AlternateUserId, Z_STRVAL_PP(option_val), sizeof(obj_desc->AlternateUserId));
-			}
 /* TODO: Implement these ?
    MQLONG    RecsPresent;          
    MQLONG    ObjectRecOffset;      
@@ -1909,13 +1774,10 @@ static void set_obj_desc_from_array(zval *array, PMQOD obj_desc)
  Will not support this.
   not supported MQBYTE40  AlternateSecurityId;  
 */
-		}
-		zend_hash_move_forward_ex(Z_ARRVAL_P(array), &pos);
-	}
 }
 /* }}} */
 
-/* {{{ 
+/* {{{ set_array_from_obj_desc
  * Set array from MQOD  Object Descriptor
  */
 static void set_array_from_obj_desc(zval *array, PMQOD obj_desc) {
@@ -1937,41 +1799,26 @@ static void set_array_from_obj_desc(zval *array, PMQOD obj_desc) {
  * sets the get message struct from an array.
  */
 static void set_get_msg_opts_from_array(zval *array, PMQGMO get_msg_opts  TSRMLS_DC) {
-	zval **option_val;
-	char *string_key;
-	uint  string_key_len;
-	ulong  num_key;
-	HashPosition pos;
+	HashTable *ht = Z_ARRVAL_P(array);
+	zval **tmp;
 	mqseries_bytes * byte16;
 
-	zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(array), &pos);
-	while (zend_hash_get_current_data_ex(Z_ARRVAL_P(array), (void **)&option_val, &pos) == SUCCESS) {
+	MQSERIES_SETOPT_LONG(get_msg_opts, Version);
+	MQSERIES_SETOPT_LONG(get_msg_opts, Options);
+	MQSERIES_SETOPT_LONG(get_msg_opts, WaitInterval);
+	MQSERIES_SETOPT_LONG(get_msg_opts, MatchOptions);
+	MQSERIES_SETOPT_LONG(get_msg_opts, Signal1);
+	MQSERIES_SETOPT_LONG(get_msg_opts, Signal2);
 
-		if (zend_hash_get_current_key_ex(Z_ARRVAL_P(array), &string_key, &string_key_len, &num_key, 0, &pos) == HASH_KEY_IS_STRING) {
-			if (!strcmp(string_key, "Version")) {
-				get_msg_opts->Version = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "Options")) {
-				get_msg_opts->Options = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "WaitInterval")) {
-				get_msg_opts->WaitInterval = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "MatchOptions")) {
-				get_msg_opts->MatchOptions = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "Signal1")) {
-				get_msg_opts->Signal1 = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "Signal2")) {
-				get_msg_opts->Signal2 = Z_LVAL_PP(option_val);
-			} else if (!strcmp(string_key, "MsgToken")) {
-				/*
-				 * option_val should contain the resource reference
-				 */
-				byte16 = (mqseries_bytes *) zend_fetch_resource(option_val TSRMLS_CC, -1, PHP_MQSERIES_BYTES_RES_NAME, NULL, 1, le_mqseries_bytes);
-				if (byte16 != NULL) {
-					memcpy(get_msg_opts->MsgToken, byte16->bytes, sizeof(get_msg_opts->MsgToken));
-				}
-
-			}
+	if (zend_hash_find(ht, "MsgToken", sizeof("MsgToken"), (void**)&tmp) == SUCCESS &&
+		Z_TYPE_PP(tmp) == IS_RESOURCE) {
+		/*
+		 * tmp should contain the resource reference
+		 */
+		byte16 = (mqseries_bytes *) zend_fetch_resource(tmp TSRMLS_CC, -1, PHP_MQSERIES_BYTES_RES_NAME, NULL, 1, le_mqseries_bytes);
+		if (byte16 != NULL) {
+			memcpy(get_msg_opts->MsgToken, byte16->bytes, sizeof(get_msg_opts->MsgToken));
 		}
-		zend_hash_move_forward_ex(Z_ARRVAL_P(array), &pos);
 	}
 }
 /* }}} */

@@ -59,7 +59,7 @@ static void _mqseries_bytes(zend_rsrc_list_entry *rsrc TSRMLS_DC);
 #define MQSERIES_FALSE 0
 
 static void set_msg_desc_from_array(zval *array, PMQMD msg_desc, int put_get TSRMLS_DC);
-static void set_array_from_msg_desc(zval *return_value, PMQMD msg_desc);
+static void set_array_from_msg_desc(zval *return_value, PMQMD msg_desc TSRMLS_DC);
 
 static void set_obj_desc_from_array(zval *array, PMQOD obj_desc);
 static void set_array_from_obj_desc(zval *array, PMQOD obj_desc);
@@ -68,7 +68,7 @@ static void set_put_msg_opts_from_array(zval *array, PMQPMO put_msg_opts TSRMLS_
 static void set_array_from_put_msg_opts(zval *array, PMQPMO put_msg_opts);
 
 static void set_get_msg_opts_from_array(zval *array, PMQGMO get_msg_opts TSRMLS_DC);
-static void set_array_from_get_msg_opts(zval *array, PMQGMO get_msg_opts);
+static void set_array_from_get_msg_opts(zval *array, PMQGMO get_msg_opts TSRMLS_DC);
 
 
 static void set_connect_opts_from_array(zval *array,
@@ -614,14 +614,16 @@ PHP_FUNCTION(mqseries_get)
 	ZVAL_LONG(z_comp_code, comp_code);
 	ZVAL_LONG(z_reason, reason);
 	ZVAL_LONG(z_data_length, data_length);
+
+	zval_dtor(z_buffer);
 	ZVAL_STRINGL(z_buffer,(char *) data, data_length, 1);
 	efree(buf);
 
 	if (PZVAL_IS_REF(z_msg_desc)) {
-		set_array_from_msg_desc(z_msg_desc, &msg_desc);
+		set_array_from_msg_desc(z_msg_desc, &msg_desc TSRMLS_CC);
 	}
 	if (PZVAL_IS_REF(z_get_msg_opts)) {
-		set_array_from_get_msg_opts(z_get_msg_opts, &get_msg_opts);
+		set_array_from_get_msg_opts(z_get_msg_opts, &get_msg_opts TSRMLS_CC);
 	}
 
 }
@@ -702,7 +704,7 @@ PHP_FUNCTION(mqseries_put)
 	ZVAL_LONG(z_comp_code, comp_code);
 	ZVAL_LONG(z_reason, reason);
 	if (PZVAL_IS_REF(z_msg_desc)) {
-		set_array_from_msg_desc(z_msg_desc, &msg_desc);
+		set_array_from_msg_desc(z_msg_desc, &msg_desc TSRMLS_CC);
 	}
 	if (PZVAL_IS_REF(z_put_msg_opts)) {
 		set_array_from_put_msg_opts(z_put_msg_opts, &put_msg_opts);
@@ -1105,7 +1107,7 @@ PHP_FUNCTION(mqseries_put1)
 		set_array_from_obj_desc(z_obj_desc, &obj_desc);
 	}
 	if (PZVAL_IS_REF(z_msg_desc)) {
-		set_array_from_msg_desc(z_msg_desc, &msg_desc);
+		set_array_from_msg_desc(z_msg_desc, &msg_desc TSRMLS_CC);
 	}
 	if (PZVAL_IS_REF(z_put_msg_opts)) {
 		set_array_from_put_msg_opts(z_put_msg_opts, &put_msg_opts);
@@ -1797,7 +1799,9 @@ static zval* make_reference(PMQBYTE bytes, MQLONG size) {
 /* {{{ 
  * makes an array from the message descriptor struct for output.
  */
-static  void set_array_from_msg_desc(zval *array, PMQMD msg_desc) {
+static  void set_array_from_msg_desc(zval *array, PMQMD msg_desc TSRMLS_DC) {
+	zval *ref;
+
 	zval_dtor(array);
 	array_init(array);
 	
@@ -1809,7 +1813,12 @@ static  void set_array_from_msg_desc(zval *array, PMQMD msg_desc) {
 	}
 	add_assoc_long(array, "BackoutCount",msg_desc->BackoutCount);
 	add_assoc_long(array, "CodedCharSetId",msg_desc->CodedCharSetId);
-	add_assoc_resource(array, "CorrelId", Z_LVAL_P(make_reference(msg_desc->CorrelId, 24)));
+
+	ref = make_reference(msg_desc->CorrelId, 24);
+	add_assoc_resource(array, "CorrelId", Z_RESVAL_P(ref));
+	zend_list_addref(Z_RESVAL_P(ref));
+	zval_ptr_dtor(&ref);
+
 	add_assoc_long(array, "Encoding",msg_desc->Encoding);
 	add_assoc_long(array, "Expiry",msg_desc->Expiry);
 	add_assoc_long(array, "Feedback",msg_desc->Feedback);
@@ -1825,7 +1834,11 @@ static  void set_array_from_msg_desc(zval *array, PMQMD msg_desc) {
 	add_assoc_long(array, "Priority",msg_desc->Priority);
 	add_assoc_long(array, "Persistence",msg_desc->Persistence);
 
-	add_assoc_resource(array, "MsgId", Z_LVAL_P(make_reference(msg_desc->MsgId, 24)));
+	ref = make_reference(msg_desc->MsgId, 24);
+	add_assoc_resource(array, "MsgId", Z_RESVAL_P(ref));
+	zend_list_addref(Z_RESVAL_P(ref));
+	zval_ptr_dtor(&ref);
+
 	if (msg_desc->ReplyToQ != NULL && strlen(msg_desc->ReplyToQ)>0)
 		add_assoc_stringl(array, "ReplyToQ",msg_desc->ReplyToQ, sizeof(msg_desc->ReplyToQ), 1);
 	if (msg_desc->ReplyToQMgr != NULL && strlen(msg_desc->ReplyToQMgr)>0)	
@@ -1957,13 +1970,18 @@ static void set_get_msg_opts_from_array(zval *array, PMQGMO get_msg_opts  TSRMLS
 /* {{{ 
  * Builds an array from the get message options struct for output
  */
-static void set_array_from_get_msg_opts(zval *array, PMQGMO get_msg_opts) {
+static void set_array_from_get_msg_opts(zval *array, PMQGMO get_msg_opts TSRMLS_DC) {
+	zval *ref;
 	char str[2];
 
 	zval_dtor(array);
 	array_init(array);
 	
-	add_assoc_resource(array, "MsgToken", Z_LVAL_P(make_reference(get_msg_opts->MsgToken, 16)));
+	ref = make_reference(get_msg_opts->MsgToken, 16);
+	add_assoc_resource(array, "MsgToken", Z_RESVAL_P(ref));
+	zend_list_addref(Z_RESVAL_P(ref));
+	zval_ptr_dtor(&ref);
+
 	if (get_msg_opts->ResolvedQName != NULL && strlen(get_msg_opts->ResolvedQName) > 0) {
 		add_assoc_stringl(array, "ResolvedQName",get_msg_opts->ResolvedQName, sizeof(get_msg_opts->ResolvedQName), 1);
 	}

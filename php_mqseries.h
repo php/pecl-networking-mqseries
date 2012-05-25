@@ -32,6 +32,7 @@ any other GPL-like (LGPL, GPL2) License.
 
 Author: Michael Bretterklieber <mbretter@jawa.at>    
 		philippe Tjon A Hen <tjonahen@zonnet.nl>
+		Pierrick Charron <pierrick@php.net>
 */
 
 #ifndef PHP_MQSERIES_H

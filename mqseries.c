@@ -32,6 +32,7 @@ any other GPL-like (LGPL, GPL2) License.
 
 Author: Michael Bretterklieber <mbretter@jawa.at>
 	    Philippe Tjon A Hen <philippe@tjonahen.nl>
+		Pierrick Charron <pierrick@php.net>
 
 */
 

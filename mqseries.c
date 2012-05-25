@@ -483,10 +483,10 @@ PHP_FUNCTION(mqseries_open)
 	mqseries_obj *mqobj;
 	zval *z_mqdesc, *z_obj_desc, *z_obj, *z_comp_code, *z_reason;
 
-	MQOD obj_desc = {MQOD_DEFAULT}; 
 	MQLONG open_options; 
 	MQLONG comp_code; 
 	MQLONG reason;
+	MQOD obj_desc = {MQOD_DEFAULT}; 
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ralzzz", &z_mqdesc, 
 		&z_obj_desc, &open_options, &z_obj, &z_comp_code, &z_reason) 
@@ -1676,6 +1676,7 @@ static void set_put_msg_opts_from_array(zval *array, PMQPMO put_msg_opts TSRMLS_
  * makes an array from the put message options struct for output
  */
 static void set_array_from_put_msg_opts(zval *array, PMQPMO put_msg_opts) {
+	zval_dtor(array);
 	array_init(array);
 	if (put_msg_opts->ResolvedQName != NULL && strlen(put_msg_opts->ResolvedQName) > 0) {
 		add_assoc_stringl(array, "ResolvedQName",put_msg_opts->ResolvedQName, strlen(put_msg_opts->ResolvedQName),1);
@@ -1797,6 +1798,7 @@ static zval* make_reference(PMQBYTE bytes, MQLONG size) {
  * makes an array from the message descriptor struct for output.
  */
 static  void set_array_from_msg_desc(zval *array, PMQMD msg_desc) {
+	zval_dtor(array);
 	array_init(array);
 	
 	if (msg_desc->ApplIdentityData != NULL && strlen(msg_desc->ApplIdentityData) > 0) {
@@ -1958,6 +1960,7 @@ static void set_get_msg_opts_from_array(zval *array, PMQGMO get_msg_opts  TSRMLS
 static void set_array_from_get_msg_opts(zval *array, PMQGMO get_msg_opts) {
 	char str[2];
 
+	zval_dtor(array);
 	array_init(array);
 	
 	add_assoc_resource(array, "MsgToken", Z_LVAL_P(make_reference(get_msg_opts->MsgToken, 16)));

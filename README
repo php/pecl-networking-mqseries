@@ -8,7 +8,7 @@ To compile the extension in your PHP, do as follows:
 
 - Uncompress the tarball
 - Run phpize
-- Run ./configure 
+- Run ./configure (for 64-bit you can use --with-libdir=lib64) 
 - Run make.
 - Either load the extension dynamically into your scripts (with dl()) or add
   an extension= entry for it in your php.ini

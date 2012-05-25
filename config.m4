@@ -38,12 +38,12 @@ if test "$PHP_MQSERIES" != "no"; then
 
   PHP_CHECK_LIBRARY($LIBNAME,$LIBSYMBOL,
   [
-     PHP_ADD_LIBRARY_WITH_PATH($LIBNAME, $MQSERIES_DIR/lib, MQSERIES_SHARED_LIBADD)
+     PHP_ADD_LIBRARY_WITH_PATH($LIBNAME, $MQSERIES_DIR/$PHP_LIBDIR, MQSERIES_SHARED_LIBADD)
      AC_DEFINE(HAVE_MQSERIESLIB,1,[ ])
   ],[
-     AC_MSG_ERROR([wrong mqseries lib version or lib not found])
+     AC_MSG_ERROR([wrong mqseries lib version or lib not found (use --with-libdir=lib64 for 64-bit) ])
   ],[
-     -L$MQSERIES_DIR/lib
+     -L$MQSERIES_DIR/$PHP_LIBDIR
   ])
 
   PHP_SUBST(MQSERIES_SHARED_LIBADD)

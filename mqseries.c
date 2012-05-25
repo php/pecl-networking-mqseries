@@ -488,7 +488,7 @@ PHP_FUNCTION(mqseries_open)
 	MQLONG comp_code; 
 	MQLONG reason;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rzlzzz", &z_mqdesc, 
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ralzzz", &z_mqdesc, 
 		&z_obj_desc, &open_options, &z_obj, &z_comp_code, &z_reason) 
 		== FAILURE) {
 		return;
@@ -578,7 +578,7 @@ PHP_FUNCTION(mqseries_get)
 	MQRFH rfh = {MQRFH_DEFAULT};
 	MQRFH2 rfh2 = {MQRFH2_DEFAULT};
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rrzzlzzzz",&z_mqdesc, &z_mqobj,
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rraalzzzz",&z_mqdesc, &z_mqobj,
 		&z_msg_desc, &z_get_msg_opts, &buf_len, &z_buffer, &z_data_length,&z_comp_code, &z_reason)
 		== FAILURE) {
 		return;
@@ -683,7 +683,7 @@ PHP_FUNCTION(mqseries_put)
 	MQLONG comp_code; 
 	MQLONG reason; 
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rrzzszz", &z_mqdesc, &z_mqobj,
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rraaszz", &z_mqdesc, &z_mqobj,
 		&z_msg_desc, &z_put_msg_opts, &msg, &msg_len, &z_comp_code, &z_reason)
 		== FAILURE) {
 		return;
@@ -1082,7 +1082,7 @@ PHP_FUNCTION(mqseries_put1)
 	MQLONG comp_code; 
 	MQLONG reason;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rzzzszz", 
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "raaaszz", 
 		&z_mqdesc, &z_obj_desc, &z_msg_desc, &z_put_msg_opts, &msg, &msg_len, &z_comp_code, &z_reason)
 		== FAILURE) {
 		return;

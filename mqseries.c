@@ -1795,7 +1795,7 @@ static void set_array_from_obj_desc(zval *array, PMQOD obj_desc) {
 }
 /* }}} */
 
-/* {{{
+/* {{{ set_get_msg_opts_from_array
  * sets the get message struct from an array.
  */
 static void set_get_msg_opts_from_array(zval *array, PMQGMO get_msg_opts  TSRMLS_DC) {
@@ -1823,7 +1823,7 @@ static void set_get_msg_opts_from_array(zval *array, PMQGMO get_msg_opts  TSRMLS
 }
 /* }}} */
 
-/* {{{ 
+/* {{{ set_array_from_get_msg_opts
  * Builds an array from the get message options struct for output
  */
 static void set_array_from_get_msg_opts(zval *array, PMQGMO get_msg_opts TSRMLS_DC) {
@@ -1857,7 +1857,7 @@ static void set_array_from_get_msg_opts(zval *array, PMQGMO get_msg_opts TSRMLS_
 /* End of conversion methods                                                  */
 /******************************************************************************/
 
-/* {{{ 
+/* {{{ _mqseries_bytes
  * frees memomory previuosly allocated 
  */
 static void _mqseries_bytes(zend_rsrc_list_entry *rsrc TSRMLS_DC)
@@ -1867,7 +1867,7 @@ static void _mqseries_bytes(zend_rsrc_list_entry *rsrc TSRMLS_DC)
 }
 /* }}} */
 
-/* {{{ 
+/* {{{ is_compcode_reason_ref
  * test to see if compcode and reason where passed by reference.
  */
 static int is_compcode_reason_ref(zval *z_comp_code, zval *z_reason) {
@@ -1883,7 +1883,7 @@ static int is_compcode_reason_ref(zval *z_comp_code, zval *z_reason) {
 }
 /* }}} */
 
-/* {{{ 
+/* {{{ is_called_by_ref
  * Test to see if a parameters was passed by reference.
  */
 static int is_called_by_ref(zval *param, char *param_name) {

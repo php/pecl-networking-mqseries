@@ -9,33 +9,49 @@ http://pear.php.net/dtd/package-2.0.xsd">
  <description>This package provides support for IBM Websphere MQ (MQSeries).
  </description>
  <lead>
-  <name>Philippe Tjon A Hen</name>
-  <user>philippe</user>
-  <email>tjonahen@php.net</email>
+  <name>Pierrick Charron</name>
+  <user>pierrick</user>
+  <email>pierrick@php.net</email>
   <active>yes</active>
  </lead>
- <date>2008-01-19</date>
- <time>21:25:00</time>
+ <date>2012-05-25</date>
+ <time>20:00:00</time>
  <version>
-  <release>0.11.0</release>
-  <api>0.11.0</api>
+  <release>0.12.0</release>
+  <api>0.12.0</api>
  </version>
  <stability>
   <release>beta</release>
   <api>beta</api>
  </stability>
  <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
-		 <notes>Fixed php function calling deprication warnings.
-		 tested agains MQ6.
-		 </notes>
+ <notes>
+- Add the possibility to use --with-libdir to compile the extension in 64-bit
+- PHP5.3 and PHP5.4 Compatibilty
+- Fixed bug #59577. (mqseries_strerror causes server to drop connection)
+- Fixed several memory leaks
+- Fixed several function signatures
+- Fixed segfault when non array variables are passed in array parameters
+- Fixed segfault when unexpected variables are in options array
+- Removed compilation warnings
+ </notes>
  <contents>
   <dir name="/">
    <dir name="examples">
+    <file name="conn.php" role="doc" />
     <file name="connx.php" role="doc" />
     <file name="get.php" role="doc" />
+    <file name="mput.php" role="doc" />
+    <file name="mqclient.php" role="doc" />
+    <file name="mqing.php" role="doc" />
     <file name="msgid.php" role="doc" />
     <file name="msgidput.php" role="doc" />
+    <file name="mtest.php" role="doc" />
+    <file name="open.php" role="doc" />
     <file name="put.php" role="doc" />
+    <file name="test1.php" role="doc" />
+    <file name="test2.php" role="doc" />
+    <file name="test.php" role="doc" />
     <file name="transaction.php" role="doc" />
    </dir> <!-- //examples -->
    <file name="config.m4" role="src" />
@@ -61,6 +77,28 @@ http://pear.php.net/dtd/package-2.0.xsd">
  <providesextension>mqseries</providesextension>
  <extsrcrelease />
  <changelog>
+	 <release>
+		 <version>
+			 <release>0.12.0</release>
+			 <api>0.12.0</api>
+		 </version>
+		 <stability>
+			 <release>beta</release>
+			 <api>beta</api>
+		 </stability>
+		 <date>2012-05-25</date>
+		 <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
+		 <notes>
+- Add the possibility to use --with-libdir to compile the extension in 64-bit
+- PHP5.3 and PHP5.4 Compatibilty
+- Fixed bug #59577. (mqseries_strerror causes server to drop connection)
+- Fixed several memory leaks
+- Fixed several function signatures
+- Fixed segfault when non array variables are passed in array parameters
+- Fixed segfault when unexpected variables are in options array
+- Removed compilation warnings
+		 </notes>
+	 </release>
 	 <release>
 		 <version>
 			 <release>0.11.0</release>

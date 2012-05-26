@@ -1667,7 +1667,7 @@ static void set_msg_desc_from_array(zval *array, PMQMD msg_desc, int put_get TSR
 /* {{{ make_reference
  * makes an mqseries_bytes reference, needed when returning message and correlation id's
  */
-static zval* make_reference(PMQBYTE bytes, MQLONG size) {
+static zval* make_reference(PMQBYTE bytes, MQLONG size TSRMLS_DC) {
 	mqseries_bytes *pBytes;
 	zval *z_byte24;
 	
@@ -1702,7 +1702,7 @@ static  void set_array_from_msg_desc(zval *array, PMQMD msg_desc TSRMLS_DC) {
 	add_assoc_long(array, "BackoutCount",msg_desc->BackoutCount);
 	add_assoc_long(array, "CodedCharSetId",msg_desc->CodedCharSetId);
 
-	ref = make_reference(msg_desc->CorrelId, 24);
+	ref = make_reference(msg_desc->CorrelId, 24 TSRMLS_CC);
 	add_assoc_resource(array, "CorrelId", Z_RESVAL_P(ref));
 	zend_list_addref(Z_RESVAL_P(ref));
 	zval_ptr_dtor(&ref);
@@ -1722,7 +1722,7 @@ static  void set_array_from_msg_desc(zval *array, PMQMD msg_desc TSRMLS_DC) {
 	add_assoc_long(array, "Priority",msg_desc->Priority);
 	add_assoc_long(array, "Persistence",msg_desc->Persistence);
 
-	ref = make_reference(msg_desc->MsgId, 24);
+	ref = make_reference(msg_desc->MsgId, 24 TSRMLS_CC);
 	add_assoc_resource(array, "MsgId", Z_RESVAL_P(ref));
 	zend_list_addref(Z_RESVAL_P(ref));
 	zval_ptr_dtor(&ref);
@@ -1833,7 +1833,7 @@ static void set_array_from_get_msg_opts(zval *array, PMQGMO get_msg_opts TSRMLS_
 	zval_dtor(array);
 	array_init(array);
 	
-	ref = make_reference(get_msg_opts->MsgToken, 16);
+	ref = make_reference(get_msg_opts->MsgToken, 16 TSRMLS_CC);
 	add_assoc_resource(array, "MsgToken", Z_RESVAL_P(ref));
 	zend_list_addref(Z_RESVAL_P(ref));
 	zval_ptr_dtor(&ref);

@@ -59,7 +59,7 @@ static void _mqseries_bytes(zend_rsrc_list_entry *rsrc TSRMLS_DC);
 #define MQSERIES_TRUE  1
 #define MQSERIES_FALSE 0
 
-static void set_msg_desc_from_array(zval *array, PMQMD msg_desc, int put_get TSRMLS_DC);
+static void set_msg_desc_from_array(zval *array, PMQMD msg_desc TSRMLS_DC);
 static void set_array_from_msg_desc(zval *return_value, PMQMD msg_desc TSRMLS_DC);
 
 static void set_obj_desc_from_array(zval *array, PMQOD obj_desc);
@@ -605,7 +605,7 @@ PHP_FUNCTION(mqseries_get)
 	ZEND_FETCH_RESOURCE(mqdesc, mqseries_descriptor *, &z_mqdesc, -1, PHP_MQSERIES_DESCRIPTOR_RES_NAME, le_mqseries_conn);
 	ZEND_FETCH_RESOURCE(mqobj, mqseries_obj *, &z_mqobj, -1, PHP_MQSERIES_OBJ_RES_NAME, le_mqseries_obj);
 
-	set_msg_desc_from_array(z_msg_desc, &msg_desc, MQMD_GET TSRMLS_CC);
+	set_msg_desc_from_array(z_msg_desc, &msg_desc TSRMLS_CC);
 	set_get_msg_opts_from_array(z_get_msg_opts, &get_msg_opts TSRMLS_CC);
 
 	data = buf = (MQBYTE *)emalloc(sizeof(MQBYTE)*buf_len);
@@ -709,7 +709,7 @@ PHP_FUNCTION(mqseries_put)
 	ZEND_FETCH_RESOURCE(mqdesc, mqseries_descriptor *, &z_mqdesc, -1, PHP_MQSERIES_DESCRIPTOR_RES_NAME, le_mqseries_conn);
 	ZEND_FETCH_RESOURCE(mqobj, mqseries_obj *, &z_mqobj, -1, PHP_MQSERIES_OBJ_RES_NAME, le_mqseries_obj);
 
-	set_msg_desc_from_array(z_msg_desc, &msg_desc,MQMD_PUT TSRMLS_CC);
+	set_msg_desc_from_array(z_msg_desc, &msg_desc TSRMLS_CC);
 	set_put_msg_opts_from_array(z_put_msg_opts, &put_msg_opts TSRMLS_CC);
 
 	MQPUT(mqdesc->conn,	mqobj->obj, &msg_desc, 	&put_msg_opts, msg_len, msg, &comp_code, &reason);
@@ -1116,7 +1116,7 @@ PHP_FUNCTION(mqseries_put1)
 	ZEND_FETCH_RESOURCE(mqdesc, mqseries_descriptor *, &z_mqdesc, -1, PHP_MQSERIES_DESCRIPTOR_RES_NAME, le_mqseries_conn);
 	
 	set_obj_desc_from_array(z_obj_desc, &obj_desc);
-	set_msg_desc_from_array(z_msg_desc, &msg_desc, MQMD_PUT TSRMLS_CC);
+	set_msg_desc_from_array(z_msg_desc, &msg_desc TSRMLS_CC);
 	set_put_msg_opts_from_array(z_put_msg_opts, &put_msg_opts TSRMLS_CC);
 	
 	MQPUT1(mqdesc->conn, &obj_desc, &msg_desc, &put_msg_opts, msg_len, msg, &comp_code, &reason);
@@ -1606,7 +1606,7 @@ Not supported:
 	AccountingToken
 		
 */
-static void set_msg_desc_from_array(zval *array, PMQMD msg_desc, int put_get TSRMLS_DC)
+static void set_msg_desc_from_array(zval *array, PMQMD msg_desc TSRMLS_DC)
 {
 	HashTable *ht = Z_ARRVAL_P(array);
 	zval **tmp;
@@ -1624,35 +1624,25 @@ static void set_msg_desc_from_array(zval *array, PMQMD msg_desc, int put_get TSR
 	MQSERIES_SETOPT_LONG(msg_desc, CodedCharSetId);
 
 	if (zend_hash_find(ht, "MsgId", sizeof("MsgId"), (void**)&tmp) == SUCCESS) {
-		if (put_get == MQMD_GET) {
-			/* The messageID of the MQGet call should be the one specified by the MQPut either generated or user supplied*/
-			/*
-			 * tmp should contain the resource reference
-			 */
-			if (Z_TYPE_PP(tmp) == IS_RESOURCE) {
-				byte24 = (mqseries_bytes *) zend_fetch_resource(tmp TSRMLS_CC, -1, PHP_MQSERIES_BYTES_RES_NAME, NULL, 1, le_mqseries_bytes);
-				if (byte24 != NULL) {
-					memcpy(msg_desc->MsgId, byte24->bytes, sizeof(msg_desc->MsgId));
-				}
+		if (Z_TYPE_PP(tmp) == IS_RESOURCE) {
+			byte24 = (mqseries_bytes *) zend_fetch_resource(tmp TSRMLS_CC, -1, PHP_MQSERIES_BYTES_RES_NAME, NULL, 1, le_mqseries_bytes);
+			if (byte24 != NULL) {
+				memcpy(msg_desc->MsgId, byte24->bytes, sizeof(msg_desc->MsgId));
 			}
 		} else {
+			convert_to_string(*tmp);
 			strncpy((MQCHAR *) msg_desc->MsgId,Z_STRVAL_PP(tmp), sizeof(msg_desc->MsgId));
 		}
 	}
 
 	if (zend_hash_find(ht, "CorrelId", sizeof("CorrelId"), (void**)&tmp) == SUCCESS) {
-		if (put_get == MQMD_GET) {
-			/*See mesgId comments*/
-			/*
-			 * tmp should contain the resource reference
-			 */
-			if (Z_TYPE_PP(tmp) == IS_RESOURCE) {
-				byte24 = (mqseries_bytes *) zend_fetch_resource(tmp TSRMLS_CC, -1, PHP_MQSERIES_BYTES_RES_NAME, NULL, 1, le_mqseries_bytes);
-				if (byte24 != NULL) {
-					memcpy(msg_desc->CorrelId, byte24->bytes, sizeof(msg_desc->CorrelId));
-				}
+		if (Z_TYPE_PP(tmp) == IS_RESOURCE) {
+			byte24 = (mqseries_bytes *) zend_fetch_resource(tmp TSRMLS_CC, -1, PHP_MQSERIES_BYTES_RES_NAME, NULL, 1, le_mqseries_bytes);
+			if (byte24 != NULL) {
+				memcpy(msg_desc->CorrelId, byte24->bytes, sizeof(msg_desc->CorrelId));
 			}
 		} else {
+			convert_to_string(*tmp);
 			strncpy((MQCHAR *) msg_desc->CorrelId, Z_STRVAL_PP(tmp), sizeof(msg_desc->CorrelId));
 		}
 	}

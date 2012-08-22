@@ -14,11 +14,11 @@ http://pear.php.net/dtd/package-2.0.xsd">
   <email>pierrick@php.net</email>
   <active>yes</active>
  </lead>
- <date>2012-05-26</date>
+ <date>2012-XX-XX</date>
  <time>20:00:00</time>
  <version>
-  <release>0.12.0</release>
-  <api>0.12.0</api>
+  <release>0.13.0</release>
+  <api>0.13.0</api>
  </version>
  <stability>
   <release>beta</release>
@@ -26,14 +26,7 @@ http://pear.php.net/dtd/package-2.0.xsd">
  </stability>
  <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
  <notes>
-- Add the possibility to use --with-libdir to compile the extension in 64-bit
-- PHP5.3 and PHP5.4 Compatibilty
-- Fixed bug #59577. (mqseries_strerror causes server to drop connection)
-- Fixed several memory leaks
-- Fixed several function signatures
-- Fixed segfault when non array variables are passed in array parameters
-- Fixed segfault when unexpected variables are in options array
-- Removed compilation warnings
+- Add the mqseries_bytes_val() function.
  </notes>
  <contents>
   <dir name="/">

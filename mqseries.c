@@ -245,6 +245,7 @@ zend_function_entry mqseries_functions[] = {
 	PHP_FE(mqseries_put1,   arginfo_mqseries_put1)
 	PHP_FE(mqseries_set,    arginfo_mqseries_set)	
 	PHP_FE(mqseries_strerror,	NULL)
+	PHP_FE(mqseries_bytes_val, NULL)
 	{NULL, NULL, NULL}	/* Must be the last line in mqseries_functions[] */
 };
 /* }}} */
@@ -1362,6 +1363,27 @@ PHP_FUNCTION(mqseries_set)
 	}
 	efree(selectors);
 
+}
+/* }}} */
+
+/* {{{ proto string mqseries_bytes_val(resource bytes)
+       Returns the string of bytes contained in the mqseries bytes resource */
+PHP_FUNCTION(mqseries_bytes_val)
+{
+    zval *z_bytes;
+	mqseries_bytes *bytes;	
+    
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "r", &z_bytes) == FAILURE) {
+		return;
+	}
+
+	ZEND_FETCH_RESOURCE(bytes, mqseries_bytes *, &z_bytes, -1, PHP_MQSERIES_BYTES_RES_NAME, le_mqseries_bytes);
+
+	if (bytes && bytes->bytes) {
+		RETVAL_STRING(bytes->bytes, 1);
+	} else {
+		RETVAL_NULL();
+	}
 }
 /* }}} */
 

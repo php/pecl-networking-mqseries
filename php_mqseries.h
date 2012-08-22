@@ -99,6 +99,7 @@ PHP_FUNCTION(mqseries_put1);
 PHP_FUNCTION(mqseries_set);
 PHP_FUNCTION(mqseries_error);
 PHP_FUNCTION(mqseries_strerror);
+PHP_FUNCTION(mqseries_bytes_val);
 
 #ifdef ZTS
 #define MQSERIES_G(v) TSRMG(mqseries_globals_id, zend_mqseries_globals *, v)

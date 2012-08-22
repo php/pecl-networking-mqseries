@@ -220,6 +220,13 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_set,0 ,0, 10)
 	ZEND_ARG_INFO(1, reason)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_strerror, 0, 0, 1)
+    ZEND_ARG_INFO(0, reason)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_bytes_val, 0, 0, 1)
+    ZEND_ARG_INFO(0, resource)
+ZEND_END_ARG_INFO()
 /* }}} */
 
 /* {{{ mqseries_functions[]
@@ -240,8 +247,8 @@ zend_function_entry mqseries_functions[] = {
 	PHP_FE(mqseries_put,	arginfo_mqseries_put)
 	PHP_FE(mqseries_put1,   arginfo_mqseries_put1)
 	PHP_FE(mqseries_set,    arginfo_mqseries_set)	
-	PHP_FE(mqseries_strerror,	NULL)
-	PHP_FE(mqseries_bytes_val, NULL)
+	PHP_FE(mqseries_strerror, arginfo_mqseries_strerror)
+	PHP_FE(mqseries_bytes_val, arginfo_mqseries_bytes_val)
 	{NULL, NULL, NULL}	/* Must be the last line in mqseries_functions[] */
 };
 /* }}} */

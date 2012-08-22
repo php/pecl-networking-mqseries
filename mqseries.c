@@ -52,10 +52,6 @@ static void _mqseries_disc(zend_rsrc_list_entry *rsrc TSRMLS_DC);
 static void _mqseries_close(zend_rsrc_list_entry *rsrc TSRMLS_DC);
 static void _mqseries_bytes(zend_rsrc_list_entry *rsrc TSRMLS_DC);
 
-/* Are whe parsing message descriptor for an MQGet or MQPut */
-#define MQMD_GET 0
-#define MQMD_PUT 1
-
 #define MQSERIES_TRUE  1
 #define MQSERIES_FALSE 0
 

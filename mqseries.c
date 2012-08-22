@@ -1383,7 +1383,7 @@ PHP_FUNCTION(mqseries_bytes_val)
 	ZEND_FETCH_RESOURCE(bytes, mqseries_bytes *, &z_bytes, -1, PHP_MQSERIES_BYTES_RES_NAME, le_mqseries_bytes);
 
 	if (bytes && bytes->bytes) {
-		RETVAL_STRING(bytes->bytes, 1);
+		RETVAL_STRING((char *) bytes->bytes, 1);
 	} else {
 		RETVAL_NULL();
 	}

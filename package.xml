@@ -9,6 +9,18 @@ http://pear.php.net/dtd/package-2.0.xsd">
  <description>This package provides support for IBM Websphere MQ (MQSeries).
  </description>
  <lead>
+   <name>Michael Bretterklieber</name>
+   <user>mbretter</user>
+   <email>mbretter@jawa.at</email>
+   <active>no</active>
+ </lead>
+ <lead>
+   <name>Philippe Tjon A Hen</name>
+   <user>philippe</user>
+   <email>philippe@tjonahen.nl</email>
+   <active>no</active>
+ </lead>
+ <lead>
   <name>Pierrick Charron</name>
   <user>pierrick</user>
   <email>pierrick@php.net</email>

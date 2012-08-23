@@ -52,9 +52,6 @@ static void _mqseries_disc(zend_rsrc_list_entry *rsrc TSRMLS_DC);
 static void _mqseries_close(zend_rsrc_list_entry *rsrc TSRMLS_DC);
 static void _mqseries_bytes(zend_rsrc_list_entry *rsrc TSRMLS_DC);
 
-#define MQSERIES_TRUE  1
-#define MQSERIES_FALSE 0
-
 static void set_msg_desc_from_array(zval *array, PMQMD msg_desc TSRMLS_DC);
 static void set_array_from_msg_desc(zval *return_value, PMQMD msg_desc TSRMLS_DC);
 
@@ -104,20 +101,20 @@ static HashTable *ht_reason_texts;
 /* }}} */
 
 /* {{{ arginfo */
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_back, 0 ,0, 3)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_back, 0, 0, 3)
 	ZEND_ARG_INFO(0, hconn)
 	ZEND_ARG_INFO(1, compCode)
 	ZEND_ARG_INFO(1, reason)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_begin,0 ,0, 4)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_begin, 0, 0, 4)
 	ZEND_ARG_INFO(0, hconn)
 	ZEND_ARG_ARRAY_INFO(0, beginOptions, 0)
 	ZEND_ARG_INFO(1, compCode)
 	ZEND_ARG_INFO(1, reason)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_close,0 ,0, 5)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_close, 0, 0, 5)
 	ZEND_ARG_INFO(0, hconn)
 	ZEND_ARG_INFO(1, hobj)
 	ZEND_ARG_INFO(0, options)
@@ -125,7 +122,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_close,0 ,0, 5)
 	ZEND_ARG_INFO(1, reason)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_cmit,0 ,0, 3)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_cmit, 0, 0, 3)
 	ZEND_ARG_INFO(0, hconn)
 	ZEND_ARG_INFO(1, compCode)
 	ZEND_ARG_INFO(1, reason)
@@ -146,13 +143,13 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_connx, 0, 0, 5)
          ZEND_ARG_INFO(1, reason)
 ZEND_END_ARG_INFO()
       
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_disc,0 ,0, 3)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_disc, 0, 0, 3)
 	ZEND_ARG_INFO(0, hconn)
 	ZEND_ARG_INFO(1, compCode)
 	ZEND_ARG_INFO(1, reason)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_get,0 ,0, 9)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_get, 0, 0, 9)
 	ZEND_ARG_INFO(0, hconn)
 	ZEND_ARG_INFO(0, hobj)
 	ZEND_ARG_ARRAY_INFO(1, msgDesc, 0)
@@ -164,7 +161,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_get,0 ,0, 9)
 	ZEND_ARG_INFO(1, reason)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_inq,0 ,0, 10)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_inq, 0, 0, 10)
 	ZEND_ARG_INFO(0, hconn)
 	ZEND_ARG_INFO(0, hobj)
 	ZEND_ARG_INFO(0, selectorCount)
@@ -177,7 +174,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_inq,0 ,0, 10)
 	ZEND_ARG_INFO(1, reason)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_open,0 ,0, 6)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_open, 0, 0, 6)
 	ZEND_ARG_INFO(0, hconn)
 	ZEND_ARG_ARRAY_INFO(1, objDesc, 0)
 	ZEND_ARG_INFO(0, options)
@@ -186,7 +183,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_open,0 ,0, 6)
 	ZEND_ARG_INFO(1, reason)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_put,0 ,0, 7)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_put, 0, 0, 7)
 	ZEND_ARG_INFO(0, hconn)
 	ZEND_ARG_INFO(0, hobj)
 	ZEND_ARG_ARRAY_INFO(1, msgDesc, 0) 
@@ -196,7 +193,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_put,0 ,0, 7)
 	ZEND_ARG_INFO(1, reason)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_put1,0 ,0, 7)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_put1, 0, 0, 7)
 	ZEND_ARG_INFO(0, hconn)
 	ZEND_ARG_ARRAY_INFO(0, objDesc, 0)
 	ZEND_ARG_ARRAY_INFO(1, msgDesc, 0) 
@@ -207,7 +204,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_put1,0 ,0, 7)
 ZEND_END_ARG_INFO()
 	
 	
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_set,0 ,0, 10)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_set, 0, 0, 10)
 	ZEND_ARG_INFO(0, hconn)
 	ZEND_ARG_INFO(0, hobj)
 	ZEND_ARG_INFO(0, selectorCount)
@@ -234,21 +231,21 @@ ZEND_END_ARG_INFO()
  * Every user visible function must have an entry in mqseries_functions[].
  */
 zend_function_entry mqseries_functions[] = {
-	PHP_FE(mqseries_back,	arginfo_mqseries_back)
-	PHP_FE(mqseries_begin,	arginfo_mqseries_begin)
-	PHP_FE(mqseries_close,	arginfo_mqseries_close)
-	PHP_FE(mqseries_cmit,	arginfo_mqseries_cmit)
-	PHP_FE(mqseries_conn,	arginfo_mqseries_conn)
-	PHP_FE(mqseries_connx,  arginfo_mqseries_connx)
-	PHP_FE(mqseries_disc,	arginfo_mqseries_disc)
-	PHP_FE(mqseries_get,	arginfo_mqseries_get)
-	PHP_FE(mqseries_inq,    arginfo_mqseries_inq)
-	PHP_FE(mqseries_open,	arginfo_mqseries_open)
-	PHP_FE(mqseries_put,	arginfo_mqseries_put)
-	PHP_FE(mqseries_put1,   arginfo_mqseries_put1)
-	PHP_FE(mqseries_set,    arginfo_mqseries_set)	
-	PHP_FE(mqseries_strerror, arginfo_mqseries_strerror)
-	PHP_FE(mqseries_bytes_val, arginfo_mqseries_bytes_val)
+	PHP_FE(mqseries_back,		arginfo_mqseries_back)
+	PHP_FE(mqseries_begin,		arginfo_mqseries_begin)
+	PHP_FE(mqseries_close,		arginfo_mqseries_close)
+	PHP_FE(mqseries_cmit,		arginfo_mqseries_cmit)
+	PHP_FE(mqseries_conn,		arginfo_mqseries_conn)
+	PHP_FE(mqseries_connx,		arginfo_mqseries_connx)
+	PHP_FE(mqseries_disc,		arginfo_mqseries_disc)
+	PHP_FE(mqseries_get,		arginfo_mqseries_get)
+	PHP_FE(mqseries_inq,		arginfo_mqseries_inq)
+	PHP_FE(mqseries_open,		arginfo_mqseries_open)
+	PHP_FE(mqseries_put,		arginfo_mqseries_put)
+	PHP_FE(mqseries_put1,		arginfo_mqseries_put1)
+	PHP_FE(mqseries_set,		arginfo_mqseries_set)	
+	PHP_FE(mqseries_strerror,	arginfo_mqseries_strerror)
+	PHP_FE(mqseries_bytes_val,	arginfo_mqseries_bytes_val)
 	{NULL, NULL, NULL}	/* Must be the last line in mqseries_functions[] */
 };
 /* }}} */
@@ -520,7 +517,7 @@ PHP_FUNCTION(mqseries_open)
 
 	mqobj = (mqseries_obj *) emalloc(sizeof(mqseries_obj));
 	
-	MQOPEN(	mqdesc->conn, &obj_desc, open_options, &mqobj->obj, &comp_code, &reason);
+	MQOPEN(mqdesc->conn, &obj_desc, open_options, &mqobj->obj, &comp_code, &reason);
 
 	ZVAL_LONG(z_comp_code, comp_code);
 	ZVAL_LONG(z_reason, reason);
@@ -595,14 +592,14 @@ PHP_FUNCTION(mqseries_get)
 	MQRFH rfh = {MQRFH_DEFAULT};
 	MQRFH2 rfh2 = {MQRFH2_DEFAULT};
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rraalzzzz",&z_mqdesc, &z_mqobj,
-		&z_msg_desc, &z_get_msg_opts, &buf_len, &z_buffer, &z_data_length,&z_comp_code, &z_reason)
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rraalzzzz", &z_mqdesc, &z_mqobj,
+		&z_msg_desc, &z_get_msg_opts, &buf_len, &z_buffer, &z_data_length, &z_comp_code, &z_reason)
 		== FAILURE) {
 		return;
 	}
 	
-	if (!is_called_by_ref(z_data_length, "datalength")) return ;
-	if (!is_called_by_ref(z_buffer, "buffer")) return ;
+	if (!is_called_by_ref(z_data_length, "datalength")) return;
+	if (!is_called_by_ref(z_buffer, "buffer")) return;
 	if (!is_compcode_reason_ref(z_comp_code, z_reason)) return;
 	
 
@@ -612,7 +609,7 @@ PHP_FUNCTION(mqseries_get)
 	set_msg_desc_from_array(z_msg_desc, &msg_desc TSRMLS_CC);
 	set_get_msg_opts_from_array(z_get_msg_opts, &get_msg_opts TSRMLS_CC);
 
-	data = buf = (MQBYTE *)emalloc(sizeof(MQBYTE)*buf_len);
+	data = buf = (MQBYTE *) emalloc(sizeof(MQBYTE) * buf_len);
 	MQGET(mqdesc->conn, mqobj->obj, &msg_desc, &get_msg_opts, buf_len, buf, &data_length, &comp_code, &reason);
 
 /*
@@ -633,7 +630,7 @@ PHP_FUNCTION(mqseries_get)
 	ZVAL_LONG(z_data_length, data_length);
 
 	zval_dtor(z_buffer);
-	ZVAL_STRINGL(z_buffer,(char *) data, data_length, 1);
+	ZVAL_STRINGL(z_buffer, (char *) data, data_length, 1);
 	efree(buf);
 
 	if (PZVAL_IS_REF(z_msg_desc)) {
@@ -716,7 +713,7 @@ PHP_FUNCTION(mqseries_put)
 	set_msg_desc_from_array(z_msg_desc, &msg_desc TSRMLS_CC);
 	set_put_msg_opts_from_array(z_put_msg_opts, &put_msg_opts TSRMLS_CC);
 
-	MQPUT(mqdesc->conn,	mqobj->obj, &msg_desc, 	&put_msg_opts, msg_len, msg, &comp_code, &reason);
+	MQPUT(mqdesc->conn, mqobj->obj, &msg_desc, 	&put_msg_opts, msg_len, msg, &comp_code, &reason);
 
 	ZVAL_LONG(z_comp_code, comp_code);
 	ZVAL_LONG(z_reason, reason);
@@ -921,12 +918,7 @@ PHP_FUNCTION(mqseries_close)
 	ZEND_FETCH_RESOURCE(mqdesc, mqseries_descriptor *, &z_mqdesc, -1, PHP_MQSERIES_DESCRIPTOR_RES_NAME, le_mqseries_conn);
 	ZEND_FETCH_RESOURCE(mqobj, mqseries_obj *, &z_mqobj, -1, PHP_MQSERIES_OBJ_RES_NAME, le_mqseries_obj);
 	
-	MQCLOSE(mqdesc->conn,
-		&mqobj->obj,
-		close_options,
-		&comp_code,
-		&reason);
-	
+	MQCLOSE(mqdesc->conn, &mqobj->obj, close_options, &comp_code, &reason);
 	
 	ZVAL_LONG(z_comp_code, comp_code);
 	ZVAL_LONG(z_reason, reason);
@@ -1237,7 +1229,7 @@ PHP_FUNCTION(mqseries_inq)
 	
 	if (comp_code == MQCC_OK) {
 		if (charAttrLength > 0) { /* set only when charAttrs where requested */
-			ZVAL_STRING(z_charAttrs, charAttrs, MQSERIES_TRUE);
+			ZVAL_STRING(z_charAttrs, charAttrs, 1);
 		}
 		if (intAttrLength > 0) { /*  set only when intAttrs where requested */
 			/* create an indexed array of long values */
@@ -1612,14 +1604,14 @@ static void set_array_from_put_msg_opts(zval *array, PMQPMO put_msg_opts) {
 	zval_dtor(array);
 	array_init(array);
 	if (put_msg_opts->ResolvedQName != NULL && strlen(put_msg_opts->ResolvedQName) > 0) {
-		add_assoc_stringl(array, "ResolvedQName",put_msg_opts->ResolvedQName, strlen(put_msg_opts->ResolvedQName),1);
+		add_assoc_stringl(array, "ResolvedQName", put_msg_opts->ResolvedQName, strlen(put_msg_opts->ResolvedQName), 1);
 	}
 	if (put_msg_opts->ResolvedQMgrName != NULL && strlen(put_msg_opts->ResolvedQMgrName) >0) {
-		add_assoc_stringl(array, "ResolvedQMgrName",put_msg_opts->ResolvedQMgrName, strlen(put_msg_opts->ResolvedQMgrName),1);
+		add_assoc_stringl(array, "ResolvedQMgrName", put_msg_opts->ResolvedQMgrName, strlen(put_msg_opts->ResolvedQMgrName), 1);
 	}
-	add_assoc_long(array, "KnownDestCount",put_msg_opts->KnownDestCount);
-	add_assoc_long(array, "UnknownDestCount",put_msg_opts->UnknownDestCount);
-	add_assoc_long(array, "InvalidDestCount",put_msg_opts->InvalidDestCount);
+	add_assoc_long(array, "KnownDestCount", put_msg_opts->KnownDestCount);
+	add_assoc_long(array, "UnknownDestCount", put_msg_opts->UnknownDestCount);
+	add_assoc_long(array, "InvalidDestCount", put_msg_opts->InvalidDestCount);
 }
 /* }}} */
 
@@ -1656,7 +1648,7 @@ static void set_msg_desc_from_array(zval *array, PMQMD msg_desc TSRMLS_DC)
 			}
 		} else {
 			convert_to_string(*tmp);
-			strncpy((MQCHAR *) msg_desc->MsgId,Z_STRVAL_PP(tmp), sizeof(msg_desc->MsgId));
+			strncpy((MQCHAR *) msg_desc->MsgId, Z_STRVAL_PP(tmp), sizeof(msg_desc->MsgId));
 		}
 	}
 
@@ -1709,33 +1701,33 @@ static  void set_array_from_msg_desc(zval *array, PMQMD msg_desc TSRMLS_DC) {
 	array_init(array);
 	
 	if (msg_desc->ApplIdentityData != NULL && strlen(msg_desc->ApplIdentityData) > 0) {
-		add_assoc_stringl(array, "ApplIdentityData",msg_desc->ApplIdentityData, sizeof(msg_desc->ApplIdentityData), 1);
+		add_assoc_stringl(array, "ApplIdentityData", msg_desc->ApplIdentityData, sizeof(msg_desc->ApplIdentityData), 1);
 	}
 	if (msg_desc->ApplOriginData != NULL && strlen(msg_desc->ApplOriginData) > 0) {
-		add_assoc_stringl(array, "ApplOriginData",msg_desc->ApplOriginData, sizeof(msg_desc->ApplOriginData), 1);
+		add_assoc_stringl(array, "ApplOriginData", msg_desc->ApplOriginData, sizeof(msg_desc->ApplOriginData), 1);
 	}
-	add_assoc_long(array, "BackoutCount",msg_desc->BackoutCount);
-	add_assoc_long(array, "CodedCharSetId",msg_desc->CodedCharSetId);
+	add_assoc_long(array, "BackoutCount", msg_desc->BackoutCount);
+	add_assoc_long(array, "CodedCharSetId", msg_desc->CodedCharSetId);
 
 	ref = make_reference(msg_desc->CorrelId, 24 TSRMLS_CC);
 	add_assoc_resource(array, "CorrelId", Z_RESVAL_P(ref));
 	zend_list_addref(Z_RESVAL_P(ref));
 	zval_ptr_dtor(&ref);
 
-	add_assoc_long(array, "Encoding",msg_desc->Encoding);
-	add_assoc_long(array, "Expiry",msg_desc->Expiry);
-	add_assoc_long(array, "Feedback",msg_desc->Feedback);
+	add_assoc_long(array, "Encoding", msg_desc->Encoding);
+	add_assoc_long(array, "Expiry", msg_desc->Expiry);
+	add_assoc_long(array, "Feedback", msg_desc->Feedback);
 	if (msg_desc->Format != NULL && strlen(msg_desc->Format) > 0) {
-		add_assoc_stringl(array, "Format",msg_desc->Format, strlen(msg_desc->Format),1);
+		add_assoc_stringl(array, "Format", msg_desc->Format, strlen(msg_desc->Format), 1);
 	}
 /*	BYTE string with special meaning 
 	add_assoc_string(array, "GroupId",msg_desc->GroupId, sizeof(msg_desc->GroupId));
 */
 	
-	add_assoc_long(array, "Report",msg_desc->Report);
-	add_assoc_long(array, "MsgType",msg_desc->MsgType);
-	add_assoc_long(array, "Priority",msg_desc->Priority);
-	add_assoc_long(array, "Persistence",msg_desc->Persistence);
+	add_assoc_long(array, "Report", msg_desc->Report);
+	add_assoc_long(array, "MsgType", msg_desc->MsgType);
+	add_assoc_long(array, "Priority", msg_desc->Priority);
+	add_assoc_long(array, "Persistence", msg_desc->Persistence);
 
 	ref = make_reference(msg_desc->MsgId, 24 TSRMLS_CC);
 	add_assoc_resource(array, "MsgId", Z_RESVAL_P(ref));
@@ -1743,24 +1735,24 @@ static  void set_array_from_msg_desc(zval *array, PMQMD msg_desc TSRMLS_DC) {
 	zval_ptr_dtor(&ref);
 
 	if (msg_desc->ReplyToQ != NULL && strlen(msg_desc->ReplyToQ)>0)
-		add_assoc_stringl(array, "ReplyToQ",msg_desc->ReplyToQ, sizeof(msg_desc->ReplyToQ), 1);
+		add_assoc_stringl(array, "ReplyToQ", msg_desc->ReplyToQ, sizeof(msg_desc->ReplyToQ), 1);
 	if (msg_desc->ReplyToQMgr != NULL && strlen(msg_desc->ReplyToQMgr)>0)	
-		add_assoc_stringl(array, "ReplyToQMgr",msg_desc->ReplyToQMgr, sizeof(msg_desc->ReplyToQMgr), 1);
+		add_assoc_stringl(array, "ReplyToQMgr", msg_desc->ReplyToQMgr, sizeof(msg_desc->ReplyToQMgr), 1);
 	if (msg_desc->UserIdentifier != NULL && strlen(msg_desc->UserIdentifier) >0)	
-		add_assoc_stringl(array, "UserIdentifier",msg_desc->UserIdentifier, sizeof(msg_desc->UserIdentifier), 1);
+		add_assoc_stringl(array, "UserIdentifier", msg_desc->UserIdentifier, sizeof(msg_desc->UserIdentifier), 1);
 
 	
-	add_assoc_long(array, "PutApplType",msg_desc->PutApplType);
+	add_assoc_long(array, "PutApplType", msg_desc->PutApplType);
 	if (msg_desc->PutApplName != NULL && strlen(msg_desc->PutApplName) >0)
-		add_assoc_stringl(array, "PutApplName",msg_desc->PutApplName, sizeof(msg_desc->PutApplName), 1);
+		add_assoc_stringl(array, "PutApplName", msg_desc->PutApplName, sizeof(msg_desc->PutApplName), 1);
 	if (msg_desc->PutDate != NULL && strlen(msg_desc->PutDate)>0)	
-		add_assoc_stringl(array, "PutDate",msg_desc->PutDate, sizeof(msg_desc->PutDate), 1);
+		add_assoc_stringl(array, "PutDate", msg_desc->PutDate, sizeof(msg_desc->PutDate), 1);
 	if (msg_desc->PutTime != NULL && strlen(msg_desc->PutTime) >0)	
-		add_assoc_stringl(array, "PutTime",msg_desc->PutTime, sizeof(msg_desc->PutTime), 1);
+		add_assoc_stringl(array, "PutTime", msg_desc->PutTime, sizeof(msg_desc->PutTime), 1);
 
-	add_assoc_long(array, "MsgSeqNumber",msg_desc->MsgSeqNumber);
-	add_assoc_long(array, "MsgFlags",msg_desc->MsgFlags);
-	add_assoc_long(array, "OriginalLength",msg_desc->OriginalLength);
+	add_assoc_long(array, "MsgSeqNumber", msg_desc->MsgSeqNumber);
+	add_assoc_long(array, "MsgFlags", msg_desc->MsgFlags);
+	add_assoc_long(array, "OriginalLength", msg_desc->OriginalLength);
 }
 /* }}} */
 
@@ -1799,13 +1791,13 @@ static void set_array_from_obj_desc(zval *array, PMQOD obj_desc) {
 	zval_dtor(array);
 	array_init(array);
 
-	add_assoc_string(array, "ObjectQMgrName",obj_desc->ObjectQMgrName, sizeof(obj_desc->ObjectQMgrName));
-	add_assoc_string(array, "ObjectName",obj_desc->ObjectName, sizeof(obj_desc->ObjectName));
-	add_assoc_long(array, "KnownDestCount",obj_desc->KnownDestCount);
-	add_assoc_long(array, "UnknownDestCount",obj_desc->UnknownDestCount);
-	add_assoc_long(array, "InvalidDestCount",obj_desc->InvalidDestCount);
-	add_assoc_string(array, "ResolvedQName",obj_desc->ResolvedQName, sizeof(obj_desc->ResolvedQName));
-	add_assoc_string(array, "ResolvedQMgrName",obj_desc->ResolvedQMgrName, sizeof(obj_desc->ResolvedQMgrName));
+	add_assoc_string(array, "ObjectQMgrName", obj_desc->ObjectQMgrName, sizeof(obj_desc->ObjectQMgrName));
+	add_assoc_string(array, "ObjectName", obj_desc->ObjectName, sizeof(obj_desc->ObjectName));
+	add_assoc_long(array, "KnownDestCount", obj_desc->KnownDestCount);
+	add_assoc_long(array, "UnknownDestCount", obj_desc->UnknownDestCount);
+	add_assoc_long(array, "InvalidDestCount", obj_desc->InvalidDestCount);
+	add_assoc_string(array, "ResolvedQName", obj_desc->ResolvedQName, sizeof(obj_desc->ResolvedQName));
+	add_assoc_string(array, "ResolvedQMgrName", obj_desc->ResolvedQMgrName, sizeof(obj_desc->ResolvedQMgrName));
 	
 }
 /* }}} */
@@ -1854,16 +1846,16 @@ static void set_array_from_get_msg_opts(zval *array, PMQGMO get_msg_opts TSRMLS_
 	zval_ptr_dtor(&ref);
 
 	if (get_msg_opts->ResolvedQName != NULL && strlen(get_msg_opts->ResolvedQName) > 0) {
-		add_assoc_stringl(array, "ResolvedQName",get_msg_opts->ResolvedQName, sizeof(get_msg_opts->ResolvedQName), 1);
+		add_assoc_stringl(array, "ResolvedQName", get_msg_opts->ResolvedQName, sizeof(get_msg_opts->ResolvedQName), 1);
 	}
 	sprintf(str, "%c", get_msg_opts->GroupStatus);
-	add_assoc_string(array, "GroupStatus",str, sizeof(get_msg_opts->GroupStatus));
+	add_assoc_string(array, "GroupStatus", str, sizeof(get_msg_opts->GroupStatus));
 	sprintf(str, "%c", get_msg_opts->SegmentStatus);
-	add_assoc_string(array, "SegmentStatus",str, sizeof(get_msg_opts->SegmentStatus));
+	add_assoc_string(array, "SegmentStatus", str, sizeof(get_msg_opts->SegmentStatus));
 	sprintf(str, "%c", get_msg_opts->Segmentation);
-	add_assoc_string(array, "Segmentation",str, sizeof(get_msg_opts->Segmentation));
+	add_assoc_string(array, "Segmentation", str, sizeof(get_msg_opts->Segmentation));
 
-	add_assoc_long(array, "ReturnedLength",get_msg_opts->ReturnedLength);
+	add_assoc_long(array, "ReturnedLength", get_msg_opts->ReturnedLength);
 	
 }
 /* }}} */

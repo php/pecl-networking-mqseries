@@ -98,6 +98,18 @@ static HashTable *ht_reason_texts;
         Z_TYPE_PP(tmp) == IS_STRING) { \
         strncpy(s->m, Z_STRVAL_PP(tmp), sizeof(s->m)); \
     }
+#define MQSERIES_SETOPT_RESBYTES(s,m) \
+	if (zend_hash_find(ht, #m, sizeof(#m), (void**)&tmp) == SUCCESS) { \
+		if (Z_TYPE_PP(tmp) == IS_RESOURCE) { \
+			byte24 = (mqseries_bytes *) zend_fetch_resource(tmp TSRMLS_CC, -1, PHP_MQSERIES_BYTES_RES_NAME, NULL, 1, le_mqseries_bytes); \
+			if (byte24 != NULL) { \
+				memcpy(s->m, byte24->bytes, sizeof(s->m)); \
+			} \
+		} else { \
+			convert_to_string(*tmp); \
+			strncpy((MQCHAR *) s->m, Z_STRVAL_PP(tmp), sizeof(s->m)); \
+		} \
+	}
 /* }}} */
 
 /* {{{ arginfo */
@@ -1640,41 +1652,9 @@ static void set_msg_desc_from_array(zval *array, PMQMD msg_desc TSRMLS_DC)
 	MQSERIES_SETOPT_LONG(msg_desc, Encoding);
 	MQSERIES_SETOPT_LONG(msg_desc, CodedCharSetId);
 
-	if (zend_hash_find(ht, "MsgId", sizeof("MsgId"), (void**)&tmp) == SUCCESS) {
-		if (Z_TYPE_PP(tmp) == IS_RESOURCE) {
-			byte24 = (mqseries_bytes *) zend_fetch_resource(tmp TSRMLS_CC, -1, PHP_MQSERIES_BYTES_RES_NAME, NULL, 1, le_mqseries_bytes);
-			if (byte24 != NULL) {
-				memcpy(msg_desc->MsgId, byte24->bytes, sizeof(msg_desc->MsgId));
-			}
-		} else {
-			convert_to_string(*tmp);
-			strncpy((MQCHAR *) msg_desc->MsgId, Z_STRVAL_PP(tmp), sizeof(msg_desc->MsgId));
-		}
-	}
-
-	if (zend_hash_find(ht, "CorrelId", sizeof("CorrelId"), (void**)&tmp) == SUCCESS) {
-		if (Z_TYPE_PP(tmp) == IS_RESOURCE) {
-			byte24 = (mqseries_bytes *) zend_fetch_resource(tmp TSRMLS_CC, -1, PHP_MQSERIES_BYTES_RES_NAME, NULL, 1, le_mqseries_bytes);
-			if (byte24 != NULL) {
-				memcpy(msg_desc->CorrelId, byte24->bytes, sizeof(msg_desc->CorrelId));
-			}
-		} else {
-			convert_to_string(*tmp);
-			strncpy((MQCHAR *) msg_desc->CorrelId, Z_STRVAL_PP(tmp), sizeof(msg_desc->CorrelId));
-		}
-	}
-	if (zend_hash_find(ht, "GroupId", sizeof("GroupId"), (void**)&tmp) == SUCCESS) {
-		if (Z_TYPE_PP(tmp) == IS_RESOURCE) {
-			byte24 = (mqseries_bytes *) zend_fetch_resource(tmp TSRMLS_CC, -1, PHP_MQSERIES_BYTES_RES_NAME, NULL, 1, le_mqseries_bytes);
-            if (byte24 != NULL) {
-                memcpy(msg_desc->GroupId, byte24->bytes, sizeof(msg_desc->GroupId));
-            }
-        } else {
-            convert_to_string(*tmp);
-            strncpy((MQCHAR *) msg_desc->GroupId, Z_STRVAL_PP(tmp), sizeof(msg_desc->GroupId));
-        }
-    }
-
+	MQSERIES_SETOPT_RESBYTES(msg_desc, MsgId);
+	MQSERIES_SETOPT_RESBYTES(msg_desc, CorrelId);
+	MQSERIES_SETOPT_RESBYTES(msg_desc, GroupId);
 
 	MQSERIES_SETOPT_STRING(msg_desc, ReplyToQMgr);
 	MQSERIES_SETOPT_LONG(msg_desc, PutApplType);

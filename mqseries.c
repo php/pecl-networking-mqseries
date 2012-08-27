@@ -1663,6 +1663,18 @@ static void set_msg_desc_from_array(zval *array, PMQMD msg_desc TSRMLS_DC)
 			strncpy((MQCHAR *) msg_desc->CorrelId, Z_STRVAL_PP(tmp), sizeof(msg_desc->CorrelId));
 		}
 	}
+	if (zend_hash_find(ht, "GroupId", sizeof("GroupId"), (void**)&tmp) == SUCCESS) {
+		if (Z_TYPE_PP(tmp) == IS_RESOURCE) {
+			byte24 = (mqseries_bytes *) zend_fetch_resource(tmp TSRMLS_CC, -1, PHP_MQSERIES_BYTES_RES_NAME, NULL, 1, le_mqseries_bytes);
+            if (byte24 != NULL) {
+                memcpy(msg_desc->GroupId, byte24->bytes, sizeof(msg_desc->GroupId));
+            }
+        } else {
+            convert_to_string(*tmp);
+            strncpy((MQCHAR *) msg_desc->GroupId, Z_STRVAL_PP(tmp), sizeof(msg_desc->GroupId));
+        }
+    }
+
 
 	MQSERIES_SETOPT_STRING(msg_desc, ReplyToQMgr);
 	MQSERIES_SETOPT_LONG(msg_desc, PutApplType);
@@ -1720,9 +1732,11 @@ static  void set_array_from_msg_desc(zval *array, PMQMD msg_desc TSRMLS_DC) {
 	if (msg_desc->Format != NULL && strlen(msg_desc->Format) > 0) {
 		add_assoc_stringl(array, "Format", msg_desc->Format, strlen(msg_desc->Format), 1);
 	}
-/*	BYTE string with special meaning 
-	add_assoc_string(array, "GroupId",msg_desc->GroupId, sizeof(msg_desc->GroupId));
-*/
+
+	ref = make_reference(msg_desc->GroupId, 24 TSRMLS_CC);
+	add_assoc_resource(array, "GroupId", Z_RESVAL_P(ref));
+	zend_list_addref(Z_RESVAL_P(ref));
+	zval_ptr_dtor(&ref);
 	
 	add_assoc_long(array, "Report", msg_desc->Report);
 	add_assoc_long(array, "MsgType", msg_desc->MsgType);

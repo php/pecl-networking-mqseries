@@ -40,6 +40,7 @@ http://pear.php.net/dtd/package-2.0.xsd">
  <notes>
 - Add the mqseries_bytes_val() function. (Pierrick)
 - Add support for msg_desc->GroupId. (Pierrick)
+- Add Version support within the msg_desc support. (Pierrick)
  </notes>
  <contents>
   <dir name="/">

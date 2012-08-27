@@ -1641,6 +1641,7 @@ static void set_msg_desc_from_array(zval *array, PMQMD msg_desc TSRMLS_DC)
 	zval **tmp;
 	mqseries_bytes *byte24;
 
+	MQSERIES_SETOPT_LONG(msg_desc, Version);
 	MQSERIES_SETOPT_LONG(msg_desc, Report);
 	MQSERIES_SETOPT_LONG(msg_desc, MsgType);
 	MQSERIES_SETOPT_LONG(msg_desc, Expiry);

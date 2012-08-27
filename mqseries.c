@@ -1655,12 +1655,15 @@ static void set_msg_desc_from_array(zval *array, PMQMD msg_desc TSRMLS_DC)
 
 	MQSERIES_SETOPT_RESBYTES(msg_desc, MsgId);
 	MQSERIES_SETOPT_RESBYTES(msg_desc, CorrelId);
-	MQSERIES_SETOPT_RESBYTES(msg_desc, GroupId);
 
 	MQSERIES_SETOPT_STRING(msg_desc, ReplyToQMgr);
 	MQSERIES_SETOPT_LONG(msg_desc, PutApplType);
-	MQSERIES_SETOPT_LONG(msg_desc, MsgSeqNumber);
-	MQSERIES_SETOPT_LONG(msg_desc, MsgFlags);
+
+	if (msg_desc->Version >=  MQMD_VERSION_2) {
+		MQSERIES_SETOPT_RESBYTES(msg_desc, GroupId);
+		MQSERIES_SETOPT_LONG(msg_desc, MsgSeqNumber);
+		MQSERIES_SETOPT_LONG(msg_desc, MsgFlags);
+	}
 }
 /* }}} */
 
@@ -1714,10 +1717,6 @@ static  void set_array_from_msg_desc(zval *array, PMQMD msg_desc TSRMLS_DC) {
 		add_assoc_stringl(array, "Format", msg_desc->Format, strlen(msg_desc->Format), 1);
 	}
 
-	ref = make_reference(msg_desc->GroupId, 24 TSRMLS_CC);
-	add_assoc_resource(array, "GroupId", Z_RESVAL_P(ref));
-	zend_list_addref(Z_RESVAL_P(ref));
-	zval_ptr_dtor(&ref);
 	
 	add_assoc_long(array, "Report", msg_desc->Report);
 	add_assoc_long(array, "MsgType", msg_desc->MsgType);
@@ -1744,10 +1743,17 @@ static  void set_array_from_msg_desc(zval *array, PMQMD msg_desc TSRMLS_DC) {
 		add_assoc_stringl(array, "PutDate", msg_desc->PutDate, sizeof(msg_desc->PutDate), 1);
 	if (msg_desc->PutTime != NULL && strlen(msg_desc->PutTime) >0)	
 		add_assoc_stringl(array, "PutTime", msg_desc->PutTime, sizeof(msg_desc->PutTime), 1);
+	
+	if (msg_desc->Version >= MQMD_VERSION_2) {
+		ref = make_reference(msg_desc->GroupId, 24 TSRMLS_CC);
+		add_assoc_resource(array, "GroupId", Z_RESVAL_P(ref));
+		zend_list_addref(Z_RESVAL_P(ref));
+		zval_ptr_dtor(&ref);
 
-	add_assoc_long(array, "MsgSeqNumber", msg_desc->MsgSeqNumber);
-	add_assoc_long(array, "MsgFlags", msg_desc->MsgFlags);
-	add_assoc_long(array, "OriginalLength", msg_desc->OriginalLength);
+		add_assoc_long(array, "MsgSeqNumber", msg_desc->MsgSeqNumber);
+		add_assoc_long(array, "MsgFlags", msg_desc->MsgFlags);
+		add_assoc_long(array, "OriginalLength", msg_desc->OriginalLength);
+	}
 }
 /* }}} */
 

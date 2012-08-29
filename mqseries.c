@@ -41,8 +41,6 @@ Author: Michael Bretterklieber <mbretter@jawa.at>
 #endif
 
 #include "php.h"
-#include "php_ini.h"
-#include "php_network.h"
 #include "ext/standard/info.h"
 #include "php_mqseries.h"
 

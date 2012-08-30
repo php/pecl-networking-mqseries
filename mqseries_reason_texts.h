@@ -1,448 +1,446 @@
-ADD_MQ_REASON_TXT(0, "No reason to report.");
-ADD_MQ_REASON_TXT(900, "Lowest value for an application-defined reason code returned by a data-conversion exit.");
-ADD_MQ_REASON_TXT(999, "Highest value for application-defined reason code returned by a data-conversion exit.");
-ADD_MQ_REASON_TXT(2001, "Alias base queue not a valid type.");
-ADD_MQ_REASON_TXT(2002, "Application already connected.");
-ADD_MQ_REASON_TXT(2003, "Unit of work encountered fatal error or backed out.");
-ADD_MQ_REASON_TXT(2004, "Buffer parameter not valid.");
-ADD_MQ_REASON_TXT(2005, "Buffer length parameter not valid.");
-ADD_MQ_REASON_TXT(2006, "Length of character attributes not valid.");
-ADD_MQ_REASON_TXT(2007, "Character attributes string not valid.");
-ADD_MQ_REASON_TXT(2008, "Not enough space allowed for character attributes.");
-ADD_MQ_REASON_TXT(2009, "Connection to queue manager lost.");
-ADD_MQ_REASON_TXT(2010, "Data length parameter not valid.");
-ADD_MQ_REASON_TXT(2011, "Name of dynamic queue not valid.");
-ADD_MQ_REASON_TXT(2012, "Call not valid in environment.");
-ADD_MQ_REASON_TXT(2013, "Expiry time not valid.");
-ADD_MQ_REASON_TXT(2014, "Feedback code not valid.");
-ADD_MQ_REASON_TXT(2016, "Gets inhibited for the queue.");
-ADD_MQ_REASON_TXT(2017, "No more handles available.");
-ADD_MQ_REASON_TXT(2018, "Connection handle not valid.");
-ADD_MQ_REASON_TXT(2019, "Object handle not valid.");
-ADD_MQ_REASON_TXT(2020, "Value for inhibit-get or inhibit-put queue attribute not valid.");
-ADD_MQ_REASON_TXT(2021, "Count of integer attributes not valid.");
-ADD_MQ_REASON_TXT(2022, "Not enough space allowed for integer attributes.");
-ADD_MQ_REASON_TXT(2023, "Integer attributes array not valid.");
-ADD_MQ_REASON_TXT(2024, "No more messages can be handled within current unit of work.");
-ADD_MQ_REASON_TXT(2025, "Maximum number of connections reached.");
-ADD_MQ_REASON_TXT(2026, "Message descriptor not valid.");
-ADD_MQ_REASON_TXT(2027, "Missing reply-to queue.");
-ADD_MQ_REASON_TXT(2029, "Message type in message descriptor not valid.");
-ADD_MQ_REASON_TXT(2030, "Message length greater than maximum for queue.");
-ADD_MQ_REASON_TXT(2031, "Message length greater than maximum for queue manager.");
-ADD_MQ_REASON_TXT(2033, "No message available.");
-ADD_MQ_REASON_TXT(2034, "Browse cursor not positioned on message.");
-ADD_MQ_REASON_TXT(2035, "Not authorized for access.");
-ADD_MQ_REASON_TXT(2036, "Queue not open for browse.");
-ADD_MQ_REASON_TXT(2037, "Queue not open for input.");
-ADD_MQ_REASON_TXT(2038, "Queue not open for inquire.");
-ADD_MQ_REASON_TXT(2039, "Queue not open for output.");
-ADD_MQ_REASON_TXT(2040, "Queue not open for set.");
-ADD_MQ_REASON_TXT(2041, "Object definition changed since opened.");
-ADD_MQ_REASON_TXT(2042, "Object already open with conflicting options.");
-ADD_MQ_REASON_TXT(2043, "Object type not valid.");
-ADD_MQ_REASON_TXT(2044, "Object descriptor structure not valid.");
-ADD_MQ_REASON_TXT(2045, "Option not valid for object type.");
-ADD_MQ_REASON_TXT(2046, "Options not valid or not consistent.");
-ADD_MQ_REASON_TXT(2047, "Persistence not valid.");
-ADD_MQ_REASON_TXT(2048, "Message on a temporary dynamic queue cannot be persistent.");
-ADD_MQ_REASON_TXT(2049, "Message Priority exceeds maximum value supported.");
-ADD_MQ_REASON_TXT(2050, "Message priority not valid.");
-ADD_MQ_REASON_TXT(2051, "Put calls inhibited for the queue.");
-ADD_MQ_REASON_TXT(2052, "Queue has been deleted.");
-ADD_MQ_REASON_TXT(2053, "Queue already contains maximum number of messages.");
-ADD_MQ_REASON_TXT(2055, "Queue contains one or more messages or uncommitted put or get requests.");
-ADD_MQ_REASON_TXT(2056, "No space available on disk for queue.");
-ADD_MQ_REASON_TXT(2057, "Queue type not valid.");
-ADD_MQ_REASON_TXT(2058, "Queue manager name not valid or not known.");
-ADD_MQ_REASON_TXT(2059, "Queue manager not available for connection.");
-ADD_MQ_REASON_TXT(2061, "Report options in message descriptor not valid.");
-ADD_MQ_REASON_TXT(2062, "A message is already marked.");
-ADD_MQ_REASON_TXT(2063, "Security error occurred.");
-ADD_MQ_REASON_TXT(2065, "Count of selectors not valid.");
-ADD_MQ_REASON_TXT(2066, "Count of selectors too big.");
-ADD_MQ_REASON_TXT(2067, "Attribute selector not valid.");
-ADD_MQ_REASON_TXT(2068, "Selector not applicable to queue type.");
-ADD_MQ_REASON_TXT(2069, "Signal outstanding for this handle.");
-ADD_MQ_REASON_TXT(2070, "No message returned (but signal request accepted).");
-ADD_MQ_REASON_TXT(2071, "Insufficient storage available.");
-ADD_MQ_REASON_TXT(2072, "Syncpoint support not available.");
-ADD_MQ_REASON_TXT(2075, "Value for trigger-control attribute not valid.");
-ADD_MQ_REASON_TXT(2076, "Value for trigger-depth attribute not valid.");
-ADD_MQ_REASON_TXT(2077, "Value for trigger-message-priority attribute not valid.");
-ADD_MQ_REASON_TXT(2078, "Value for trigger-type attribute not valid.");
-ADD_MQ_REASON_TXT(2079, "Truncated message returned (processing completed).");
-ADD_MQ_REASON_TXT(2080, "Truncated message returned (processing not completed).");
-ADD_MQ_REASON_TXT(2082, "Unknown alias base queue.");
-ADD_MQ_REASON_TXT(2085, "Unknown object name.");
-ADD_MQ_REASON_TXT(2086, "Unknown object queue manager.");
-ADD_MQ_REASON_TXT(2087, "Unknown remote queue manager.");
-ADD_MQ_REASON_TXT(2090, "Wait interval in MQGMO not valid.");
-ADD_MQ_REASON_TXT(2091, "Transmission queue not local.");
-ADD_MQ_REASON_TXT(2092, "Transmission queue with wrong usage.");
-ADD_MQ_REASON_TXT(2093, "Queue not open for pass all context.");
-ADD_MQ_REASON_TXT(2094, "Queue not open for pass identity context.");
-ADD_MQ_REASON_TXT(2095, "Queue not open for set all context.");
-ADD_MQ_REASON_TXT(2096, "Queue not open for set identity context.");
-ADD_MQ_REASON_TXT(2097, "Queue handle referred to does not save context.");
-ADD_MQ_REASON_TXT(2098, "Context not available for queue handle referred to.");
-ADD_MQ_REASON_TXT(2099, "Signal field not valid.");
-ADD_MQ_REASON_TXT(2100, "Object already exists.");
-ADD_MQ_REASON_TXT(2101, "Object damaged.");
-ADD_MQ_REASON_TXT(2102, "Insufficient system resources available.");
-ADD_MQ_REASON_TXT(2103, "Another queue manager already connected.");
-ADD_MQ_REASON_TXT(2104, "Report option(s) in message descriptor not recognized.");
-ADD_MQ_REASON_TXT(2105, "Storage class error.");
-ADD_MQ_REASON_TXT(2106, "COD report option not valid for XCF queue.");
-ADD_MQ_REASON_TXT(2107, "MQXWAIT call canceled.");
-ADD_MQ_REASON_TXT(2108, "Invocation of MQXWAIT call not valid.");
-ADD_MQ_REASON_TXT(2109, "Call suppressed by exit program.");
-ADD_MQ_REASON_TXT(2110, "Message format not valid.");
-ADD_MQ_REASON_TXT(2111, "Source coded character set identifier not valid.");
-ADD_MQ_REASON_TXT(2112, "Source integer encoding not recognized.");
-ADD_MQ_REASON_TXT(2113, "Packed-decimal encoding in message not recognized.");
-ADD_MQ_REASON_TXT(2114, "Floating-point encoding in message not recognized.");
-ADD_MQ_REASON_TXT(2115, "Target coded character set identifier not valid.");
-ADD_MQ_REASON_TXT(2116, "Target integer encoding not recognized.");
-ADD_MQ_REASON_TXT(2117, "Packed-decimal encoding specified by receiver not recognized.");
-ADD_MQ_REASON_TXT(2118, "Floating-point encoding specified by receiver not recognized.");
-ADD_MQ_REASON_TXT(2119, "Application message data not converted.");
-ADD_MQ_REASON_TXT(2120, "Converted data too big for buffer.");
-ADD_MQ_REASON_TXT(2121, "No participating resource managers registered.");
-ADD_MQ_REASON_TXT(2122, "Participating resource manager not available.");
-ADD_MQ_REASON_TXT(2123, "Result of commit or back-out operation is mixed.");
-ADD_MQ_REASON_TXT(2124, "Result of commit operation is pending.");
-ADD_MQ_REASON_TXT(2125, "Bridge started.");
-ADD_MQ_REASON_TXT(2126, "Bridge stopped.");
-ADD_MQ_REASON_TXT(2127, "Insufficient storage for adapter.");
-ADD_MQ_REASON_TXT(2128, "Unit of work already started.");
-ADD_MQ_REASON_TXT(2129, "Unable to load adapter connection module.");
-ADD_MQ_REASON_TXT(2130, "Unable to load adapter service module.");
-ADD_MQ_REASON_TXT(2131, "Adapter subsystem definition module not valid.");
-ADD_MQ_REASON_TXT(2132, "Unable to load adapter subsystem definition module.");
-ADD_MQ_REASON_TXT(2133, "Unable to load data conversion services modules.");
-ADD_MQ_REASON_TXT(2134, "Begin-options structure not valid.");
-ADD_MQ_REASON_TXT(2135, "Distribution header structure not valid.");
-ADD_MQ_REASON_TXT(2136, "Multiple reason codes returned.");
-ADD_MQ_REASON_TXT(2137, "Object not opened successfully.");
-ADD_MQ_REASON_TXT(2138, "Unable to load adapter disconnection module.");
-ADD_MQ_REASON_TXT(2139, "Connect-options structure not valid.");
-ADD_MQ_REASON_TXT(2140, "Wait request rejected by CICS.");
-ADD_MQ_REASON_TXT(2141, "Dead letter header structure not valid.");
-ADD_MQ_REASON_TXT(2142, "MQ header structure not valid.");
-ADD_MQ_REASON_TXT(2143, "Source length parameter not valid.");
-ADD_MQ_REASON_TXT(2144, "Target length parameter not valid.");
-ADD_MQ_REASON_TXT(2145, "Source buffer parameter not valid.");
-ADD_MQ_REASON_TXT(2146, "Target buffer parameter not valid.");
-ADD_MQ_REASON_TXT(2148, "IMS information header structure not valid.");
-ADD_MQ_REASON_TXT(2149, "PCF structures not valid.");
-ADD_MQ_REASON_TXT(2150, "DBCS string not valid.");
-ADD_MQ_REASON_TXT(2152, "Object name not valid.");
-ADD_MQ_REASON_TXT(2153, "Object queue-manager name not valid.");
-ADD_MQ_REASON_TXT(2154, "Number of records present not valid.");
-ADD_MQ_REASON_TXT(2155, "Object records not valid.");
-ADD_MQ_REASON_TXT(2156, "Response records not valid.");
-ADD_MQ_REASON_TXT(2157, "Primary and home ASIDs differ.");
-ADD_MQ_REASON_TXT(2158, "Put message record flags not valid.");
-ADD_MQ_REASON_TXT(2159, "Put message records not valid.");
-ADD_MQ_REASON_TXT(2160, "Connection identifier already in use.");
-ADD_MQ_REASON_TXT(2161, "Queue manager quiescing.");
-ADD_MQ_REASON_TXT(2162, "Queue manager shutting down.");
-ADD_MQ_REASON_TXT(2163, "Recovery coordinator already exists.");
-ADD_MQ_REASON_TXT(2173, "Put-message options structure not valid.");
-ADD_MQ_REASON_TXT(2183, "Unable to load API crossing exit.");
-ADD_MQ_REASON_TXT(2184, "Remote queue name not valid.");
-ADD_MQ_REASON_TXT(2185, "Inconsistent persistence specification.");
-ADD_MQ_REASON_TXT(2186, "Get-message options structure not valid.");
-ADD_MQ_REASON_TXT(2187, "Requested function not supported by CICS bridge.");
-ADD_MQ_REASON_TXT(2188, "Call rejected by cluster-workload exit.");
-ADD_MQ_REASON_TXT(2189, "Cluster name resolution failed.");
-ADD_MQ_REASON_TXT(2190, "Converted string too big for field.");
-ADD_MQ_REASON_TXT(2191, "Character trigger message structure not valid.");
-ADD_MQ_REASON_TXT(2192, "Page set data set full.");
-ADD_MQ_REASON_TXT(2193, "Error accessing page set data set.");
-ADD_MQ_REASON_TXT(2194, "Object name not valid for object type.");
-ADD_MQ_REASON_TXT(2195, "Unexpected error occurred.");
-ADD_MQ_REASON_TXT(2196, "Unknown transmission queue.");
-ADD_MQ_REASON_TXT(2197, "Unknown default transmission queue.");
-ADD_MQ_REASON_TXT(2198, "Default transmission queue not local.");
-ADD_MQ_REASON_TXT(2199, "Default transmission queue usage error.");
-ADD_MQ_REASON_TXT(2201, "Name in use.");
-ADD_MQ_REASON_TXT(2202, "Connection quiescing.");
-ADD_MQ_REASON_TXT(2203, "Connection shutting down.");
-ADD_MQ_REASON_TXT(2204, "Adapter not available.");
-ADD_MQ_REASON_TXT(2206, "Message-identifier error.");
-ADD_MQ_REASON_TXT(2207, "Correlation-identifier error.");
-ADD_MQ_REASON_TXT(2208, "File-system error.");
-ADD_MQ_REASON_TXT(2209, "No message locked.");
-ADD_MQ_REASON_TXT(2217, "Not authorized for connection.");
-ADD_MQ_REASON_TXT(2218, "Message length greater than maximum for channel.");
-ADD_MQ_REASON_TXT(2219, "MQI call reentered before previous call complete.");
-ADD_MQ_REASON_TXT(2220, "Reference message header structure not valid.");
-ADD_MQ_REASON_TXT(2222, "Queue manager created.");
-ADD_MQ_REASON_TXT(2223, "Queue manager unavailable.");
-ADD_MQ_REASON_TXT(2224, "Queue depth high limit reached or exceeded.");
-ADD_MQ_REASON_TXT(2225, "Queue depth low limit reached or exceeded.");
-ADD_MQ_REASON_TXT(2226, "Queue service interval high.");
-ADD_MQ_REASON_TXT(2227, "Queue service interval ok.");
-ADD_MQ_REASON_TXT(2232, "Unit of work not started.");
-ADD_MQ_REASON_TXT(2233, "Automatic channel definition succeeded.");
-ADD_MQ_REASON_TXT(2234, "Automatic channel definition failed.");
-ADD_MQ_REASON_TXT(2235, "PCF header structure not valid.");
-ADD_MQ_REASON_TXT(2236, "PCF integer list parameter structure not valid.");
-ADD_MQ_REASON_TXT(2237, "PCF integer parameter structure not valid.");
-ADD_MQ_REASON_TXT(2238, "PCF string list parameter structure not valid.");
-ADD_MQ_REASON_TXT(2239, "PCF string parameter structure not valid.");
-ADD_MQ_REASON_TXT(2241, "Message group not complete.");
-ADD_MQ_REASON_TXT(2242, "Logical message not complete.");
-ADD_MQ_REASON_TXT(2243, "Message segments have differing CCSIDs.");
-ADD_MQ_REASON_TXT(2244, "Message segments have differing encodings.");
-ADD_MQ_REASON_TXT(2245, "Inconsistent unit-of-work specification.");
-ADD_MQ_REASON_TXT(2246, "Message under cursor not valid for retrieval.");
-ADD_MQ_REASON_TXT(2247, "Match options not valid.");
-ADD_MQ_REASON_TXT(2248, "Message descriptor extension not valid.");
-ADD_MQ_REASON_TXT(2249, "Message flags not valid.");
-ADD_MQ_REASON_TXT(2250, "Message sequence number not valid.");
-ADD_MQ_REASON_TXT(2251, "Message segment offset not valid.");
-ADD_MQ_REASON_TXT(2252, "Original length not valid.");
-ADD_MQ_REASON_TXT(2253, "Length of data in message segment is zero.");
-ADD_MQ_REASON_TXT(2255, "Unit of work not available for the queue manager to use.");
-ADD_MQ_REASON_TXT(2256, "Wrong version of MQGMO supplied.");
-ADD_MQ_REASON_TXT(2257, "Wrong version of MQMD supplied.");
-ADD_MQ_REASON_TXT(2258, "Group identifier not valid.");
-ADD_MQ_REASON_TXT(2259, "Inconsistent browse specification.");
-ADD_MQ_REASON_TXT(2260, "Transmission queue header structure not valid.");
-ADD_MQ_REASON_TXT(2261, "Source environment data error.");
-ADD_MQ_REASON_TXT(2262, "Source name data error.");
-ADD_MQ_REASON_TXT(2263, "Destination environment data error.");
-ADD_MQ_REASON_TXT(2264, "Destination name data error.");
-ADD_MQ_REASON_TXT(2265, "Trigger message structure not valid.");
-ADD_MQ_REASON_TXT(2266, "Cluster workload exit failed.");
-ADD_MQ_REASON_TXT(2267, "Unable to load cluster workload exit.");
-ADD_MQ_REASON_TXT(2268, "Put calls inhibited for all queues in cluster.");
-ADD_MQ_REASON_TXT(2270, "No destination queues available.");
-ADD_MQ_REASON_TXT(2273, "Error processing MQCONN call.");
-ADD_MQ_REASON_TXT(2274, "Option not valid in environment.");
-ADD_MQ_REASON_TXT(2277, "Channel definition not valid.");
-ADD_MQ_REASON_TXT(2278, "Client connection fields not valid.");
-ADD_MQ_REASON_TXT(2279, "Channel stopped by user.");
-ADD_MQ_REASON_TXT(2280, "Configuration handle not valid.");
-ADD_MQ_REASON_TXT(2281, "Function identifier not valid for service.");
-ADD_MQ_REASON_TXT(2282, "Channel started.");
-ADD_MQ_REASON_TXT(2283, "Channel stopped.");
-ADD_MQ_REASON_TXT(2284, "Channel conversion error.");
-ADD_MQ_REASON_TXT(2285, "Underlying service not available.");
-ADD_MQ_REASON_TXT(2286, "Initialization failed for an undefined reason.");
-ADD_MQ_REASON_TXT(2287, "Termination failed for an undefined reason.");
-ADD_MQ_REASON_TXT(2288, "Queue name not found.");
-ADD_MQ_REASON_TXT(2289, "Unexpected error occurred accessing service.");
-ADD_MQ_REASON_TXT(2290, "Queue object already exists.");
-ADD_MQ_REASON_TXT(2291, "Unable to determine the user ID.");
-ADD_MQ_REASON_TXT(2292, "Entity unknown to service.");
-ADD_MQ_REASON_TXT(2293, "Authorization entity unknown to service.");
-ADD_MQ_REASON_TXT(2294, "Reference object unknown.");
-ADD_MQ_REASON_TXT(2295, "Channel activated.");
-ADD_MQ_REASON_TXT(2296, "Channel cannot be activated.");
-ADD_MQ_REASON_TXT(2297, "Unit of work canceled.");
-ADD_MQ_REASON_TXT(2299, "Selector has wrong data type.");
-ADD_MQ_REASON_TXT(2300, "Command type not valid.");
-ADD_MQ_REASON_TXT(2301, "Multiple instances of system data item not valid.");
-ADD_MQ_REASON_TXT(2302, "System data item is read-only and cannot be altered.");
-ADD_MQ_REASON_TXT(2303, "Data could not be converted into a bag.");
-ADD_MQ_REASON_TXT(2304, "Selector not within valid range for call.");
-ADD_MQ_REASON_TXT(2305, "Selector occurs more than once in bag.");
-ADD_MQ_REASON_TXT(2306, "Index not present.");
-ADD_MQ_REASON_TXT(2307, "String parameter not valid.");
-ADD_MQ_REASON_TXT(2308, "Encoding not supported.");
-ADD_MQ_REASON_TXT(2309, "Selector not present in bag.");
-ADD_MQ_REASON_TXT(2310, "OutSelector parameter not valid.");
-ADD_MQ_REASON_TXT(2311, "String truncated (too long for output buffer).");
-ADD_MQ_REASON_TXT(2312, "Selector implies a data type not valid for call.");
-ADD_MQ_REASON_TXT(2313, "Data type of item differs from previous occurrence of selector.");
-ADD_MQ_REASON_TXT(2314, "Index not valid.");
-ADD_MQ_REASON_TXT(2315, "System bag is read-only and cannot be altered.");
-ADD_MQ_REASON_TXT(2316, "ItemCount parameter not valid.");
-ADD_MQ_REASON_TXT(2317, "Format not supported.");
-ADD_MQ_REASON_TXT(2318, "System selector not supported.");
-ADD_MQ_REASON_TXT(2319, "ItemValue parameter not valid.");
-ADD_MQ_REASON_TXT(2320, "Bag handle not valid.");
-ADD_MQ_REASON_TXT(2321, "Parameter missing.");
-ADD_MQ_REASON_TXT(2322, "Command server not available.");
-ADD_MQ_REASON_TXT(2323, "StringLength parameter not valid.");
-ADD_MQ_REASON_TXT(2324, "Command code is not a recognized inquiry command.");
-ADD_MQ_REASON_TXT(2325, "Input bag contains one or more nested bags.");
-ADD_MQ_REASON_TXT(2326, "Bag has wrong type for intended use.");
-ADD_MQ_REASON_TXT(2327, "ItemType parameter not valid.");
-ADD_MQ_REASON_TXT(2328, "System bag is read-only and cannot be deleted.");
-ADD_MQ_REASON_TXT(2329, "System data item is read-only and cannot be deleted.");
-ADD_MQ_REASON_TXT(2330, "Coded character set identifier parameter not valid.");
-ADD_MQ_REASON_TXT(2331, "Use of message token not valid.");
-ADD_MQ_REASON_TXT(2332, "Message data does not begin with MQWIH.");
-ADD_MQ_REASON_TXT(2333, "MQWIH structure not valid.");
-ADD_MQ_REASON_TXT(2334, "MQRFH structure not valid.");
-ADD_MQ_REASON_TXT(2335, "NameValueString field not valid.");
-ADD_MQ_REASON_TXT(2336, "Command not valid.");
-ADD_MQ_REASON_TXT(2337, "Parameter not valid.");
-ADD_MQ_REASON_TXT(2338, "Duplicate parameter.");
-ADD_MQ_REASON_TXT(2339, "Parameter missing.");
-ADD_MQ_REASON_TXT(2367, "Create Object");
-ADD_MQ_REASON_TXT(2368, "Change Object");
-ADD_MQ_REASON_TXT(2369, "Delete Object");
-ADD_MQ_REASON_TXT(2370, "Refresh Object");
-ADD_MQ_REASON_TXT(3001, "Type not valid.");
-ADD_MQ_REASON_TXT(3002, "Structure length not valid.");
-ADD_MQ_REASON_TXT(3003, "Structure version number is not valid.");
-ADD_MQ_REASON_TXT(3004, "Message sequence number not valid.");
-ADD_MQ_REASON_TXT(3005, "Control option not valid.");
-ADD_MQ_REASON_TXT(3006, "Parameter count not valid.");
-ADD_MQ_REASON_TXT(3007, "Command identifier not valid.");
-ADD_MQ_REASON_TXT(3008, "Command failed.");
-ADD_MQ_REASON_TXT(3009, "Structure length not valid.");
-ADD_MQ_REASON_TXT(3010, "Structure length not valid.");
-ADD_MQ_REASON_TXT(3011, "String length not valid.");
-ADD_MQ_REASON_TXT(3012, "Force value not valid.");
-ADD_MQ_REASON_TXT(3013, "Structure type not valid.");
-ADD_MQ_REASON_TXT(3014, "Parameter identifier is not valid.");
-ADD_MQ_REASON_TXT(3015, "Parameter identifier is not valid.");
-ADD_MQ_REASON_TXT(3016, "Message length not valid.");
-ADD_MQ_REASON_TXT(3017, "Duplicate parameter.");
-ADD_MQ_REASON_TXT(3018, "Duplicate parameter.");
-ADD_MQ_REASON_TXT(3019, "Parameter count too small.");
-ADD_MQ_REASON_TXT(3020, "Parameter count too big.");
-ADD_MQ_REASON_TXT(3021, "Queue already exists in cell.");
-ADD_MQ_REASON_TXT(3022, "Queue type not valid.");
-ADD_MQ_REASON_TXT(3023, "Format not valid.");
-ADD_MQ_REASON_TXT(3025, "Replace value not valid.");
-ADD_MQ_REASON_TXT(3026, "Duplicate parameter.");
-ADD_MQ_REASON_TXT(3027, "Count of parameter values not valid.");
-ADD_MQ_REASON_TXT(3028, "Structure length not valid.");
-ADD_MQ_REASON_TXT(3029, "Mode value not valid.");
-ADD_MQ_REASON_TXT(3029, "Quiesce value not valid.");
-ADD_MQ_REASON_TXT(3030, "Message sequence number not valid.");
-ADD_MQ_REASON_TXT(3031, "Data count not valid.");
-ADD_MQ_REASON_TXT(3032, "Ping Channel command failed.");
-ADD_MQ_REASON_TXT(3034, "Channel type not valid.");
-ADD_MQ_REASON_TXT(3035, "Parameter sequence not valid.");
-ADD_MQ_REASON_TXT(3036, "Transmission protocol type not valid.");
-ADD_MQ_REASON_TXT(3037, "Batch size not valid.");
-ADD_MQ_REASON_TXT(3038, "Disconnection interval not valid.");
-ADD_MQ_REASON_TXT(3039, "Short retry count not valid.");
-ADD_MQ_REASON_TXT(3040, "Short timer value not valid.");
-ADD_MQ_REASON_TXT(3041, "Long retry count not valid.");
-ADD_MQ_REASON_TXT(3042, "Long timer not valid.");
-ADD_MQ_REASON_TXT(3043, "Sequence wrap number not valid.");
-ADD_MQ_REASON_TXT(3044, "Maximum message length not valid.");
-ADD_MQ_REASON_TXT(3045, "Put authority value not valid.");
-ADD_MQ_REASON_TXT(3046, "Purge value not valid.");
-ADD_MQ_REASON_TXT(3047, "Parameter identifier is not valid.");
-ADD_MQ_REASON_TXT(3048, "Message truncated.");
-ADD_MQ_REASON_TXT(3049, "Coded character-set identifier error.");
-ADD_MQ_REASON_TXT(3050, "Encoding error.");
-ADD_MQ_REASON_TXT(3052, "Data conversion value not valid.");
-ADD_MQ_REASON_TXT(3053, "In-doubt value not valid.");
-ADD_MQ_REASON_TXT(3054, "Escape type not valid.");
-ADD_MQ_REASON_TXT(3062, "Channel table value not valid.");
-ADD_MQ_REASON_TXT(3063, "Message channel agent type not valid.");
-ADD_MQ_REASON_TXT(3064, "Channel instance type not valid.");
-ADD_MQ_REASON_TXT(3065, "Channel status not found.");
-ADD_MQ_REASON_TXT(3066, "Duplicate parameter.");
-ADD_MQ_REASON_TXT(3067, "Total string length error.");
-ADD_MQ_REASON_TXT(3068, "Name count value not valid.");
-ADD_MQ_REASON_TXT(3069, "String length not valid.");
-ADD_MQ_REASON_TXT(3086, "Queue manager coded character set identifier error.");
-ADD_MQ_REASON_TXT(3088, "ClusterName and ClusterNamelist attributes conflict.");
-ADD_MQ_REASON_TXT(3089, "RepositoryName and RepositoryNamelist attributes conflict.");
-ADD_MQ_REASON_TXT(3090, "Cluster queue cannot be a transmission queue.");
-ADD_MQ_REASON_TXT(3091, "Action value not valid.");
-ADD_MQ_REASON_TXT(3092, "Library for requested communications protocol could not be loaded.");
-ADD_MQ_REASON_TXT(3093, "NetBIOS listener name not defined.");
-ADD_MQ_REASON_TXT(3095, "Conflicting parameters.");
-ADD_MQ_REASON_TXT(3150, "Content based filter expression not valid.");
-ADD_MQ_REASON_TXT(3151, "Wrong user.");
-ADD_MQ_REASON_TXT(4001, "Object already exists.");
-ADD_MQ_REASON_TXT(4002, "Object has wrong type.");
-ADD_MQ_REASON_TXT(4003, "New and existing objects have different type.");
-ADD_MQ_REASON_TXT(4004, "Object is open.");
-ADD_MQ_REASON_TXT(4005, "Attribute value not valid.");
-ADD_MQ_REASON_TXT(4006, "Queue manager not known.");
-ADD_MQ_REASON_TXT(4007, "Action not valid for the queue of specified type.");
-ADD_MQ_REASON_TXT(4008, "Object name not valid.");
-ADD_MQ_REASON_TXT(4009, "Allocation failed.");
-ADD_MQ_REASON_TXT(4010, "Remote system not available.");
-ADD_MQ_REASON_TXT(4011, "Configuration error.");
-ADD_MQ_REASON_TXT(4012, "Connection refused.");
-ADD_MQ_REASON_TXT(4013, "Invalid connection name.");
-ADD_MQ_REASON_TXT(4014, "Send failed.");
-ADD_MQ_REASON_TXT(4015, "Received data error.");
-ADD_MQ_REASON_TXT(4016, "Receive failed.");
-ADD_MQ_REASON_TXT(4017, "Connection closed.");
-ADD_MQ_REASON_TXT(4018, "Not enough storage available.");
-ADD_MQ_REASON_TXT(4019, "Communications manager not available.");
-ADD_MQ_REASON_TXT(4020, "Listener not started.");
-ADD_MQ_REASON_TXT(4024, "Bind failed.");
-ADD_MQ_REASON_TXT(4025, "Channel in-doubt.");
-ADD_MQ_REASON_TXT(4026, "MQCONN call failed.");
-ADD_MQ_REASON_TXT(4027, "MQOPEN call failed.");
-ADD_MQ_REASON_TXT(4028, "MQGET call failed.");
-ADD_MQ_REASON_TXT(4029, "MQPUT call failed.");
-ADD_MQ_REASON_TXT(4030, "Ping error.");
-ADD_MQ_REASON_TXT(4031, "Channel in use.");
-ADD_MQ_REASON_TXT(4032, "Channel not found.");
-ADD_MQ_REASON_TXT(4033, "Remote channel not known.");
-ADD_MQ_REASON_TXT(4034, "Remote queue manager not available.");
-ADD_MQ_REASON_TXT(4035, "Remote queue manager terminating.");
-ADD_MQ_REASON_TXT(4036, "MQINQ call failed.");
-ADD_MQ_REASON_TXT(4037, "Queue is not a transmission queue.");
-ADD_MQ_REASON_TXT(4038, "Channel disabled.");
-ADD_MQ_REASON_TXT(4039, "User exit not available.");
-ADD_MQ_REASON_TXT(4040, "Commit failed.");
-ADD_MQ_REASON_TXT(4041, "Parameter not allowed for this channel type.");
-ADD_MQ_REASON_TXT(4042, "Channel already exists.");
-ADD_MQ_REASON_TXT(4043, "Data too large.");
-ADD_MQ_REASON_TXT(4044, "Channel name error.");
-ADD_MQ_REASON_TXT(4045, "Transmission queue name error.");
-ADD_MQ_REASON_TXT(4047, "Message channel agent name error.");
-ADD_MQ_REASON_TXT(4048, "Channel send exit name error.");
-ADD_MQ_REASON_TXT(4049, "Channel security exit name error.");
-ADD_MQ_REASON_TXT(4050, "Channel message exit name error.");
-ADD_MQ_REASON_TXT(4051, "Channel receive exit name error.");
-ADD_MQ_REASON_TXT(4052, "Transmission queue name not allowed for this channel type.");
-ADD_MQ_REASON_TXT(4053, "Message channel agent name not allowed for this channel type.");
-ADD_MQ_REASON_TXT(4054, "Disconnection interval not allowed for this channel type.");
-ADD_MQ_REASON_TXT(4055, "Short retry parameter not allowed for this channel type.");
-ADD_MQ_REASON_TXT(4056, "Short timer parameter not allowed for this channel type.");
-ADD_MQ_REASON_TXT(4057, "Long retry parameter not allowed for this channel type.");
-ADD_MQ_REASON_TXT(4058, "Long timer parameter not allowed for this channel type.");
-ADD_MQ_REASON_TXT(4059, "Put authority parameter not allowed for this channel type.");
-ADD_MQ_REASON_TXT(4060, "Keepalive interval not valid.");
-ADD_MQ_REASON_TXT(4061, "Connection name parameter required but missing.");
-ADD_MQ_REASON_TXT(4062, "Error in connection name parameter.");
-ADD_MQ_REASON_TXT(4063, "MQSET call failed.");
-ADD_MQ_REASON_TXT(4064, "Channel not active.");
-ADD_MQ_REASON_TXT(4065, "Channel terminated by security exit.");
-ADD_MQ_REASON_TXT(4067, "Dynamic queue scope error.");
-ADD_MQ_REASON_TXT(4068, "Cell directory is not available.");
-ADD_MQ_REASON_TXT(4069, "Message retry count not valid.");
-ADD_MQ_REASON_TXT(4070, "Message-retry count parameter not allowed for this channel type.");
-ADD_MQ_REASON_TXT(4071, "Channel message-retry exit name error.");
-ADD_MQ_REASON_TXT(4072, "Message-retry exit parameter not allowed for this channel type.");
-ADD_MQ_REASON_TXT(4073, "Message retry interval not valid.");
-ADD_MQ_REASON_TXT(4074, "Message-retry interval parameter not allowed for this channel type.");
-ADD_MQ_REASON_TXT(4075, "Nonpersistent message speed not valid.");
-ADD_MQ_REASON_TXT(4076, "Nonpersistent message speed parameter not allowed for this channel type.");
-ADD_MQ_REASON_TXT(4077, "Heartbeat interval not valid.");
-ADD_MQ_REASON_TXT(4078, "Heartbeat interval parameter not allowed for this channel type.");
-ADD_MQ_REASON_TXT(4079, "Channel automatic definition error.");
-ADD_MQ_REASON_TXT(4080, "Channel automatic definition parameter not allowed for this channel type.");
-ADD_MQ_REASON_TXT(4081, "Channel automatic definition event error.");
-ADD_MQ_REASON_TXT(4082, "Channel automatic definition event parameter not allowed for this channel type.");
-ADD_MQ_REASON_TXT(4083, "Channel automatic definition exit name error.");
-ADD_MQ_REASON_TXT(4084, "Channel automatic definition exit parameter not allowed for this channel type.");
-ADD_MQ_REASON_TXT(4085, "Action suppressed by exit program.");
-ADD_MQ_REASON_TXT(4086, "Batch interval not valid.");
-ADD_MQ_REASON_TXT(4087, "Batch interval parameter not allowed for this channel type.");
-ADD_MQ_REASON_TXT(4088, "Network priority value is not valid.");
-ADD_MQ_REASON_TXT(4089, "Network priority parameter not allowed for this channel type.");
-ADD_MQ_REASON_TXT(6117, "Length is negative.");
-
-
+ADD_MQ_REASON_TXT(MQRC_NONE, "No reason to report."); /* 0 */
+ADD_MQ_REASON_TXT(MQRC_APPL_FIRST, "Lowest value for an application-defined reason code returned by a data-conversion exit."); /* 900 */
+ADD_MQ_REASON_TXT(MQRC_APPL_LAST, "Highest value for application-defined reason code returned by a data-conversion exit."); /* 999 */
+ADD_MQ_REASON_TXT(MQRC_ALIAS_BASE_Q_TYPE_ERROR, "Alias base queue not a valid type."); /* 2001 */
+ADD_MQ_REASON_TXT(MQRC_ALREADY_CONNECTED, "Application already connected."); /* 2002 */
+ADD_MQ_REASON_TXT(MQRC_BACKED_OUT, "Unit of work encountered fatal error or backed out."); /* 2003 */
+ADD_MQ_REASON_TXT(MQRC_BUFFER_ERROR, "Buffer parameter not valid."); /* 2004 */
+ADD_MQ_REASON_TXT(MQRC_BUFFER_LENGTH_ERROR, "Buffer length parameter not valid."); /* 2005 */
+ADD_MQ_REASON_TXT(MQRC_CHAR_ATTR_LENGTH_ERROR, "Length of character attributes not valid."); /* 2006 */
+ADD_MQ_REASON_TXT(MQRC_CHAR_ATTRS_ERROR, "Character attributes string not valid."); /* 2007 */
+ADD_MQ_REASON_TXT(MQRC_CHAR_ATTRS_TOO_SHORT, "Not enough space allowed for character attributes."); /* 2008 */
+ADD_MQ_REASON_TXT(MQRC_CONNECTION_BROKEN, "Connection to queue manager lost."); /* 2009 */
+ADD_MQ_REASON_TXT(MQRC_DATA_LENGTH_ERROR, "Data length parameter not valid."); /* 2010 */
+ADD_MQ_REASON_TXT(MQRC_DYNAMIC_Q_NAME_ERROR, "Name of dynamic queue not valid."); /* 2011 */
+ADD_MQ_REASON_TXT(MQRC_ENVIRONMENT_ERROR, "Call not valid in environment."); /* 2012 */
+ADD_MQ_REASON_TXT(MQRC_EXPIRY_ERROR, "Expiry time not valid."); /* 2013 */
+ADD_MQ_REASON_TXT(MQRC_FEEDBACK_ERROR, "Feedback code not valid."); /* 2014 */
+ADD_MQ_REASON_TXT(MQRC_GET_INHIBITED, "Gets inhibited for the queue."); /* 2016 */
+ADD_MQ_REASON_TXT(MQRC_HANDLE_NOT_AVAILABLE, "No more handles available."); /* 2017 */
+ADD_MQ_REASON_TXT(MQRC_HCONN_ERROR, "Connection handle not valid."); /* 2018 */
+ADD_MQ_REASON_TXT(MQRC_HOBJ_ERROR, "Object handle not valid."); /* 2019 */
+ADD_MQ_REASON_TXT(MQRC_INHIBIT_VALUE_ERROR, "Value for inhibit-get or inhibit-put queue attribute not valid."); /* 2020 */
+ADD_MQ_REASON_TXT(MQRC_INT_ATTR_COUNT_ERROR, "Count of integer attributes not valid."); /* 2021 */
+ADD_MQ_REASON_TXT(MQRC_INT_ATTR_COUNT_TOO_SMALL, "Not enough space allowed for integer attributes."); /* 2022 */
+ADD_MQ_REASON_TXT(MQRC_INT_ATTRS_ARRAY_ERROR, "Integer attributes array not valid."); /* 2023 */
+ADD_MQ_REASON_TXT(MQRC_SYNCPOINT_LIMIT_REACHED, "No more messages can be handled within current unit of work."); /* 2024 */
+ADD_MQ_REASON_TXT(MQRC_MAX_CONNS_LIMIT_REACHED, "Maximum number of connections reached."); /* 2025 */
+ADD_MQ_REASON_TXT(MQRC_MD_ERROR, "Message descriptor not valid."); /* 2026 */
+ADD_MQ_REASON_TXT(MQRC_MISSING_REPLY_TO_Q, "Missing reply-to queue."); /* 2027 */
+ADD_MQ_REASON_TXT(MQRC_MSG_TYPE_ERROR, "Message type in message descriptor not valid."); /* 2029 */
+ADD_MQ_REASON_TXT(MQRC_MSG_TOO_BIG_FOR_Q, "Message length greater than maximum for queue."); /* 2030 */
+ADD_MQ_REASON_TXT(MQRC_MSG_TOO_BIG_FOR_Q_MGR, "Message length greater than maximum for queue manager."); /* 2031 */
+ADD_MQ_REASON_TXT(MQRC_NO_MSG_AVAILABLE, "No message available."); /* 2033 */
+ADD_MQ_REASON_TXT(MQRC_NO_MSG_UNDER_CURSOR, "Browse cursor not positioned on message."); /* 2034 */
+ADD_MQ_REASON_TXT(MQRC_NOT_AUTHORIZED, "Not authorized for access."); /* 2035 */
+ADD_MQ_REASON_TXT(MQRC_NOT_OPEN_FOR_BROWSE, "Queue not open for browse."); /* 2036 */
+ADD_MQ_REASON_TXT(MQRC_NOT_OPEN_FOR_INPUT, "Queue not open for input."); /* 2037 */
+ADD_MQ_REASON_TXT(MQRC_NOT_OPEN_FOR_INQUIRE, "Queue not open for inquire."); /* 2038 */
+ADD_MQ_REASON_TXT(MQRC_NOT_OPEN_FOR_OUTPUT, "Queue not open for output."); /* 2039 */
+ADD_MQ_REASON_TXT(MQRC_NOT_OPEN_FOR_SET, "Queue not open for set."); /* 2040 */
+ADD_MQ_REASON_TXT(MQRC_OBJECT_CHANGED, "Object definition changed since opened."); /* 2041 */
+ADD_MQ_REASON_TXT(MQRC_OBJECT_IN_USE, "Object already open with conflicting options."); /* 2042 */
+ADD_MQ_REASON_TXT(MQRC_OBJECT_TYPE_ERROR, "Object type not valid."); /* 2043 */
+ADD_MQ_REASON_TXT(MQRC_OD_ERROR, "Object descriptor structure not valid."); /* 2044 */
+ADD_MQ_REASON_TXT(MQRC_OPTION_NOT_VALID_FOR_TYPE, "Option not valid for object type."); /* 2045 */
+ADD_MQ_REASON_TXT(MQRC_OPTIONS_ERROR, "Options not valid or not consistent."); /* 2046 */
+ADD_MQ_REASON_TXT(MQRC_PERSISTENCE_ERROR, "Persistence not valid."); /* 2047 */
+ADD_MQ_REASON_TXT(MQRC_PERSISTENT_NOT_ALLOWED, "Message on a temporary dynamic queue cannot be persistent."); /* 2048 */
+ADD_MQ_REASON_TXT(MQRC_PRIORITY_EXCEEDS_MAXIMUM, "Message Priority exceeds maximum value supported."); /* 2049 */
+ADD_MQ_REASON_TXT(MQRC_PRIORITY_ERROR, "Message priority not valid."); /* 2050 */
+ADD_MQ_REASON_TXT(MQRC_PUT_INHIBITED, "Put calls inhibited for the queue."); /* 2051 */
+ADD_MQ_REASON_TXT(MQRC_Q_DELETED, "Queue has been deleted."); /* 2052 */
+ADD_MQ_REASON_TXT(MQRC_Q_FULL, "Queue already contains maximum number of messages."); /* 2053 */
+ADD_MQ_REASON_TXT(MQRC_Q_NOT_EMPTY, "Queue contains one or more messages or uncommitted put or get requests."); /* 2055 */
+ADD_MQ_REASON_TXT(MQRC_Q_SPACE_NOT_AVAILABLE, "No space available on disk for queue."); /* 2056 */
+ADD_MQ_REASON_TXT(MQRC_Q_TYPE_ERROR, "Queue type not valid."); /* 2057 */
+ADD_MQ_REASON_TXT(MQRC_Q_MGR_NAME_ERROR, "Queue manager name not valid or not known."); /* 2058 */
+ADD_MQ_REASON_TXT(MQRC_Q_MGR_NOT_AVAILABLE, "Queue manager not available for connection."); /* 2059 */
+ADD_MQ_REASON_TXT(MQRC_REPORT_OPTIONS_ERROR, "Report options in message descriptor not valid."); /* 2061 */
+ADD_MQ_REASON_TXT(MQRC_SECOND_MARK_NOT_ALLOWED, "A message is already marked."); /* 2062 */
+ADD_MQ_REASON_TXT(MQRC_SECURITY_ERROR, "Security error occurred."); /* 2063 */
+ADD_MQ_REASON_TXT(MQRC_SELECTOR_COUNT_ERROR, "Count of selectors not valid."); /* 2065 */
+ADD_MQ_REASON_TXT(MQRC_SELECTOR_LIMIT_EXCEEDED, "Count of selectors too big."); /* 2066 */
+ADD_MQ_REASON_TXT(MQRC_SELECTOR_ERROR, "Attribute selector not valid."); /* 2067 */
+ADD_MQ_REASON_TXT(MQRC_SELECTOR_NOT_FOR_TYPE, "Selector not applicable to queue type."); /* 2068 */
+ADD_MQ_REASON_TXT(MQRC_SIGNAL_OUTSTANDING, "Signal outstanding for this handle."); /* 2069 */
+ADD_MQ_REASON_TXT(MQRC_SIGNAL_REQUEST_ACCEPTED, "No message returned (but signal request accepted)."); /* 2070 */
+ADD_MQ_REASON_TXT(MQRC_STORAGE_NOT_AVAILABLE, "Insufficient storage available."); /* 2071 */
+ADD_MQ_REASON_TXT(MQRC_SYNCPOINT_NOT_AVAILABLE, "Syncpoint support not available."); /* 2072 */
+ADD_MQ_REASON_TXT(MQRC_TRIGGER_CONTROL_ERROR, "Value for trigger-control attribute not valid."); /* 2075 */
+ADD_MQ_REASON_TXT(MQRC_TRIGGER_DEPTH_ERROR, "Value for trigger-depth attribute not valid."); /* 2076 */
+ADD_MQ_REASON_TXT(MQRC_TRIGGER_MSG_PRIORITY_ERR, "Value for trigger-message-priority attribute not valid."); /* 2077 */
+ADD_MQ_REASON_TXT(MQRC_TRIGGER_TYPE_ERROR, "Value for trigger-type attribute not valid."); /* 2078 */
+ADD_MQ_REASON_TXT(MQRC_TRUNCATED_MSG_ACCEPTED, "Truncated message returned (processing completed)."); /* 2079 */
+ADD_MQ_REASON_TXT(MQRC_TRUNCATED_MSG_FAILED, "Truncated message returned (processing not completed)."); /* 2080 */
+ADD_MQ_REASON_TXT(MQRC_UNKNOWN_ALIAS_BASE_Q, "Unknown alias base queue."); /* 2082 */
+ADD_MQ_REASON_TXT(MQRC_UNKNOWN_OBJECT_NAME, "Unknown object name."); /* 2085 */
+ADD_MQ_REASON_TXT(MQRC_UNKNOWN_OBJECT_Q_MGR, "Unknown object queue manager."); /* 2086 */
+ADD_MQ_REASON_TXT(MQRC_UNKNOWN_REMOTE_Q_MGR, "Unknown remote queue manager."); /* 2087 */
+ADD_MQ_REASON_TXT(MQRC_WAIT_INTERVAL_ERROR, "Wait interval in MQGMO not valid."); /* 2090 */
+ADD_MQ_REASON_TXT(MQRC_XMIT_Q_TYPE_ERROR, "Transmission queue not local."); /* 2091 */
+ADD_MQ_REASON_TXT(MQRC_XMIT_Q_USAGE_ERROR, "Transmission queue with wrong usage."); /* 2092 */
+ADD_MQ_REASON_TXT(MQRC_NOT_OPEN_FOR_PASS_ALL, "Queue not open for pass all context."); /* 2093 */
+ADD_MQ_REASON_TXT(MQRC_NOT_OPEN_FOR_PASS_IDENT, "Queue not open for pass identity context."); /* 2094 */
+ADD_MQ_REASON_TXT(MQRC_NOT_OPEN_FOR_SET_ALL, "Queue not open for set all context."); /* 2095 */
+ADD_MQ_REASON_TXT(MQRC_NOT_OPEN_FOR_SET_IDENT, "Queue not open for set identity context."); /* 2096 */
+ADD_MQ_REASON_TXT(MQRC_CONTEXT_HANDLE_ERROR, "Queue handle referred to does not save context."); /* 2097 */
+ADD_MQ_REASON_TXT(MQRC_CONTEXT_NOT_AVAILABLE, "Context not available for queue handle referred to."); /* 2098 */
+ADD_MQ_REASON_TXT(MQRC_SIGNAL1_ERROR, "Signal field not valid."); /* 2099 */
+ADD_MQ_REASON_TXT(MQRC_OBJECT_ALREADY_EXISTS, "Object already exists."); /* 2100 */
+ADD_MQ_REASON_TXT(MQRC_OBJECT_DAMAGED, "Object damaged."); /* 2101 */
+ADD_MQ_REASON_TXT(MQRC_RESOURCE_PROBLEM, "Insufficient system resources available."); /* 2102 */
+ADD_MQ_REASON_TXT(MQRC_ANOTHER_Q_MGR_CONNECTED, "Another queue manager already connected."); /* 2103 */
+ADD_MQ_REASON_TXT(MQRC_UNKNOWN_REPORT_OPTION, "Report option(s) in message descriptor not recognized."); /* 2104 */
+ADD_MQ_REASON_TXT(MQRC_STORAGE_CLASS_ERROR, "Storage class error."); /* 2105 */
+ADD_MQ_REASON_TXT(MQRC_COD_NOT_VALID_FOR_XCF_Q, "COD report option not valid for XCF queue."); /* 2106 */
+ADD_MQ_REASON_TXT(MQRC_XWAIT_CANCELED, "MQXWAIT call canceled."); /* 2107 */
+ADD_MQ_REASON_TXT(MQRC_XWAIT_ERROR, "Invocation of MQXWAIT call not valid."); /* 2108 */
+ADD_MQ_REASON_TXT(MQRC_SUPPRESSED_BY_EXIT, "Call suppressed by exit program."); /* 2109 */
+ADD_MQ_REASON_TXT(MQRC_FORMAT_ERROR, "Message format not valid."); /* 2110 */
+ADD_MQ_REASON_TXT(MQRC_SOURCE_CCSID_ERROR, "Source coded character set identifier not valid."); /* 2111 */
+ADD_MQ_REASON_TXT(MQRC_SOURCE_INTEGER_ENC_ERROR, "Source integer encoding not recognized."); /* 2112 */
+ADD_MQ_REASON_TXT(MQRC_SOURCE_DECIMAL_ENC_ERROR, "Packed-decimal encoding in message not recognized."); /* 2113 */
+ADD_MQ_REASON_TXT(MQRC_SOURCE_FLOAT_ENC_ERROR, "Floating-point encoding in message not recognized."); /* 2114 */
+ADD_MQ_REASON_TXT(MQRC_TARGET_CCSID_ERROR, "Target coded character set identifier not valid."); /* 2115 */
+ADD_MQ_REASON_TXT(MQRC_TARGET_INTEGER_ENC_ERROR, "Target integer encoding not recognized."); /* 2116 */
+ADD_MQ_REASON_TXT(MQRC_TARGET_DECIMAL_ENC_ERROR, "Packed-decimal encoding specified by receiver not recognized."); /* 2117 */
+ADD_MQ_REASON_TXT(MQRC_TARGET_FLOAT_ENC_ERROR, "Floating-point encoding specified by receiver not recognized."); /* 2118 */
+ADD_MQ_REASON_TXT(MQRC_NOT_CONVERTED, "Application message data not converted."); /* 2119 */
+ADD_MQ_REASON_TXT(MQRC_CONVERTED_MSG_TOO_BIG, "Converted data too big for buffer."); /* 2120 */
+ADD_MQ_REASON_TXT(MQRC_NO_EXTERNAL_PARTICIPANTS, "No participating resource managers registered."); /* 2121 */
+ADD_MQ_REASON_TXT(MQRC_PARTICIPANT_NOT_AVAILABLE, "Participating resource manager not available."); /* 2122 */
+ADD_MQ_REASON_TXT(MQRC_OUTCOME_MIXED, "Result of commit or back-out operation is mixed."); /* 2123 */
+ADD_MQ_REASON_TXT(MQRC_OUTCOME_PENDING, "Result of commit operation is pending."); /* 2124 */
+ADD_MQ_REASON_TXT(MQRC_BRIDGE_STARTED, "Bridge started."); /* 2125 */
+ADD_MQ_REASON_TXT(MQRC_BRIDGE_STOPPED, "Bridge stopped."); /* 2126 */
+ADD_MQ_REASON_TXT(MQRC_ADAPTER_STORAGE_SHORTAGE, "Insufficient storage for adapter."); /* 2127 */
+ADD_MQ_REASON_TXT(MQRC_UOW_IN_PROGRESS, "Unit of work already started."); /* 2128 */
+ADD_MQ_REASON_TXT(MQRC_ADAPTER_CONN_LOAD_ERROR, "Unable to load adapter connection module."); /* 2129 */
+ADD_MQ_REASON_TXT(MQRC_ADAPTER_SERV_LOAD_ERROR, "Unable to load adapter service module."); /* 2130 */
+ADD_MQ_REASON_TXT(MQRC_ADAPTER_DEFS_ERROR, "Adapter subsystem definition module not valid."); /* 2131 */
+ADD_MQ_REASON_TXT(MQRC_ADAPTER_DEFS_LOAD_ERROR, "Unable to load adapter subsystem definition module."); /* 2132 */
+ADD_MQ_REASON_TXT(MQRC_ADAPTER_CONV_LOAD_ERROR, "Unable to load data conversion services modules."); /* 2133 */
+ADD_MQ_REASON_TXT(MQRC_BO_ERROR, "Begin-options structure not valid."); /* 2134 */
+ADD_MQ_REASON_TXT(MQRC_DH_ERROR, "Distribution header structure not valid."); /* 2135 */
+ADD_MQ_REASON_TXT(MQRC_MULTIPLE_REASONS, "Multiple reason codes returned."); /* 2136 */
+ADD_MQ_REASON_TXT(MQRC_OPEN_FAILED, "Object not opened successfully."); /* 2137 */
+ADD_MQ_REASON_TXT(MQRC_ADAPTER_DISC_LOAD_ERROR, "Unable to load adapter disconnection module."); /* 2138 */
+ADD_MQ_REASON_TXT(MQRC_CNO_ERROR, "Connect-options structure not valid."); /* 2139 */
+ADD_MQ_REASON_TXT(MQRC_CICS_WAIT_FAILED, "Wait request rejected by CICS."); /* 2140 */
+ADD_MQ_REASON_TXT(MQRC_DLH_ERROR, "Dead letter header structure not valid."); /* 2141 */
+ADD_MQ_REASON_TXT(MQRC_HEADER_ERROR, "MQ header structure not valid."); /* 2142 */
+ADD_MQ_REASON_TXT(MQRC_SOURCE_LENGTH_ERROR, "Source length parameter not valid."); /* 2143 */
+ADD_MQ_REASON_TXT(MQRC_TARGET_LENGTH_ERROR, "Target length parameter not valid."); /* 2144 */
+ADD_MQ_REASON_TXT(MQRC_SOURCE_BUFFER_ERROR, "Source buffer parameter not valid."); /* 2145 */
+ADD_MQ_REASON_TXT(MQRC_TARGET_BUFFER_ERROR, "Target buffer parameter not valid."); /* 2146 */
+ADD_MQ_REASON_TXT(MQRC_IIH_ERROR, "IMS information header structure not valid."); /* 2148 */
+ADD_MQ_REASON_TXT(MQRC_PCF_ERROR, "PCF structures not valid."); /* 2149 */
+ADD_MQ_REASON_TXT(MQRC_DBCS_ERROR, "DBCS string not valid."); /* 2150 */
+ADD_MQ_REASON_TXT(MQRC_OBJECT_NAME_ERROR, "Object name not valid."); /* 2152 */
+ADD_MQ_REASON_TXT(MQRC_OBJECT_Q_MGR_NAME_ERROR, "Object queue-manager name not valid."); /* 2153 */
+ADD_MQ_REASON_TXT(MQRC_RECS_PRESENT_ERROR, "Number of records present not valid."); /* 2154 */
+ADD_MQ_REASON_TXT(MQRC_OBJECT_RECORDS_ERROR, "Object records not valid."); /* 2155 */
+ADD_MQ_REASON_TXT(MQRC_RESPONSE_RECORDS_ERROR, "Response records not valid."); /* 2156 */
+ADD_MQ_REASON_TXT(MQRC_ASID_MISMATCH, "Primary and home ASIDs differ."); /* 2157 */
+ADD_MQ_REASON_TXT(MQRC_PMO_RECORD_FLAGS_ERROR, "Put message record flags not valid."); /* 2158 */
+ADD_MQ_REASON_TXT(MQRC_PUT_MSG_RECORDS_ERROR, "Put message records not valid."); /* 2159 */
+ADD_MQ_REASON_TXT(MQRC_CONN_ID_IN_USE, "Connection identifier already in use."); /* 2160 */
+ADD_MQ_REASON_TXT(MQRC_Q_MGR_QUIESCING, "Queue manager quiescing."); /* 2161 */
+ADD_MQ_REASON_TXT(MQRC_Q_MGR_STOPPING, "Queue manager shutting down."); /* 2162 */
+ADD_MQ_REASON_TXT(MQRC_DUPLICATE_RECOV_COORD, "Recovery coordinator already exists."); /* 2163 */
+ADD_MQ_REASON_TXT(MQRC_PMO_ERROR, "Put-message options structure not valid."); /* 2173 */
+ADD_MQ_REASON_TXT(MQRC_API_EXIT_LOAD_ERROR, "Unable to load API crossing exit."); /* 2183 */
+ADD_MQ_REASON_TXT(MQRC_REMOTE_Q_NAME_ERROR, "Remote queue name not valid."); /* 2184 */
+ADD_MQ_REASON_TXT(MQRC_INCONSISTENT_PERSISTENCE, "Inconsistent persistence specification."); /* 2185 */
+ADD_MQ_REASON_TXT(MQRC_GMO_ERROR, "Get-message options structure not valid."); /* 2186 */
+ADD_MQ_REASON_TXT(MQRC_CICS_BRIDGE_RESTRICTION, "Requested function not supported by CICS bridge."); /* 2187 */
+ADD_MQ_REASON_TXT(MQRC_STOPPED_BY_CLUSTER_EXIT, "Call rejected by cluster-workload exit."); /* 2188 */
+ADD_MQ_REASON_TXT(MQRC_CLUSTER_RESOLUTION_ERROR, "Cluster name resolution failed."); /* 2189 */
+ADD_MQ_REASON_TXT(MQRC_CONVERTED_STRING_TOO_BIG, "Converted string too big for field."); /* 2190 */
+ADD_MQ_REASON_TXT(MQRC_TMC_ERROR, "Character trigger message structure not valid."); /* 2191 */
+ADD_MQ_REASON_TXT(MQRC_PAGESET_FULL, "Page set data set full."); /* 2192 */
+ADD_MQ_REASON_TXT(MQRC_PAGESET_ERROR, "Error accessing page set data set."); /* 2193 */
+ADD_MQ_REASON_TXT(MQRC_NAME_NOT_VALID_FOR_TYPE, "Object name not valid for object type."); /* 2194 */
+ADD_MQ_REASON_TXT(MQRC_UNEXPECTED_ERROR, "Unexpected error occurred."); /* 2195 */
+ADD_MQ_REASON_TXT(MQRC_UNKNOWN_XMIT_Q, "Unknown transmission queue."); /* 2196 */
+ADD_MQ_REASON_TXT(MQRC_UNKNOWN_DEF_XMIT_Q, "Unknown default transmission queue."); /* 2197 */
+ADD_MQ_REASON_TXT(MQRC_DEF_XMIT_Q_TYPE_ERROR, "Default transmission queue not local."); /* 2198 */
+ADD_MQ_REASON_TXT(MQRC_DEF_XMIT_Q_USAGE_ERROR, "Default transmission queue usage error."); /* 2199 */
+ADD_MQ_REASON_TXT(MQRC_NAME_IN_USE, "Name in use."); /* 2201 */
+ADD_MQ_REASON_TXT(MQRC_CONNECTION_QUIESCING, "Connection quiescing."); /* 2202 */
+ADD_MQ_REASON_TXT(MQRC_CONNECTION_STOPPING, "Connection shutting down."); /* 2203 */
+ADD_MQ_REASON_TXT(MQRC_ADAPTER_NOT_AVAILABLE, "Adapter not available."); /* 2204 */
+ADD_MQ_REASON_TXT(MQRC_MSG_ID_ERROR, "Message-identifier error."); /* 2206 */
+ADD_MQ_REASON_TXT(MQRC_CORREL_ID_ERROR, "Correlation-identifier error."); /* 2207 */
+ADD_MQ_REASON_TXT(MQRC_FILE_SYSTEM_ERROR, "File-system error."); /* 2208 */
+ADD_MQ_REASON_TXT(MQRC_NO_MSG_LOCKED, "No message locked."); /* 2209 */
+ADD_MQ_REASON_TXT(MQRC_CONNECTION_NOT_AUTHORIZED, "Not authorized for connection."); /* 2217 */
+ADD_MQ_REASON_TXT(MQRC_MSG_TOO_BIG_FOR_CHANNEL, "Message length greater than maximum for channel."); /* 2218 */
+ADD_MQ_REASON_TXT(MQRC_CALL_IN_PROGRESS, "MQI call reentered before previous call complete."); /* 2219 */
+ADD_MQ_REASON_TXT(MQRC_RMH_ERROR, "Reference message header structure not valid."); /* 2220 */
+ADD_MQ_REASON_TXT(MQRC_Q_MGR_ACTIVE, "Queue manager created."); /* 2222 */
+ADD_MQ_REASON_TXT(MQRC_Q_MGR_NOT_ACTIVE, "Queue manager unavailable."); /* 2223 */
+ADD_MQ_REASON_TXT(MQRC_Q_DEPTH_HIGH, "Queue depth high limit reached or exceeded."); /* 2224 */
+ADD_MQ_REASON_TXT(MQRC_Q_DEPTH_LOW, "Queue depth low limit reached or exceeded."); /* 2225 */
+ADD_MQ_REASON_TXT(MQRC_Q_SERVICE_INTERVAL_HIGH, "Queue service interval high."); /* 2226 */
+ADD_MQ_REASON_TXT(MQRC_Q_SERVICE_INTERVAL_OK, "Queue service interval ok."); /* 2227 */
+ADD_MQ_REASON_TXT(MQRC_UNIT_OF_WORK_NOT_STARTED, "Unit of work not started."); /* 2232 */
+ADD_MQ_REASON_TXT(MQRC_CHANNEL_AUTO_DEF_OK, "Automatic channel definition succeeded."); /* 2233 */
+ADD_MQ_REASON_TXT(MQRC_CHANNEL_AUTO_DEF_ERROR, "Automatic channel definition failed."); /* 2234 */
+ADD_MQ_REASON_TXT(MQRC_CFH_ERROR, "PCF header structure not valid."); /* 2235 */
+ADD_MQ_REASON_TXT(MQRC_CFIL_ERROR, "PCF integer list parameter structure not valid."); /* 2236 */
+ADD_MQ_REASON_TXT(MQRC_CFIN_ERROR, "PCF integer parameter structure not valid."); /* 2237 */
+ADD_MQ_REASON_TXT(MQRC_CFSL_ERROR, "PCF string list parameter structure not valid."); /* 2238 */
+ADD_MQ_REASON_TXT(MQRC_CFST_ERROR, "PCF string parameter structure not valid."); /* 2239 */
+ADD_MQ_REASON_TXT(MQRC_INCOMPLETE_GROUP, "Message group not complete."); /* 2241 */
+ADD_MQ_REASON_TXT(MQRC_INCOMPLETE_MSG, "Logical message not complete."); /* 2242 */
+ADD_MQ_REASON_TXT(MQRC_INCONSISTENT_CCSIDS, "Message segments have differing CCSIDs."); /* 2243 */
+ADD_MQ_REASON_TXT(MQRC_INCONSISTENT_ENCODINGS, "Message segments have differing encodings."); /* 2244 */
+ADD_MQ_REASON_TXT(MQRC_INCONSISTENT_UOW, "Inconsistent unit-of-work specification."); /* 2245 */
+ADD_MQ_REASON_TXT(MQRC_INVALID_MSG_UNDER_CURSOR, "Message under cursor not valid for retrieval."); /* 2246 */
+ADD_MQ_REASON_TXT(MQRC_MATCH_OPTIONS_ERROR, "Match options not valid."); /* 2247 */
+ADD_MQ_REASON_TXT(MQRC_MDE_ERROR, "Message descriptor extension not valid."); /* 2248 */
+ADD_MQ_REASON_TXT(MQRC_MSG_FLAGS_ERROR, "Message flags not valid."); /* 2249 */
+ADD_MQ_REASON_TXT(MQRC_MSG_SEQ_NUMBER_ERROR, "Message sequence number not valid."); /* 2250 */
+ADD_MQ_REASON_TXT(MQRC_OFFSET_ERROR, "Message segment offset not valid."); /* 2251 */
+ADD_MQ_REASON_TXT(MQRC_ORIGINAL_LENGTH_ERROR, "Original length not valid."); /* 2252 */
+ADD_MQ_REASON_TXT(MQRC_SEGMENT_LENGTH_ZERO, "Length of data in message segment is zero."); /* 2253 */
+ADD_MQ_REASON_TXT(MQRC_UOW_NOT_AVAILABLE, "Unit of work not available for the queue manager to use."); /* 2255 */
+ADD_MQ_REASON_TXT(MQRC_WRONG_GMO_VERSION, "Wrong version of MQGMO supplied."); /* 2256 */
+ADD_MQ_REASON_TXT(MQRC_WRONG_MD_VERSION, "Wrong version of MQMD supplied."); /* 2257 */
+ADD_MQ_REASON_TXT(MQRC_GROUP_ID_ERROR, "Group identifier not valid."); /* 2258 */
+ADD_MQ_REASON_TXT(MQRC_INCONSISTENT_BROWSE, "Inconsistent browse specification."); /* 2259 */
+ADD_MQ_REASON_TXT(MQRC_XQH_ERROR, "Transmission queue header structure not valid."); /* 2260 */
+ADD_MQ_REASON_TXT(MQRC_SRC_ENV_ERROR, "Source environment data error."); /* 2261 */
+ADD_MQ_REASON_TXT(MQRC_SRC_NAME_ERROR, "Source name data error."); /* 2262 */
+ADD_MQ_REASON_TXT(MQRC_DEST_ENV_ERROR, "Destination environment data error."); /* 2263 */
+ADD_MQ_REASON_TXT(MQRC_DEST_NAME_ERROR, "Destination name data error."); /* 2264 */
+ADD_MQ_REASON_TXT(MQRC_TM_ERROR, "Trigger message structure not valid."); /* 2265 */
+ADD_MQ_REASON_TXT(MQRC_CLUSTER_EXIT_ERROR, "Cluster workload exit failed."); /* 2266 */
+ADD_MQ_REASON_TXT(MQRC_CLUSTER_EXIT_LOAD_ERROR, "Unable to load cluster workload exit."); /* 2267 */
+ADD_MQ_REASON_TXT(MQRC_CLUSTER_PUT_INHIBITED, "Put calls inhibited for all queues in cluster."); /* 2268 */
+ADD_MQ_REASON_TXT(MQRC_NO_DESTINATIONS_AVAILABLE, "No destination queues available."); /* 2270 */
+ADD_MQ_REASON_TXT(MQRC_CONNECTION_ERROR, "Error processing MQCONN call."); /* 2273 */
+ADD_MQ_REASON_TXT(MQRC_OPTION_ENVIRONMENT_ERROR, "Option not valid in environment."); /* 2274 */
+ADD_MQ_REASON_TXT(MQRC_CD_ERROR, "Channel definition not valid."); /* 2277 */
+ADD_MQ_REASON_TXT(MQRC_CLIENT_CONN_ERROR, "Client connection fields not valid."); /* 2278 */
+ADD_MQ_REASON_TXT(MQRC_CHANNEL_STOPPED_BY_USER, "Channel stopped by user."); /* 2279 */
+ADD_MQ_REASON_TXT(MQRC_HCONFIG_ERROR, "Configuration handle not valid."); /* 2280 */
+ADD_MQ_REASON_TXT(MQRC_FUNCTION_ERROR, "Function identifier not valid for service."); /* 2281 */
+ADD_MQ_REASON_TXT(MQRC_CHANNEL_STARTED, "Channel started."); /* 2282 */
+ADD_MQ_REASON_TXT(MQRC_CHANNEL_STOPPED, "Channel stopped."); /* 2283 */
+ADD_MQ_REASON_TXT(MQRC_CHANNEL_CONV_ERROR, "Channel conversion error."); /* 2284 */
+ADD_MQ_REASON_TXT(MQRC_SERVICE_NOT_AVAILABLE, "Underlying service not available."); /* 2285 */
+ADD_MQ_REASON_TXT(MQRC_INITIALIZATION_FAILED, "Initialization failed for an undefined reason."); /* 2286 */
+ADD_MQ_REASON_TXT(MQRC_TERMINATION_FAILED, "Termination failed for an undefined reason."); /* 2287 */
+ADD_MQ_REASON_TXT(MQRC_UNKNOWN_Q_NAME, "Queue name not found."); /* 2288 */
+ADD_MQ_REASON_TXT(MQRC_SERVICE_ERROR, "Unexpected error occurred accessing service."); /* 2289 */
+ADD_MQ_REASON_TXT(MQRC_Q_ALREADY_EXISTS, "Queue object already exists."); /* 2290 */
+ADD_MQ_REASON_TXT(MQRC_USER_ID_NOT_AVAILABLE, "Unable to determine the user ID."); /* 2291 */
+ADD_MQ_REASON_TXT(MQRC_UNKNOWN_ENTITY, "Entity unknown to service."); /* 2292 */
+ADD_MQ_REASON_TXT(MQRC_UNKNOWN_AUTH_ENTITY, "Authorization entity unknown to service."); /* 2293 */
+ADD_MQ_REASON_TXT(MQRC_UNKNOWN_REF_OBJECT, "Reference object unknown."); /* 2294 */
+ADD_MQ_REASON_TXT(MQRC_CHANNEL_ACTIVATED, "Channel activated."); /* 2295 */
+ADD_MQ_REASON_TXT(MQRC_CHANNEL_NOT_ACTIVATED, "Channel cannot be activated."); /* 2296 */
+ADD_MQ_REASON_TXT(MQRC_UOW_CANCELED, "Unit of work canceled."); /* 2297 */
+ADD_MQ_REASON_TXT(MQRC_SELECTOR_TYPE_ERROR, "Selector has wrong data type."); /* 2299 */
+ADD_MQ_REASON_TXT(MQRC_COMMAND_TYPE_ERROR, "Command type not valid."); /* 2300 */
+ADD_MQ_REASON_TXT(MQRC_MULTIPLE_INSTANCE_ERROR, "Multiple instances of system data item not valid."); /* 2301 */
+ADD_MQ_REASON_TXT(MQRC_SYSTEM_ITEM_NOT_ALTERABLE, "System data item is read-only and cannot be altered."); /* 2302 */
+ADD_MQ_REASON_TXT(MQRC_BAG_CONVERSION_ERROR, "Data could not be converted into a bag."); /* 2303 */
+ADD_MQ_REASON_TXT(MQRC_SELECTOR_OUT_OF_RANGE, "Selector not within valid range for call."); /* 2304 */
+ADD_MQ_REASON_TXT(MQRC_SELECTOR_NOT_UNIQUE, "Selector occurs more than once in bag."); /* 2305 */
+ADD_MQ_REASON_TXT(MQRC_INDEX_NOT_PRESENT, "Index not present."); /* 2306 */
+ADD_MQ_REASON_TXT(MQRC_STRING_ERROR, "String parameter not valid."); /* 2307 */
+ADD_MQ_REASON_TXT(MQRC_ENCODING_NOT_SUPPORTED, "Encoding not supported."); /* 2308 */
+ADD_MQ_REASON_TXT(MQRC_SELECTOR_NOT_PRESENT, "Selector not present in bag."); /* 2309 */
+ADD_MQ_REASON_TXT(MQRC_OUT_SELECTOR_ERROR, "OutSelector parameter not valid."); /* 2310 */
+ADD_MQ_REASON_TXT(MQRC_STRING_TRUNCATED, "String truncated (too long for output buffer)."); /* 2311 */
+ADD_MQ_REASON_TXT(MQRC_SELECTOR_WRONG_TYPE, "Selector implies a data type not valid for call."); /* 2312 */
+ADD_MQ_REASON_TXT(MQRC_INCONSISTENT_ITEM_TYPE, "Data type of item differs from previous occurrence of selector."); /* 2313 */
+ADD_MQ_REASON_TXT(MQRC_INDEX_ERROR, "Index not valid."); /* 2314 */
+ADD_MQ_REASON_TXT(MQRC_SYSTEM_BAG_NOT_ALTERABLE, "System bag is read-only and cannot be altered."); /* 2315 */
+ADD_MQ_REASON_TXT(MQRC_ITEM_COUNT_ERROR, "ItemCount parameter not valid."); /* 2316 */
+ADD_MQ_REASON_TXT(MQRC_FORMAT_NOT_SUPPORTED, "Format not supported."); /* 2317 */
+ADD_MQ_REASON_TXT(MQRC_SELECTOR_NOT_SUPPORTED, "System selector not supported."); /* 2318 */
+ADD_MQ_REASON_TXT(MQRC_ITEM_VALUE_ERROR, "ItemValue parameter not valid."); /* 2319 */
+ADD_MQ_REASON_TXT(MQRC_HBAG_ERROR, "Bag handle not valid."); /* 2320 */
+ADD_MQ_REASON_TXT(MQRC_PARAMETER_MISSING, "Parameter missing."); /* 2321 */
+ADD_MQ_REASON_TXT(MQRC_CMD_SERVER_NOT_AVAILABLE, "Command server not available."); /* 2322 */
+ADD_MQ_REASON_TXT(MQRC_STRING_LENGTH_ERROR, "StringLength parameter not valid."); /* 2323 */
+ADD_MQ_REASON_TXT(MQRC_INQUIRY_COMMAND_ERROR, "Command code is not a recognized inquiry command."); /* 2324 */
+ADD_MQ_REASON_TXT(MQRC_NESTED_BAG_NOT_SUPPORTED, "Input bag contains one or more nested bags."); /* 2325 */
+ADD_MQ_REASON_TXT(MQRC_BAG_WRONG_TYPE, "Bag has wrong type for intended use."); /* 2326 */
+ADD_MQ_REASON_TXT(MQRC_ITEM_TYPE_ERROR, "ItemType parameter not valid."); /* 2327 */
+ADD_MQ_REASON_TXT(MQRC_SYSTEM_BAG_NOT_DELETABLE, "System bag is read-only and cannot be deleted."); /* 2328 */
+ADD_MQ_REASON_TXT(MQRC_SYSTEM_ITEM_NOT_DELETABLE, "System data item is read-only and cannot be deleted."); /* 2329 */
+ADD_MQ_REASON_TXT(MQRC_CODED_CHAR_SET_ID_ERROR, "Coded character set identifier parameter not valid."); /* 2330 */
+ADD_MQ_REASON_TXT(MQRC_MSG_TOKEN_ERROR, "Use of message token not valid."); /* 2331 */
+ADD_MQ_REASON_TXT(MQRC_MISSING_WIH, "Message data does not begin with MQWIH."); /* 2332 */
+ADD_MQ_REASON_TXT(MQRC_WIH_ERROR, "MQWIH structure not valid."); /* 2333 */
+ADD_MQ_REASON_TXT(MQRC_RFH_ERROR, "MQRFH structure not valid."); /* 2334 */
+ADD_MQ_REASON_TXT(MQRC_RFH_STRING_ERROR, "NameValueString field not valid."); /* 2335 */
+ADD_MQ_REASON_TXT(MQRC_RFH_COMMAND_ERROR, "Command not valid."); /* 2336 */
+ADD_MQ_REASON_TXT(MQRC_RFH_PARM_ERROR, "Parameter not valid."); /* 2337 */
+ADD_MQ_REASON_TXT(MQRC_RFH_DUPLICATE_PARM, "Duplicate parameter."); /* 2338 */
+ADD_MQ_REASON_TXT(MQRC_RFH_PARM_MISSING, "Parameter missing."); /* 2339 */
+ADD_MQ_REASON_TXT(MQRC_CONFIG_CREATE_OBJECT, "Create Object"); /* 2367 */
+ADD_MQ_REASON_TXT(MQRC_CONFIG_CHANGE_OBJECT, "Change Object"); /* 2368 */
+ADD_MQ_REASON_TXT(MQRC_CONFIG_DELETE_OBJECT, "Delete Object"); /* 2369 */
+ADD_MQ_REASON_TXT(MQRC_CONFIG_REFRESH_OBJECT, "Refresh Object"); /* 2370 */
+ADD_MQ_REASON_TXT(MQRCCF_CFH_TYPE_ERROR, "Type not valid."); /* 3001 */
+ADD_MQ_REASON_TXT(MQRCCF_CFH_LENGTH_ERROR, "Structure length not valid."); /* 3002 */
+ADD_MQ_REASON_TXT(MQRCCF_CFH_VERSION_ERROR, "Structure version number is not valid."); /* 3003 */
+ADD_MQ_REASON_TXT(MQRCCF_CFH_MSG_SEQ_NUMBER_ERR, "Message sequence number not valid."); /* 3004 */
+ADD_MQ_REASON_TXT(MQRCCF_CFH_CONTROL_ERROR, "Control option not valid."); /* 3005 */
+ADD_MQ_REASON_TXT(MQRCCF_CFH_PARM_COUNT_ERROR, "Parameter count not valid."); /* 3006 */
+ADD_MQ_REASON_TXT(MQRCCF_CFH_COMMAND_ERROR, "Command identifier not valid."); /* 3007 */
+ADD_MQ_REASON_TXT(MQRCCF_COMMAND_FAILED, "Command failed."); /* 3008 */
+ADD_MQ_REASON_TXT(MQRCCF_CFIN_LENGTH_ERROR, "Structure length not valid."); /* 3009 */
+ADD_MQ_REASON_TXT(MQRCCF_CFST_LENGTH_ERROR, "Structure length not valid."); /* 3010 */
+ADD_MQ_REASON_TXT(MQRCCF_CFST_STRING_LENGTH_ERR, "String length not valid."); /* 3011 */
+ADD_MQ_REASON_TXT(MQRCCF_FORCE_VALUE_ERROR, "Force value not valid."); /* 3012 */
+ADD_MQ_REASON_TXT(MQRCCF_STRUCTURE_TYPE_ERROR, "Structure type not valid."); /* 3013 */
+ADD_MQ_REASON_TXT(MQRCCF_CFIN_PARM_ID_ERROR, "Parameter identifier is not valid."); /* 3014 */
+ADD_MQ_REASON_TXT(MQRCCF_CFST_PARM_ID_ERROR, "Parameter identifier is not valid."); /* 3015 */
+ADD_MQ_REASON_TXT(MQRCCF_MSG_LENGTH_ERROR, "Message length not valid."); /* 3016 */
+ADD_MQ_REASON_TXT(MQRCCF_CFIN_DUPLICATE_PARM, "Duplicate parameter."); /* 3017 */
+ADD_MQ_REASON_TXT(MQRCCF_CFST_DUPLICATE_PARM, "Duplicate parameter."); /* 3018 */
+ADD_MQ_REASON_TXT(MQRCCF_PARM_COUNT_TOO_SMALL, "Parameter count too small."); /* 3019 */
+ADD_MQ_REASON_TXT(MQRCCF_PARM_COUNT_TOO_BIG, "Parameter count too big."); /* 3020 */
+ADD_MQ_REASON_TXT(MQRCCF_Q_ALREADY_IN_CELL, "Queue already exists in cell."); /* 3021 */
+ADD_MQ_REASON_TXT(MQRCCF_Q_TYPE_ERROR, "Queue type not valid."); /* 3022 */
+ADD_MQ_REASON_TXT(MQRCCF_MD_FORMAT_ERROR, "Format not valid."); /* 3023 */
+ADD_MQ_REASON_TXT(MQRCCF_REPLACE_VALUE_ERROR, "Replace value not valid."); /* 3025 */
+ADD_MQ_REASON_TXT(MQRCCF_CFIL_DUPLICATE_VALUE, "Duplicate parameter."); /* 3026 */
+ADD_MQ_REASON_TXT(MQRCCF_CFIL_COUNT_ERROR, "Count of parameter values not valid."); /* 3027 */
+ADD_MQ_REASON_TXT(MQRCCF_CFIL_LENGTH_ERROR, "Structure length not valid."); /* 3028 */
+ADD_MQ_REASON_TXT(MQRCCF_QUIESCE_VALUE_ERROR, "Mode value not valid."); /* 3029 */
+ADD_MQ_REASON_TXT(MQRCCF_QUIESCE_VALUE_ERROR, "Mode value not valid."); /* 3029 */
+ADD_MQ_REASON_TXT(MQRCCF_MSG_SEQ_NUMBER_ERROR, "Message sequence number not valid."); /* 3030 */
+ADD_MQ_REASON_TXT(MQRCCF_PING_DATA_COUNT_ERROR, "Data count not valid."); /* 3031 */
+ADD_MQ_REASON_TXT(MQRCCF_PING_DATA_COMPARE_ERROR, "Ping Channel command failed."); /* 3032 */
+ADD_MQ_REASON_TXT(MQRCCF_CHANNEL_TYPE_ERROR, "Channel type not valid."); /* 3034 */
+ADD_MQ_REASON_TXT(MQRCCF_PARM_SEQUENCE_ERROR, "Parameter sequence not valid."); /* 3035 */
+ADD_MQ_REASON_TXT(MQRCCF_XMIT_PROTOCOL_TYPE_ERR, "Transmission protocol type not valid."); /* 3036 */
+ADD_MQ_REASON_TXT(MQRCCF_BATCH_SIZE_ERROR, "Batch size not valid."); /* 3037 */
+ADD_MQ_REASON_TXT(MQRCCF_DISC_INT_ERROR, "Disconnection interval not valid."); /* 3038 */
+ADD_MQ_REASON_TXT(MQRCCF_SHORT_RETRY_ERROR, "Short retry count not valid."); /* 3039 */
+ADD_MQ_REASON_TXT(MQRCCF_SHORT_TIMER_ERROR, "Short timer value not valid."); /* 3040 */
+ADD_MQ_REASON_TXT(MQRCCF_LONG_RETRY_ERROR, "Long retry count not valid."); /* 3041 */
+ADD_MQ_REASON_TXT(MQRCCF_LONG_TIMER_ERROR, "Long timer not valid."); /* 3042 */
+ADD_MQ_REASON_TXT(MQRCCF_SEQ_NUMBER_WRAP_ERROR, "Sequence wrap number not valid."); /* 3043 */
+ADD_MQ_REASON_TXT(MQRCCF_MAX_MSG_LENGTH_ERROR, "Maximum message length not valid."); /* 3044 */
+ADD_MQ_REASON_TXT(MQRCCF_PUT_AUTH_ERROR, "Put authority value not valid."); /* 3045 */
+ADD_MQ_REASON_TXT(MQRCCF_PURGE_VALUE_ERROR, "Purge value not valid."); /* 3046 */
+ADD_MQ_REASON_TXT(MQRCCF_CFIL_PARM_ID_ERROR, "Parameter identifier is not valid."); /* 3047 */
+ADD_MQ_REASON_TXT(MQRCCF_MSG_TRUNCATED, "Message truncated."); /* 3048 */
+ADD_MQ_REASON_TXT(MQRCCF_CCSID_ERROR, "Coded character-set identifier error."); /* 3049 */
+ADD_MQ_REASON_TXT(MQRCCF_ENCODING_ERROR, "Encoding error."); /* 3050 */
+ADD_MQ_REASON_TXT(MQRCCF_DATA_CONV_VALUE_ERROR, "Data conversion value not valid."); /* 3052 */
+ADD_MQ_REASON_TXT(MQRCCF_INDOUBT_VALUE_ERROR, "In-doubt value not valid."); /* 3053 */
+ADD_MQ_REASON_TXT(MQRCCF_ESCAPE_TYPE_ERROR, "Escape type not valid."); /* 3054 */
+ADD_MQ_REASON_TXT(MQRCCF_CHANNEL_TABLE_ERROR, "Channel table value not valid."); /* 3062 */
+ADD_MQ_REASON_TXT(MQRCCF_MCA_TYPE_ERROR, "Message channel agent type not valid."); /* 3063 */
+ADD_MQ_REASON_TXT(MQRCCF_CHL_INST_TYPE_ERROR, "Channel instance type not valid."); /* 3064 */
+ADD_MQ_REASON_TXT(MQRCCF_CHL_STATUS_NOT_FOUND, "Channel status not found."); /* 3065 */
+ADD_MQ_REASON_TXT(MQRCCF_CFSL_DUPLICATE_PARM, "Duplicate parameter."); /* 3066 */
+ADD_MQ_REASON_TXT(MQRCCF_CFSL_TOTAL_LENGTH_ERROR, "Total string length error."); /* 3067 */
+ADD_MQ_REASON_TXT(MQRCCF_CFSL_COUNT_ERROR, "Name count value not valid."); /* 3068 */
+ADD_MQ_REASON_TXT(MQRCCF_CFSL_STRING_LENGTH_ERR, "String length not valid."); /* 3069 */
+ADD_MQ_REASON_TXT(MQRCCF_Q_MGR_CCSID_ERROR, "Queue manager coded character set identifier error."); /* 3086 */
+ADD_MQ_REASON_TXT(MQRCCF_CLUSTER_NAME_CONFLICT, "ClusterName and ClusterNamelist attributes conflict."); /* 3088 */
+ADD_MQ_REASON_TXT(MQRCCF_REPOS_NAME_CONFLICT, "RepositoryName and RepositoryNamelist attributes conflict."); /* 3089 */
+ADD_MQ_REASON_TXT(MQRCCF_CLUSTER_Q_USAGE_ERROR, "Cluster queue cannot be a transmission queue."); /* 3090 */
+ADD_MQ_REASON_TXT(MQRCCF_ACTION_VALUE_ERROR, "Action value not valid."); /* 3091 */
+ADD_MQ_REASON_TXT(MQRCCF_COMMS_LIBRARY_ERROR, "Library for requested communications protocol could not be loaded."); /* 3092 */
+ADD_MQ_REASON_TXT(MQRCCF_NETBIOS_NAME_ERROR, "NetBIOS listener name not defined."); /* 3093 */
+ADD_MQ_REASON_TXT(MQRCCF_CFST_CONFLICTING_PARM, "Conflicting parameters."); /* 3095 */
+ADD_MQ_REASON_TXT(MQRCCF_FILTER_ERROR, "Content based filter expression not valid."); /* 3150 */
+ADD_MQ_REASON_TXT(MQRCCF_WRONG_USER, "Wrong user."); /* 3151 */
+ADD_MQ_REASON_TXT(MQRCCF_OBJECT_ALREADY_EXISTS, "Object already exists."); /* 4001 */
+ADD_MQ_REASON_TXT(MQRCCF_OBJECT_WRONG_TYPE, "Object has wrong type."); /* 4002 */
+ADD_MQ_REASON_TXT(MQRCCF_LIKE_OBJECT_WRONG_TYPE, "New and existing objects have different type."); /* 4003 */
+ADD_MQ_REASON_TXT(MQRCCF_OBJECT_OPEN, "Object is open."); /* 4004 */
+ADD_MQ_REASON_TXT(MQRCCF_ATTR_VALUE_ERROR, "Attribute value not valid."); /* 4005 */
+ADD_MQ_REASON_TXT(MQRCCF_UNKNOWN_Q_MGR, "Queue manager not known."); /* 4006 */
+ADD_MQ_REASON_TXT(MQRCCF_Q_WRONG_TYPE, "Action not valid for the queue of specified type."); /* 4007 */
+ADD_MQ_REASON_TXT(MQRCCF_OBJECT_NAME_ERROR, "Object name not valid."); /* 4008 */
+ADD_MQ_REASON_TXT(MQRCCF_ALLOCATE_FAILED, "Allocation failed."); /* 4009 */
+ADD_MQ_REASON_TXT(MQRCCF_HOST_NOT_AVAILABLE, "Remote system not available."); /* 4010 */
+ADD_MQ_REASON_TXT(MQRCCF_CONFIGURATION_ERROR, "Configuration error."); /* 4011 */
+ADD_MQ_REASON_TXT(MQRCCF_CONNECTION_REFUSED, "Connection refused."); /* 4012 */
+ADD_MQ_REASON_TXT(MQRCCF_ENTRY_ERROR, "Invalid connection name."); /* 4013 */
+ADD_MQ_REASON_TXT(MQRCCF_SEND_FAILED, "Send failed."); /* 4014 */
+ADD_MQ_REASON_TXT(MQRCCF_RECEIVED_DATA_ERROR, "Received data error."); /* 4015 */
+ADD_MQ_REASON_TXT(MQRCCF_RECEIVE_FAILED, "Receive failed."); /* 4016 */
+ADD_MQ_REASON_TXT(MQRCCF_CONNECTION_CLOSED, "Connection closed."); /* 4017 */
+ADD_MQ_REASON_TXT(MQRCCF_NO_STORAGE, "Not enough storage available."); /* 4018 */
+ADD_MQ_REASON_TXT(MQRCCF_NO_COMMS_MANAGER, "Communications manager not available."); /* 4019 */
+ADD_MQ_REASON_TXT(MQRCCF_LISTENER_NOT_STARTED, "Listener not started."); /* 4020 */
+ADD_MQ_REASON_TXT(MQRCCF_BIND_FAILED, "Bind failed."); /* 4024 */
+ADD_MQ_REASON_TXT(MQRCCF_CHANNEL_INDOUBT, "Channel in-doubt."); /* 4025 */
+ADD_MQ_REASON_TXT(MQRCCF_MQCONN_FAILED, "MQCONN call failed."); /* 4026 */
+ADD_MQ_REASON_TXT(MQRCCF_MQOPEN_FAILED, "MQOPEN call failed."); /* 4027 */
+ADD_MQ_REASON_TXT(MQRCCF_MQGET_FAILED, "MQGET call failed."); /* 4028 */
+ADD_MQ_REASON_TXT(MQRCCF_MQPUT_FAILED, "MQPUT call failed."); /* 4029 */
+ADD_MQ_REASON_TXT(MQRCCF_PING_ERROR, "Ping error."); /* 4030 */
+ADD_MQ_REASON_TXT(MQRCCF_CHANNEL_IN_USE, "Channel in use."); /* 4031 */
+ADD_MQ_REASON_TXT(MQRCCF_CHANNEL_NOT_FOUND, "Channel not found."); /* 4032 */
+ADD_MQ_REASON_TXT(MQRCCF_UNKNOWN_REMOTE_CHANNEL, "Remote channel not known."); /* 4033 */
+ADD_MQ_REASON_TXT(MQRCCF_REMOTE_QM_UNAVAILABLE, "Remote queue manager not available."); /* 4034 */
+ADD_MQ_REASON_TXT(MQRCCF_REMOTE_QM_TERMINATING, "Remote queue manager terminating."); /* 4035 */
+ADD_MQ_REASON_TXT(MQRCCF_MQINQ_FAILED, "MQINQ call failed."); /* 4036 */
+ADD_MQ_REASON_TXT(MQRCCF_NOT_XMIT_Q, "Queue is not a transmission queue."); /* 4037 */
+ADD_MQ_REASON_TXT(MQRCCF_CHANNEL_DISABLED, "Channel disabled."); /* 4038 */
+ADD_MQ_REASON_TXT(MQRCCF_USER_EXIT_NOT_AVAILABLE, "User exit not available."); /* 4039 */
+ADD_MQ_REASON_TXT(MQRCCF_COMMIT_FAILED, "Commit failed."); /* 4040 */
+ADD_MQ_REASON_TXT(MQRCCF_WRONG_CHANNEL_TYPE, "Parameter not allowed for this channel type."); /* 4041 */
+ADD_MQ_REASON_TXT(MQRCCF_CHANNEL_ALREADY_EXISTS, "Channel already exists."); /* 4042 */
+ADD_MQ_REASON_TXT(MQRCCF_DATA_TOO_LARGE, "Data too large."); /* 4043 */
+ADD_MQ_REASON_TXT(MQRCCF_CHANNEL_NAME_ERROR, "Channel name error."); /* 4044 */
+ADD_MQ_REASON_TXT(MQRCCF_XMIT_Q_NAME_ERROR, "Transmission queue name error."); /* 4045 */
+ADD_MQ_REASON_TXT(MQRCCF_MCA_NAME_ERROR, "Message channel agent name error."); /* 4047 */
+ADD_MQ_REASON_TXT(MQRCCF_SEND_EXIT_NAME_ERROR, "Channel send exit name error."); /* 4048 */
+ADD_MQ_REASON_TXT(MQRCCF_SEC_EXIT_NAME_ERROR, "Channel security exit name error."); /* 4049 */
+ADD_MQ_REASON_TXT(MQRCCF_MSG_EXIT_NAME_ERROR, "Channel message exit name error."); /* 4050 */
+ADD_MQ_REASON_TXT(MQRCCF_RCV_EXIT_NAME_ERROR, "Channel receive exit name error."); /* 4051 */
+ADD_MQ_REASON_TXT(MQRCCF_XMIT_Q_NAME_WRONG_TYPE, "Transmission queue name not allowed for this channel type."); /* 4052 */
+ADD_MQ_REASON_TXT(MQRCCF_MCA_NAME_WRONG_TYPE, "Message channel agent name not allowed for this channel type."); /* 4053 */
+ADD_MQ_REASON_TXT(MQRCCF_DISC_INT_WRONG_TYPE, "Disconnection interval not allowed for this channel type."); /* 4054 */
+ADD_MQ_REASON_TXT(MQRCCF_SHORT_RETRY_WRONG_TYPE, "Short retry parameter not allowed for this channel type."); /* 4055 */
+ADD_MQ_REASON_TXT(MQRCCF_SHORT_TIMER_WRONG_TYPE, "Short timer parameter not allowed for this channel type."); /* 4056 */
+ADD_MQ_REASON_TXT(MQRCCF_LONG_RETRY_WRONG_TYPE, "Long retry parameter not allowed for this channel type."); /* 4057 */
+ADD_MQ_REASON_TXT(MQRCCF_LONG_TIMER_WRONG_TYPE, "Long timer parameter not allowed for this channel type."); /* 4058 */
+ADD_MQ_REASON_TXT(MQRCCF_PUT_AUTH_WRONG_TYPE, "Put authority parameter not allowed for this channel type."); /* 4059 */
+ADD_MQ_REASON_TXT(MQRCCF_KEEP_ALIVE_INT_ERROR, "Keepalive interval not valid."); /* 4060 */
+ADD_MQ_REASON_TXT(MQRCCF_MISSING_CONN_NAME, "Connection name parameter required but missing."); /* 4061 */
+ADD_MQ_REASON_TXT(MQRCCF_CONN_NAME_ERROR, "Error in connection name parameter."); /* 4062 */
+ADD_MQ_REASON_TXT(MQRCCF_MQSET_FAILED, "MQSET call failed."); /* 4063 */
+ADD_MQ_REASON_TXT(MQRCCF_CHANNEL_NOT_ACTIVE, "Channel not active."); /* 4064 */
+ADD_MQ_REASON_TXT(MQRCCF_TERMINATED_BY_SEC_EXIT, "Channel terminated by security exit."); /* 4065 */
+ADD_MQ_REASON_TXT(MQRCCF_DYNAMIC_Q_SCOPE_ERROR, "Dynamic queue scope error."); /* 4067 */
+ADD_MQ_REASON_TXT(MQRCCF_CELL_DIR_NOT_AVAILABLE, "Cell directory is not available."); /* 4068 */
+ADD_MQ_REASON_TXT(MQRCCF_MR_COUNT_ERROR, "Message retry count not valid."); /* 4069 */
+ADD_MQ_REASON_TXT(MQRCCF_MR_COUNT_WRONG_TYPE, "Message-retry count parameter not allowed for this channel type."); /* 4070 */
+ADD_MQ_REASON_TXT(MQRCCF_MR_EXIT_NAME_ERROR, "Channel message-retry exit name error."); /* 4071 */
+ADD_MQ_REASON_TXT(MQRCCF_MR_EXIT_NAME_WRONG_TYPE, "Message-retry exit parameter not allowed for this channel type."); /* 4072 */
+ADD_MQ_REASON_TXT(MQRCCF_MR_INTERVAL_ERROR, "Message retry interval not valid."); /* 4073 */
+ADD_MQ_REASON_TXT(MQRCCF_MR_INTERVAL_WRONG_TYPE, "Message-retry interval parameter not allowed for this channel type."); /* 4074 */
+ADD_MQ_REASON_TXT(MQRCCF_NPM_SPEED_ERROR, "Nonpersistent message speed not valid."); /* 4075 */
+ADD_MQ_REASON_TXT(MQRCCF_NPM_SPEED_WRONG_TYPE, "Nonpersistent message speed parameter not allowed for this channel type."); /* 4076 */
+ADD_MQ_REASON_TXT(MQRCCF_HB_INTERVAL_ERROR, "Heartbeat interval not valid."); /* 4077 */
+ADD_MQ_REASON_TXT(MQRCCF_HB_INTERVAL_WRONG_TYPE, "Heartbeat interval parameter not allowed for this channel type."); /* 4078 */
+ADD_MQ_REASON_TXT(MQRCCF_CHAD_ERROR, "Channel automatic definition error."); /* 4079 */
+ADD_MQ_REASON_TXT(MQRCCF_CHAD_WRONG_TYPE, "Channel automatic definition parameter not allowed for this channel type."); /* 4080 */
+ADD_MQ_REASON_TXT(MQRCCF_CHAD_EVENT_ERROR, "Channel automatic definition event error."); /* 4081 */
+ADD_MQ_REASON_TXT(MQRCCF_CHAD_EVENT_WRONG_TYPE, "Channel automatic definition event parameter not allowed for this channel type."); /* 4082 */
+ADD_MQ_REASON_TXT(MQRCCF_CHAD_EXIT_ERROR, "Channel automatic definition exit name error."); /* 4083 */
+ADD_MQ_REASON_TXT(MQRCCF_CHAD_EXIT_WRONG_TYPE, "Channel automatic definition exit parameter not allowed for this channel type."); /* 4084 */
+ADD_MQ_REASON_TXT(MQRCCF_SUPPRESSED_BY_EXIT, "Action suppressed by exit program."); /* 4085 */
+ADD_MQ_REASON_TXT(MQRCCF_BATCH_INT_ERROR, "Batch interval not valid."); /* 4086 */
+ADD_MQ_REASON_TXT(MQRCCF_BATCH_INT_WRONG_TYPE, "Batch interval parameter not allowed for this channel type."); /* 4087 */
+ADD_MQ_REASON_TXT(MQRCCF_NET_PRIORITY_ERROR, "Network priority value is not valid."); /* 4088 */
+ADD_MQ_REASON_TXT(MQRCCF_NET_PRIORITY_WRONG_TYPE, "Network priority parameter not allowed for this channel type."); /* 4089 */
+ADD_MQ_REASON_TXT(MQRC_NEGATIVE_LENGTH, "Length is negative."); /* 6117 */

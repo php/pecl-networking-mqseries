@@ -371,7 +371,7 @@ PHP_FUNCTION(mqseries_conn)
 		== FAILURE) {
 		return;
 	}
-	if (!is_called_by_ref(z_conn, "conn")) return ;
+	if (!is_called_by_ref(z_conn, "conn")) return;
 	if (!is_compcode_reason_ref(z_comp_code, z_reason)) return;
 	
 	strncpy(qManagerName, name, sizeof(MQCHAR48));
@@ -440,16 +440,16 @@ PHP_FUNCTION(mqseries_connx)
 	MQCNO connect_opts 			= {MQCNO_DEFAULT};
 	MQCD  channel_definition    = {MQCD_CLIENT_CONN_DEFAULT};
 	MQSCO ssl_configuration     = {MQSCO_DEFAULT};
-	MQAIR authentication_information_record = {MQAIR_DEFAULT} ; /* Only 1 (one) record is supported for now. */
+	MQAIR authentication_information_record = {MQAIR_DEFAULT}; /* Only 1 (one) record is supported for now. */
 	MQCHAR LDAPUserName[MQ_DISTINGUISHED_NAME_LENGTH];
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sazzz", &name, &name_len, 
 		&z_connect_opts, &z_conn, &z_comp_code, &z_reason)
 		== FAILURE) {
-		return ;
+		return;
 	}
 
-	if (!is_called_by_ref(z_conn, "conn")) return ;
+	if (!is_called_by_ref(z_conn, "conn")) return;
 	if (!is_compcode_reason_ref(z_comp_code, z_reason)) return;
 	
 	set_connect_opts_from_array(z_connect_opts, &connect_opts, &channel_definition, &ssl_configuration, &authentication_information_record, LDAPUserName);
@@ -518,7 +518,7 @@ PHP_FUNCTION(mqseries_open)
 		return;
 	}
 
-	if (!is_called_by_ref(z_obj, "obj")) return ;
+	if (!is_called_by_ref(z_obj, "obj")) return;
 	if (!is_compcode_reason_ref(z_comp_code, z_reason)) return;
 
 	ZEND_FETCH_RESOURCE(mqdesc, mqseries_descriptor *, &z_mqdesc, -1, PHP_MQSERIES_DESCRIPTOR_RES_NAME, le_mqseries_conn);
@@ -1203,7 +1203,7 @@ PHP_FUNCTION(mqseries_inq)
 	ZEND_FETCH_RESOURCE(mqdesc, mqseries_descriptor *, &z_mqdesc, -1, PHP_MQSERIES_DESCRIPTOR_RES_NAME, le_mqseries_conn);
 	ZEND_FETCH_RESOURCE(mqobj,  mqseries_obj *, &z_mqobj, -1, PHP_MQSERIES_OBJ_RES_NAME, le_mqseries_obj);
 	
-	selectors = (MQLONG *)emalloc(selectorCount * sizeof(MQLONG));
+	selectors = (MQLONG *) emalloc(selectorCount * sizeof(MQLONG));
 	
 	zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(z_selectors), &pos);
 	while (zend_hash_get_current_data_ex(Z_ARRVAL_P(z_selectors), (void **)&option_val, &pos) == SUCCESS) {
@@ -1215,11 +1215,11 @@ PHP_FUNCTION(mqseries_inq)
 	
 	
 	if (charAttrLength > 0) { /* Are charAttr requested */
-		charAttrs = (MQCHAR *)emalloc(charAttrLength+1);
+		charAttrs = (MQCHAR *) emalloc(charAttrLength+1);
 		memset(charAttrs, 0, charAttrLength+1); // set to zero
 	}
 	if (intAttrLength > 0) { /*  Are intAttr requested */
-		intAttrs = (MQLONG *)emalloc(intAttrLength+sizeof(MQLONG));
+		intAttrs = (MQLONG *) emalloc(intAttrLength+sizeof(MQLONG));
 	}
 	
 	MQINQ(
@@ -1307,7 +1307,7 @@ PHP_FUNCTION(mqseries_set)
 	ZEND_FETCH_RESOURCE(mqdesc, mqseries_descriptor *, &z_mqdesc, -1, PHP_MQSERIES_DESCRIPTOR_RES_NAME, le_mqseries_conn);
 	ZEND_FETCH_RESOURCE(mqobj,  mqseries_obj *, &z_mqobj, -1, PHP_MQSERIES_OBJ_RES_NAME, le_mqseries_obj);
 	
-	selectors = (MQLONG *)emalloc(selectorCount * sizeof(MQLONG));
+	selectors = (MQLONG *) emalloc(selectorCount * sizeof(MQLONG));
 	
 	zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(z_selectors), &pos);
 	current = 0;
@@ -1319,7 +1319,7 @@ PHP_FUNCTION(mqseries_set)
 	}
 	
 	if (intAttrLength > 0) { /*  Are intAttr requested */
-		intAttrs = (MQLONG *)emalloc(intAttrLength+sizeof(MQLONG));
+		intAttrs = (MQLONG *) emalloc(intAttrLength+sizeof(MQLONG));
 		current = 0;
 		zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(z_intAttrs), &pos);
 		while (zend_hash_get_current_data_ex(Z_ARRVAL_P(z_intAttrs), (void **)&option_val, &pos) == SUCCESS) {
@@ -1332,7 +1332,7 @@ PHP_FUNCTION(mqseries_set)
 
 	
 	if (charAttrLength > 0) { /* Are charAttr requested */
-		charAttrs = (MQCHAR *)emalloc(charAttrLength+1);
+		charAttrs = (MQCHAR *) emalloc(charAttrLength+1);
 		current = 0;
 		zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(z_charAttrs), &pos);
 		while (zend_hash_get_current_data_ex(Z_ARRVAL_P(z_charAttrs), (void **)&option_val, &pos) == SUCCESS) {

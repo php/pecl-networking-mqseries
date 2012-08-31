@@ -103,7 +103,7 @@ static HashTable *ht_reason_texts;
 			if (byte24 != NULL) { \
 				memcpy(s->m, byte24->bytes, sizeof(s->m)); \
 			} \
-		} else { \
+		} else if (Z_TYPE_PP(tmp) != IS_NULL) { \
 			convert_to_string(*tmp); \
 			strncpy((MQCHAR *) s->m, Z_STRVAL_PP(tmp), sizeof(s->m)); \
 		} \

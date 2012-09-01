@@ -599,8 +599,6 @@ PHP_FUNCTION(mqseries_get)
 	MQBYTE *buf, *data;
 	MQMD msg_desc = 	 { MQMD_DEFAULT }; 	/* Message descriptor */
 	MQGMO get_msg_opts = { MQGMO_DEFAULT }; /* Options which control the MQGET call */
-	MQRFH rfh = {MQRFH_DEFAULT};
-	MQRFH2 rfh2 = {MQRFH2_DEFAULT};
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rraalzzzz", &z_mqdesc, &z_mqobj,
 		&z_msg_desc, &z_get_msg_opts, &buf_len, &z_buffer, &z_data_length, &z_comp_code, &z_reason)
@@ -628,11 +626,17 @@ PHP_FUNCTION(mqseries_get)
  * TODO: Other formatting headers, if there are any
  */
 	if (!strncmp(msg_desc.Format, MQFMT_RF_HEADER, sizeof(msg_desc.Format))) {
+		MQRFH rfh = {MQRFH_DEFAULT};
 		memcpy(&rfh, buf, MQRFH_STRUC_LENGTH_FIXED);
 		data = buf + rfh.StrucLength;
 	} else if (!strncmp(msg_desc.Format, MQFMT_RF_HEADER_2, sizeof(msg_desc.Format))) {
+		MQRFH2 rfh2 = {MQRFH2_DEFAULT};
 		memcpy(&rfh2, buf, MQRFH_STRUC_LENGTH_FIXED_2);
 		data = buf + rfh2.StrucLength;
+	} else if (!strncmp(msg_desc.Format, MQFMT_MD_EXTENSION, sizeof(msg_desc.Format))) {
+		MQMDE rfhe = { MQMDE_DEFAULT };
+		memcpy(&rfhe, buf, MQMDE_LENGTH_2);
+		data = buf + rfhe.StrucLength;
 	}
 
 	ZVAL_LONG(z_comp_code, comp_code);

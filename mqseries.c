@@ -1415,6 +1415,7 @@ static void set_authentication_information_record_from_array(zval *array,
 	MQSERIES_SETOPT_LONG(authentication_information_record, AuthInfoType);
 	MQSERIES_SETOPT_STRING(authentication_information_record, AuthInfoConnName);
 	MQSERIES_SETOPT_STRING(authentication_information_record, LDAPPassword);
+	MQSERIES_SETOPT_STRING(authentication_information_record, OCSPResponderURL);
 
 	if (zend_hash_find(ht, "LDAPUserName", sizeof("LDAPUserName"), (void**)&tmp) == SUCCESS &&
 		Z_TYPE_PP(tmp) == IS_STRING) {
@@ -1533,7 +1534,7 @@ static void set_channel_definition_from_array(zval *array, PMQCD channel_definit
 				strncpy(channel_definition->SSLCipherSpec, Z_STRVAL_PP(option_val), sizeof(channel_definition->SSLCipherSpec));
    MQPTR     SSLPeerNamePtr;             Address of SSL peer name 
  */
-
+	MQSERIES_SETOPT_LONG(channel_definition, SSLCipherSpec);
 	MQSERIES_SETOPT_LONG(channel_definition, SSLPeerNameLength);
 	MQSERIES_SETOPT_LONG(channel_definition, SSLClientAuth);
 	MQSERIES_SETOPT_LONG(channel_definition, KeepAliveInterval);

@@ -40,6 +40,8 @@ http://pear.php.net/dtd/package-2.0.xsd">
  <notes>
 - Add support for the MQFMT_MD_EXTENSION Format to remove the 
   MQMDE from the message. (Pierrick)
+- Add support for the SSLCipherSpec and OCSPResponderURL.
+  (Dieter Devlieghere, Pierrick)
  </notes>
  <contents>
   <dir name="/">

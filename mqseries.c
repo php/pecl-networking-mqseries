@@ -963,6 +963,7 @@ static void _mqseries_close(zend_rsrc_list_entry *rsrc TSRMLS_DC)
 				switch(reason) {
 					case MQRC_CONNECTION_BROKEN:
 					case MQRC_HCONN_ERROR:
+					case MQRC_HOBJ_ERROR:
 						break;
 		
 					default:

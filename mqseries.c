@@ -1899,10 +1899,8 @@ static int is_compcode_reason_ref(zval *z_comp_code, zval *z_reason) {
  * Test to see if a parameters was passed by reference.
  */
 static int is_called_by_ref(zval *param, char *param_name) {
-	char str[255];
 	if (!PZVAL_IS_REF(param)) {
-		sprintf(str, "Parameter %s wasn't passed by reference", param_name);
-	    zend_error(E_WARNING, str);
+		zend_error(E_WARNING, "Parameter %s wasn't passed by reference", param_name);
 		return 0;
 	}
 	return 1;

@@ -2,30 +2,30 @@
 Copyright (c) 2003, JAWA Management Software GmbH http://www.jawa.at
 All rights reserved.
 
-Redistribution and use in source and binary forms, with or without 
-modification, are permitted provided that the following conditions 
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
 are met:
 
-1. Redistributions of source code must retain the above copyright 
+1. Redistributions of source code must retain the above copyright
    notice, this list of conditions and the following disclaimer.
-2. Redistributions in binary form must reproduce the above copyright 
-   notice, this list of conditions and the following disclaimer in the 
+2. Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimer in the
    documentation and/or other materials provided with the distribution.
 3. The names of the authors may not be used to endorse or promote products
    derived from this software without specific prior written permission.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
-ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. 
-IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, 
-INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
-BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
-DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
-OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
-NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
+OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-This code cannot simply be copied and put under the GNU Public License or 
+This code cannot simply be copied and put under the GNU Public License or
 any other GPL-like (LGPL, GPL2) License.
 
     $Id$
@@ -44,7 +44,7 @@ Author: Michael Bretterklieber <mbretter@jawa.at>
 #include "ext/standard/info.h"
 #include "php_mqseries.h"
 
-/* {{{ helper methods 
+/* {{{ helper methods
  */
 static void _mqseries_disc(zend_rsrc_list_entry *rsrc TSRMLS_DC);
 static void _mqseries_close(zend_rsrc_list_entry *rsrc TSRMLS_DC);
@@ -64,7 +64,7 @@ static void set_array_from_get_msg_opts(zval *array, PMQGMO get_msg_opts TSRMLS_
 
 
 static void set_connect_opts_from_array(zval *array,
-						PMQCNO connect_opts, 
+						PMQCNO connect_opts,
 						PMQCD channel_definition,
 						PMQSCO ssl_configuration,
 						PMQAIR auth_inf_record,
@@ -152,7 +152,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_connx, 0, 0, 5)
          ZEND_ARG_INFO(1, compCode)
          ZEND_ARG_INFO(1, reason)
 ZEND_END_ARG_INFO()
-      
+
 ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_disc, 0, 0, 3)
 	ZEND_ARG_INFO(0, hconn)
 	ZEND_ARG_INFO(1, compCode)
@@ -196,9 +196,9 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_put, 0, 0, 7)
 	ZEND_ARG_INFO(0, hconn)
 	ZEND_ARG_INFO(0, hobj)
-	ZEND_ARG_ARRAY_INFO(1, msgDesc, 0) 
-	ZEND_ARG_ARRAY_INFO(1, putMsgOpts, 0) 
-	ZEND_ARG_INFO(0, buffer) 
+	ZEND_ARG_ARRAY_INFO(1, msgDesc, 0)
+	ZEND_ARG_ARRAY_INFO(1, putMsgOpts, 0)
+	ZEND_ARG_INFO(0, buffer)
 	ZEND_ARG_INFO(1, compCode)
 	ZEND_ARG_INFO(1, reason)
 ZEND_END_ARG_INFO()
@@ -206,9 +206,9 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_put1, 0, 0, 7)
 	ZEND_ARG_INFO(0, hconn)
 	ZEND_ARG_ARRAY_INFO(0, objDesc, 0)
-	ZEND_ARG_ARRAY_INFO(1, msgDesc, 0) 
-	ZEND_ARG_ARRAY_INFO(1, putMsgOpts, 0) 
-	ZEND_ARG_INFO(0, buffer) 
+	ZEND_ARG_ARRAY_INFO(1, msgDesc, 0)
+	ZEND_ARG_ARRAY_INFO(1, putMsgOpts, 0)
+	ZEND_ARG_INFO(0, buffer)
 	ZEND_ARG_INFO(1, compCode)
 	ZEND_ARG_INFO(1, reason)
 ZEND_END_ARG_INFO()
@@ -335,8 +335,8 @@ PHP_MINFO_FUNCTION(mqseries)
 /* {{{ proto mqseries_conn(string name, resourceref connection, resourceref compcode, resourceref reason )
 	Connect to the Queue-Manager with the given name. */
 /*
- 
-	You need either the Channel-Table (usualy in /var/mqm) 
+
+	You need either the Channel-Table (usualy in /var/mqm)
 	or set the environment var MQSERVER=<channel>/<proto>/<host>[(port)] MQSERVER=example/TCP/mqs.example.com
 
 PHP sample:	
@@ -367,7 +367,7 @@ PHP_FUNCTION(mqseries_conn)
 	MQLONG reason;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "szzz", &name, &name_len,
-		&z_conn, &z_comp_code, &z_reason) 
+		&z_conn, &z_comp_code, &z_reason)
 		== FAILURE) {
 		return;
 	}
@@ -420,7 +420,7 @@ PHP sample:
 	}
 
 MQ call:		
-	The MQCONNX call is similar to the MQCONN call, except that MQCONNX allows 
+	The MQCONNX call is similar to the MQCONN call, except that MQCONNX allows
 	options to be specified to control the way that the call works.
 	MQCONNX ( QMgrName   	-- input  		 : QManager name
 			, ConnectOpts 	-- input/output  : Connction options
@@ -435,7 +435,7 @@ PHP_FUNCTION(mqseries_connx)
 	mqseries_descriptor *mqdesc;
 	zval *z_connect_opts, *z_conn, *z_comp_code, *z_reason;
 
-	MQLONG comp_code; 
+	MQLONG comp_code;
 	MQLONG reason;
 	MQCNO connect_opts 			= {MQCNO_DEFAULT};
 	MQCD  channel_definition    = {MQCD_CLIENT_CONN_DEFAULT};
@@ -443,7 +443,7 @@ PHP_FUNCTION(mqseries_connx)
 	MQAIR authentication_information_record = {MQAIR_DEFAULT}; /* Only 1 (one) record is supported for now. */
 	MQCHAR LDAPUserName[MQ_DISTINGUISHED_NAME_LENGTH];
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sazzz", &name, &name_len, 
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sazzz", &name, &name_len,
 		&z_connect_opts, &z_conn, &z_comp_code, &z_reason)
 		== FAILURE) {
 		return;
@@ -459,7 +459,7 @@ PHP_FUNCTION(mqseries_connx)
 	MQCONNX(name, &connect_opts, &mqdesc->conn, &comp_code, &reason);
 
 /*
- *  TODO: what fields can be output for the connect opts? 
+ *  TODO: what fields can be output for the connect opts?
  */
 
 	ZVAL_LONG(z_comp_code, comp_code);
@@ -474,7 +474,7 @@ PHP_FUNCTION(mqseries_connx)
 }
 /* }}} */
 
-/* {{{ proto mqseries_open(resource connection, array obj_desc, int options, resourceref object_handle, resourceref compcode, resourceref reason) 
+/* {{{ proto mqseries_open(resource connection, array obj_desc, int options, resourceref object_handle, resourceref compcode, resourceref reason)
 	Open a Queue. */
 /*
 
@@ -494,11 +494,11 @@ PHP sample
 	}
 
 MQ call:	
-	MQOPEN (Hconn, -- input : connection handle 
+	MQOPEN (Hconn, -- input : connection handle
 		ObjDesc,   -- input/output : object description
 		Options,   -- input : open options
 		Hobj,      -- output : object handle
-		CompCode,  -- output : completion code 
+		CompCode,  -- output : completion code
 		Reason)	   -- output : reason code
 */
 PHP_FUNCTION(mqseries_open)
@@ -507,13 +507,13 @@ PHP_FUNCTION(mqseries_open)
 	mqseries_obj *mqobj;
 	zval *z_mqdesc, *z_obj_desc, *z_obj, *z_comp_code, *z_reason;
 
-	MQLONG open_options; 
-	MQLONG comp_code; 
+	MQLONG open_options;
+	MQLONG comp_code;
 	MQLONG reason;
-	MQOD obj_desc = {MQOD_DEFAULT}; 
+	MQOD obj_desc = {MQOD_DEFAULT};
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ralzzz", &z_mqdesc, 
-		&z_obj_desc, &open_options, &z_obj, &z_comp_code, &z_reason) 
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ralzzz", &z_mqdesc,
+		&z_obj_desc, &open_options, &z_obj, &z_comp_code, &z_reason)
 		== FAILURE) {
 		return;
 	}
@@ -558,9 +558,9 @@ $mqmd = array();
 $mqgmo = array('Options' => MQSERIES_MQGMO_FAIL_IF_QUIESCING | MQSERIES_MQGMO_WAIT,
 	           'WaitInterval' => MQSERIES_MQWI_UNLIMITED);
 mqseries_get(
-	$conn, 
+	$conn,
 	$obj,
-	$mqmd,              
+	$mqmd,
 	$mqmo,
 	10,
 	$msg,
@@ -584,7 +584,7 @@ MQ call:
 			, CompCode  -- output : completion code
 			, Reason)   -- output : reason code
 
-Note: MQMD - Message Descriptor fields are first set to MQMD_DEFAULT. Before the 
+Note: MQMD - Message Descriptor fields are first set to MQMD_DEFAULT. Before the
       values of the array are taken.			
 */
 PHP_FUNCTION(mqseries_get)
@@ -593,7 +593,7 @@ PHP_FUNCTION(mqseries_get)
 	mqseries_obj *mqobj;
 	zval *z_mqdesc, *z_mqobj, *z_msg_desc, *z_get_msg_opts, *z_comp_code, *z_reason, *z_data_length, *z_buffer;
 	
-	MQLONG comp_code; 
+	MQLONG comp_code;
 	MQLONG reason;
 	MQLONG buf_len = 0L, data_length = 0L;
 	MQBYTE *buf, *data;
@@ -661,7 +661,7 @@ PHP_FUNCTION(mqseries_get)
 	The MQPUT call puts a message on a queue or distribution list. The queue or distribution list must already be open. */
 /*	
 
-PHP sample: 
+PHP sample:
 $md = 	array(
 		'Version' => MQSERIES_MQMD_VERSION_1,
 		'Expiry' => MQSERIES_MQEI_UNLIMITED,
@@ -671,7 +671,7 @@ $md = 	array(
 		'Priority' => 1,
 		'Persistence' => MQSERIES_MQPER_PERSISTENT,
 		'ReplyToQ' => 'RCVQ');
-mqseries_put($conn, 
+mqseries_put($conn,
 				$obj_snd,
 				$md,
 				array('Options' => MQSERIES_MQPMO_NEW_MSG_ID),
@@ -687,7 +687,7 @@ if ($comp_code !== MQSERIES_MQCC_OK) {
 MQ call:
 
 	MQPUT (
-			Hconn,			-- input 
+			Hconn,			-- input
 			Hobj, 			-- input
 			MsgDesc, 		-- input/output
 			PutMsgOpts, 	-- input/output
@@ -696,7 +696,7 @@ MQ call:
 			, CompCode  	-- output : completion code
 			, Reason)   	-- output : reason code
 
-Note: MQMD - Message Descriptor fields are first set to MQMD_DEFAULT. Before the 
+Note: MQMD - Message Descriptor fields are first set to MQMD_DEFAULT. Before the
       values of the array are taken.			
 	
 */
@@ -710,8 +710,8 @@ PHP_FUNCTION(mqseries_put)
 	
 	MQMD msg_desc = {MQMD_DEFAULT}; /* Message descriptor */
 	MQPMO put_msg_opts = {MQPMO_DEFAULT}; /* Options which control the MQPUT call */
-	MQLONG comp_code; 
-	MQLONG reason; 
+	MQLONG comp_code;
+	MQLONG reason;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rraaszz", &z_mqdesc, &z_mqobj,
 		&z_msg_desc, &z_put_msg_opts, &msg, &msg_len, &z_comp_code, &z_reason)
@@ -748,7 +748,7 @@ PHP_FUNCTION(mqseries_put)
 
 PHP sample:
 
-	mqseries_begin($conn, 
+	mqseries_begin($conn,
 					array("Options" -> MQSERIES_MQBO_NONE),
 					$comp_code,
 					$reason)	
@@ -767,7 +767,7 @@ PHP_FUNCTION(mqseries_begin)
 	uint  string_key_len;
 	ulong  num_key;
 	HashPosition pos;
-	MQLONG comp_code; 
+	MQLONG comp_code;
 	MQLONG reason;
 
 	MQBO begin_opts = {MQBO_DEFAULT};
@@ -805,10 +805,10 @@ PHP_FUNCTION(mqseries_begin)
 /* }}} */
 
 /* {{{ proto  mqseries_cmit(resource mqdesc, resourceref compcode, resourceref reason)
-	The MQCMIT call indicates to the queue manager that the application has reached 
-	a syncpoint, and that all of the message gets and puts that have occurred 
-	since the last syncpoint are to be made permanent. Messages put as part of 
-	a unit of work are made available to other applications; messages retrieved 
+	The MQCMIT call indicates to the queue manager that the application has reached
+	a syncpoint, and that all of the message gets and puts that have occurred
+	since the last syncpoint are to be made permanent. Messages put as part of
+	a unit of work are made available to other applications; messages retrieved
 	as part of a unit of work are deleted. */
 /*
 	
@@ -826,7 +826,7 @@ MQ call:
 */
 PHP_FUNCTION(mqseries_cmit)
 {
-	MQLONG comp_code; 
+	MQLONG comp_code;
 	MQLONG reason;
 
 	mqseries_descriptor *mqdesc;
@@ -850,9 +850,9 @@ PHP_FUNCTION(mqseries_cmit)
 /* }}} */
 
 /* {{{ proto mqseries_back(resource mqdesc, resourceref compcode, resourceref reason)
-	The MQBACK call indicates to the queue manager that all the message gets and 
-	puts that have occurred since the last syncpoint are to be backed out. 
-	Messages put as part of a unit of work are deleted; messages retrieved as 
+	The MQBACK call indicates to the queue manager that all the message gets and
+	puts that have occurred since the last syncpoint are to be backed out.
+	Messages put as part of a unit of work are deleted; messages retrieved as
 	part of a unit of work are reinstated on the queue.	*/
 /*
 	
@@ -866,7 +866,7 @@ MQ call:
 */
 PHP_FUNCTION(mqseries_back)
 {
-	MQLONG comp_code; 
+	MQLONG comp_code;
 	MQLONG reason;
 
 	mqseries_descriptor *mqdesc;
@@ -890,7 +890,7 @@ PHP_FUNCTION(mqseries_back)
 /* }}} */
 
 /* {{{ proto mqseries_close(resoure mqobj, resourceref compcode, resourceref reason)
-	The MQCLOSE call relinquishes access to an object, 
+	The MQCLOSE call relinquishes access to an object,
 	and is the inverse of the MQOPEN call.	*/
 /*
 
@@ -901,7 +901,7 @@ PHP sample:
 	mqseries_close($conn, $obj, MQSERIES_MQCO_NONE, $comp_code, $reason);
 	
 MQ call:
-	MQCLOSE (Hconn, 		-- input 
+	MQCLOSE (Hconn, 		-- input
 			Hobj, 			-- input
 			Options, 		-- input
 			, CompCode  	-- output : completion code
@@ -910,7 +910,7 @@ MQ call:
 */
 PHP_FUNCTION(mqseries_close)
 {
-	MQLONG comp_code; 
+	MQLONG comp_code;
 	MQLONG reason;
 	MQLONG close_options;
 
@@ -969,7 +969,7 @@ static void _mqseries_close(zend_rsrc_list_entry *rsrc TSRMLS_DC)
 					default:
 #if defined(MQ_64_BIT)						
 						zend_error(E_WARNING, "_mqseries_close Error %d %d\n", comp_code, reason);
-#else 
+#else
 						zend_error(E_WARNING, "_mqseries_close Error %ld %ld\n", comp_code, reason);
 #endif
 				}
@@ -982,7 +982,7 @@ static void _mqseries_close(zend_rsrc_list_entry *rsrc TSRMLS_DC)
 /* }}} */
 
 /* {{{ proto mqseries_disc(resource mqdesc, resourceref compcode , resourceref reason)
-	The MQDISC call breaks the connection between the queue manager and the 
+	The MQDISC call breaks the connection between the queue manager and the
 	application program, and is the inverse of the MQCONN or MQCONNX call.*/
 /*
 			
@@ -1039,7 +1039,7 @@ static void _mqseries_disc(zend_rsrc_list_entry *rsrc TSRMLS_DC)
 
 	mqseries_descriptor *mqdesc = (mqseries_descriptor *)rsrc->ptr;
 
-	if (mqdesc->conn != MQHC_UNUSABLE_HCONN) { 
+	if (mqdesc->conn != MQHC_UNUSABLE_HCONN) {
 		MQDISC(
 			&mqdesc->conn,
 			&comp_code,
@@ -1052,7 +1052,7 @@ static void _mqseries_disc(zend_rsrc_list_entry *rsrc TSRMLS_DC)
 					break;
 	
 				default:
-#if defined(MQ_64_BIT)                      
+#if defined(MQ_64_BIT)
 					zend_error(E_WARNING, "_mqseries_disc Error %d %d\n", comp_code, reason);
 #else
 					zend_error(E_WARNING, "_mqseries_disc Error %ld %ld\n", comp_code, reason);
@@ -1100,7 +1100,7 @@ MQ call:
 		CompCode, 						-- output
 		Reason)							-- output
 		
-Note: MQMD - Message Descriptor fields are first set to MQMD_DEFAULT. Before the 
+Note: MQMD - Message Descriptor fields are first set to MQMD_DEFAULT. Before the
       values of the array are taken.			
 	
 */
@@ -1113,10 +1113,10 @@ PHP_FUNCTION(mqseries_put1)
 	MQMD msg_desc = {MQMD_DEFAULT}; 	/* Message descriptor */
 	MQOD obj_desc = {MQOD_DEFAULT}; 	/* Object descriptor */
 	MQPMO put_msg_opts = {MQPMO_DEFAULT}; 	/* Options which control the MQPUT call */
-	MQLONG comp_code; 
+	MQLONG comp_code;
 	MQLONG reason;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "raaaszz", 
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "raaaszz",
 		&z_mqdesc, &z_obj_desc, &z_msg_desc, &z_put_msg_opts, &msg, &msg_len, &z_comp_code, &z_reason)
 		== FAILURE) {
 		return;
@@ -1156,10 +1156,10 @@ PHP_FUNCTION(mqseries_put1)
 PHP Sample:
 	mqseries_inq($conn, $obj, 1, array(MQSERIES_MQCA_Q_MGR_NAME), 0, &$int_attr, 48, &$char_attr, &$comp_code, &$reason);	
 	
-	The following types of object are valid: 
-	- Queue 
-	- Namelist 
-	- Process definition 
+	The following types of object are valid:
+	- Queue
+	- Namelist
+	- Process definition
 	- Queue manager
 	
 MQINQ (Hconn 			-- input
@@ -1179,24 +1179,24 @@ PHP_FUNCTION(mqseries_inq)
 	mqseries_obj *mqobj;
 	zval *z_mqdesc, *z_mqobj, *z_selectors, **option_val, *z_intAttrs, *z_charAttrs, *z_comp_code, *z_reason;
 	HashPosition pos;
-	MQLONG current=0, selectorCount, *selectors, intAttrLength, i, charAttrLength; 
+	MQLONG current=0, selectorCount, *selectors, intAttrLength, i, charAttrLength;
 	MQCHAR *charAttrs = NULL;
 	MQLONG *intAttrs = NULL;
-	MQLONG comp_code; 
+	MQLONG comp_code;
 	MQLONG reason;
 	
 	
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rrlalzlzzz", 
-			&z_mqdesc, 
-			&z_mqobj, 
-			&selectorCount, 
-			&z_selectors, 
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rrlalzlzzz",
+			&z_mqdesc,
+			&z_mqobj,
+			&selectorCount,
+			&z_selectors,
 			&intAttrLength,
-			&z_intAttrs, 
-			&charAttrLength, 
+			&z_intAttrs,
+			&charAttrLength,
 			&z_charAttrs,
-			&z_comp_code, 
+			&z_comp_code,
 			&z_reason)	== FAILURE) {
 		return;
 	}
@@ -1270,15 +1270,15 @@ PHP_FUNCTION(mqseries_inq)
 /*
 	
 	MQSET (
-		Hconn, 
-		Hobj, 
-		SelectorCount, 
-		Selectors, 
-		IntAttrCount, 
-		IntAttrs, 
-		CharAttrLength, 
-		CharAttrs, 
-		CompCode, 
+		Hconn,
+		Hobj,
+		SelectorCount,
+		Selectors,
+		IntAttrCount,
+		IntAttrs,
+		CharAttrLength,
+		CharAttrs,
+		CompCode,
 		Reason)
 */
 PHP_FUNCTION(mqseries_set)
@@ -1287,22 +1287,22 @@ PHP_FUNCTION(mqseries_set)
 	mqseries_obj *mqobj;
 	zval *z_mqdesc, *z_mqobj, *z_selectors, **option_val, *z_intAttrs, *z_charAttrs, *z_comp_code, *z_reason;
 	HashPosition pos;
-	MQLONG current=0, selectorCount, *selectors, intAttrLength, charAttrLength; 
+	MQLONG current=0, selectorCount, *selectors, intAttrLength, charAttrLength;
 	MQCHAR *charAttrs = NULL;
 	MQLONG *intAttrs = NULL;
-	MQLONG comp_code; 
+	MQLONG comp_code;
 	MQLONG reason;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rrlalalazz", 
-			&z_mqdesc, 
-			&z_mqobj, 
-			&selectorCount, 
-			&z_selectors, 
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rrlalalazz",
+			&z_mqdesc,
+			&z_mqobj,
+			&selectorCount,
+			&z_selectors,
 			&intAttrLength,
-			&z_intAttrs, 
-			&charAttrLength, 
+			&z_intAttrs,
+			&charAttrLength,
 			&z_charAttrs,
-			&z_comp_code, 
+			&z_comp_code,
 			&z_reason)	== FAILURE) {
 		return;
 	}
@@ -1382,7 +1382,7 @@ PHP_FUNCTION(mqseries_bytes_val)
 {
     zval *z_bytes;
 	mqseries_bytes *bytes;	
-    
+
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "r", &z_bytes) == FAILURE) {
 		return;
 	}
@@ -1405,8 +1405,8 @@ PHP_FUNCTION(mqseries_bytes_val)
 /* {{{ set_authentication_information_record_from_array
  * set authenication information from an array
  */
-static void set_authentication_information_record_from_array(zval *array, 
-								PMQAIR authentication_information_record, 
+static void set_authentication_information_record_from_array(zval *array,
+								PMQAIR authentication_information_record,
 								PMQCHAR LDAPUserName)
 {
 	HashTable *ht = Z_ARRVAL_P(array);
@@ -1427,12 +1427,12 @@ static void set_authentication_information_record_from_array(zval *array,
 }
 /* }}} */
 
-/* {{{ set_ssl_configuration_from_array 
+/* {{{ set_ssl_configuration_from_array
  * sets the ssl configuration from an array
  */
-static void set_ssl_configuration_from_array(zval *array, 
-									PMQSCO ssl_configuration, 
-									PMQAIR authentication_information_record, 
+static void set_ssl_configuration_from_array(zval *array,
+									PMQSCO ssl_configuration,
+									PMQAIR authentication_information_record,
 									PMQCHAR LDAPUserName)
 {
 	HashTable *ht = Z_ARRVAL_P(array);
@@ -1455,7 +1455,7 @@ static void set_ssl_configuration_from_array(zval *array,
  * Set the MQCD struct from array.
  * TODO: Findout whether all fields are needed. Do thay all have meaning during a
  * connx call?
- * 
+ *
  */
 static void set_channel_definition_from_array(zval *array, PMQCD channel_definition)
 {
@@ -1513,13 +1513,13 @@ static void set_channel_definition_from_array(zval *array, PMQCD channel_definit
 	MQSERIES_SETOPT_LONG(channel_definition, ReceiveExitsDefined);
 
 /* TODO: Do we need these? Or are they only needed during the creation of a channel?				
-   MQPTR     MsgExitPtr;                 Address of first MsgExit field 
-   MQPTR     MsgUserDataPtr;             Address of first MsgUserData field 
-   MQPTR     SendExitPtr;                Address of first SendExit field 
-   MQPTR     SendUserDataPtr;            Address of first SendUserData field 
-   MQPTR     ReceiveExitPtr;             Address of first ReceiveExit field 
-   MQPTR     ReceiveUserDataPtr;         Address of first ReceiveUserData field 
-   MQPTR     ClusterPtr;                 Address of a list of cluster names 
+   MQPTR     MsgExitPtr;                 Address of first MsgExit field
+   MQPTR     MsgUserDataPtr;             Address of first MsgUserData field
+   MQPTR     SendExitPtr;                Address of first SendExit field
+   MQPTR     SendUserDataPtr;            Address of first SendUserData field
+   MQPTR     ReceiveExitPtr;             Address of first ReceiveExit field
+   MQPTR     ReceiveUserDataPtr;         Address of first ReceiveUserData field
+   MQPTR     ClusterPtr;                 Address of a list of cluster names
  */
 
 	MQSERIES_SETOPT_LONG(channel_definition, ClustersDefined);
@@ -1527,13 +1527,13 @@ static void set_channel_definition_from_array(zval *array, PMQCD channel_definit
 	MQSERIES_SETOPT_LONG(channel_definition, LongMCAUserIdLength);
 	MQSERIES_SETOPT_LONG(channel_definition, LongRemoteUserIdLength);
 
-/*   MQPTR     LongMCAUserIdPtr;           Address of long MCA user identifier 
-   MQPTR     LongRemoteUserIdPtr;        Address of long remote user identifier 
-   MQBYTE40  MCASecurityId;              MCA security identifier 
-   MQBYTE40  RemoteSecurityId;           Remote security identifier 
+/*   MQPTR     LongMCAUserIdPtr;           Address of long MCA user identifier
+   MQPTR     LongRemoteUserIdPtr;        Address of long remote user identifier
+   MQBYTE40  MCASecurityId;              MCA security identifier
+   MQBYTE40  RemoteSecurityId;           Remote security identifier
 			} else if (!strcmp(string_key, "SSLCipherSpec")) {
 				strncpy(channel_definition->SSLCipherSpec, Z_STRVAL_PP(option_val), sizeof(channel_definition->SSLCipherSpec));
-   MQPTR     SSLPeerNamePtr;             Address of SSL peer name 
+   MQPTR     SSLPeerNamePtr;             Address of SSL peer name
  */
 	MQSERIES_SETOPT_STRING(channel_definition, SSLCipherSpec);
 	MQSERIES_SETOPT_LONG(channel_definition, SSLPeerNameLength);
@@ -1548,12 +1548,12 @@ static void set_channel_definition_from_array(zval *array, PMQCD channel_definit
  * Set MQCNO connect options from array.
  * The MQCD struct is part of the connect options. Fields for this struct are
  * prefixed with MQCD.
- * 
+ *
  */
-static void set_connect_opts_from_array(zval *array, 
-				PMQCNO connect_opts, 
-				PMQCD channel_definition, 
-				PMQSCO ssl_configuration, 
+static void set_connect_opts_from_array(zval *array,
+				PMQCNO connect_opts,
+				PMQCD channel_definition,
+				PMQSCO ssl_configuration,
 				PMQAIR authentication_information_record,
 				PMQCHAR LDAPUserName)
 {
@@ -1577,7 +1577,7 @@ static void set_connect_opts_from_array(zval *array,
 /*
    QManager connection Tag
    This field is used only on z/OS. In other environments, the value MQCT_NONE should be specified. |
-   MQBYTE128  ConnTag;          Queue-manager connection tag 
+   MQBYTE128  ConnTag;          Queue-manager connection tag
 */
 }
 /* }}} */
@@ -1591,7 +1591,7 @@ static void set_put_msg_opts_from_array(zval *array, PMQPMO put_msg_opts TSRMLS_
 	zval **tmp;
 	mqseries_obj *mqobj;
 
-	MQSERIES_SETOPT_LONG(put_msg_opts, Options); 
+	MQSERIES_SETOPT_LONG(put_msg_opts, Options);
 	MQSERIES_SETOPT_LONG(put_msg_opts, Version);
 
 	if (zend_hash_find(ht, "Context", sizeof("Context"), (void**)&tmp) == SUCCESS &&
@@ -1603,12 +1603,12 @@ static void set_put_msg_opts_from_array(zval *array, PMQPMO put_msg_opts TSRMLS_
 	}
 
 /* input fields not supported yet
-   MQLONG    RecsPresent;        
-   MQLONG    PutMsgRecFields;    
-   MQLONG    PutMsgRecOffset;    
-   MQPTR     PutMsgRecPtr;       
-   MQLONG    ResponseRecOffset;  
-   MQPTR     ResponseRecPtr;     
+   MQLONG    RecsPresent;
+   MQLONG    PutMsgRecFields;
+   MQLONG    PutMsgRecOffset;
+   MQPTR     PutMsgRecPtr;
+   MQLONG    ResponseRecOffset;
+   MQPTR     ResponseRecPtr;
 */			
 }
 /* }}} */
@@ -1777,14 +1777,14 @@ static void set_obj_desc_from_array(zval *array, PMQOD obj_desc)
 	MQSERIES_SETOPT_STRING(obj_desc, AlternateUserId);
 
 /* TODO: Implement these ?
-   MQLONG    RecsPresent;          
-   MQLONG    ObjectRecOffset;      
-   MQLONG    ResponseRecOffset;    
-   MQPTR     ObjectRecPtr;         
-   MQPTR     ResponseRecPtr;       
+   MQLONG    RecsPresent;
+   MQLONG    ObjectRecOffset;
+   MQLONG    ResponseRecOffset;
+   MQPTR     ObjectRecPtr;
+   MQPTR     ResponseRecPtr;
 
  Will not support this.
-  not supported MQBYTE40  AlternateSecurityId;  
+  not supported MQBYTE40  AlternateSecurityId;
 */
 }
 /* }}} */
@@ -1870,7 +1870,7 @@ static void set_array_from_get_msg_opts(zval *array, PMQGMO get_msg_opts TSRMLS_
 /******************************************************************************/
 
 /* {{{ _mqseries_bytes
- * frees memomory previuosly allocated 
+ * frees memomory previuosly allocated
  */
 static void _mqseries_bytes(zend_rsrc_list_entry *rsrc TSRMLS_DC)
 {	

@@ -8,9 +8,9 @@ if test "$PHP_MQSERIES" != "no"; then
   dnl Write more examples of tests here...
 
   dnl # --with-mqseries -> check with-path
-  SEARCH_PATH="/usr/local /usr /opt /opt/mqm"   
-  SEARCH_FOR="/inc/cmqcfc.h" 			
-  if test -r $PHP_MQSERIES/; then 		
+  SEARCH_PATH="/usr/local /usr /opt /opt/mqm"
+  SEARCH_FOR="/inc/cmqcfc.h"
+  if test -r $PHP_MQSERIES/; then
      MQSERIES_DIR=$PHP_MQSERIES
   else # search default path list
      AC_MSG_CHECKING([for mqseries files in default path])
@@ -32,18 +32,28 @@ if test "$PHP_MQSERIES" != "no"; then
 
   dnl # --with-mqseries -> chech for lib and symbol presence
   # when using server only
-  #LIBNAME=mqm     # use this when connectig directly to the server
+  #LIBNAME=mqm     # use this when connecting directly to the server
   LIBNAME=mqic     # use this when connecting via the mqic (client) libraries.
-  LIBSYMBOL=MQCONN 
+  LIBSYMBOL=MQCONN
 
   PHP_CHECK_LIBRARY($LIBNAME,$LIBSYMBOL,
   [
      PHP_ADD_LIBRARY_WITH_PATH($LIBNAME, $MQSERIES_DIR/$PHP_LIBDIR, MQSERIES_SHARED_LIBADD)
-     AC_DEFINE(HAVE_MQSERIESLIB,1,[ ])
+     AC_DEFINE(HAVE_MQSERIESLIB,1,[ Define to 1 if you have mqseries lib >= 7.0])
   ],[
      AC_MSG_ERROR([wrong mqseries lib version or lib not found (use --with-libdir=lib64 for 64-bit) ])
   ],[
      -L$MQSERIES_DIR/$PHP_LIBDIR
+  ])
+
+  dnl # --with-mqseries -> Check for lib version 
+  PHP_CHECK_LIBRARY($LIBNAME, MQSUB,
+  [
+		AC_DEFINE(HAVE_MQSERIESLIB_V7,1,['Define to 1 if you have mqseries lib >= 7.0'])
+  ],[
+  		AC_MSG_RESULT('No support for pubsub')
+  ],[
+  	 -L$MQSERIES_DIR/$PHP_LIBDIR
   ])
 
   PHP_SUBST(MQSERIES_SHARED_LIBADD)

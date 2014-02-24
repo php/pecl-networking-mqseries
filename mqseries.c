@@ -212,8 +212,8 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_put1, 0, 0, 7)
 	ZEND_ARG_INFO(1, compCode)
 	ZEND_ARG_INFO(1, reason)
 ZEND_END_ARG_INFO()
-	
-	
+
+
 ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_set, 0, 0, 10)
 	ZEND_ARG_INFO(0, hconn)
 	ZEND_ARG_INFO(0, hobj)
@@ -253,7 +253,7 @@ zend_function_entry mqseries_functions[] = {
 	PHP_FE(mqseries_open,		arginfo_mqseries_open)
 	PHP_FE(mqseries_put,		arginfo_mqseries_put)
 	PHP_FE(mqseries_put1,		arginfo_mqseries_put1)
-	PHP_FE(mqseries_set,		arginfo_mqseries_set)	
+	PHP_FE(mqseries_set,		arginfo_mqseries_set)
 	PHP_FE(mqseries_strerror,	arginfo_mqseries_strerror)
 	PHP_FE(mqseries_bytes_val,	arginfo_mqseries_bytes_val)
 	{NULL, NULL, NULL}	/* Must be the last line in mqseries_functions[] */
@@ -293,13 +293,13 @@ PHP_MINIT_FUNCTION(mqseries)
 
 	/* don't change the order of these, objects must be freed before connections */
 	le_mqseries_obj = zend_register_list_destructors_ex(_mqseries_close, NULL, PHP_MQSERIES_OBJ_RES_NAME, module_number);
-	
+
 	le_mqseries_conn = zend_register_list_destructors_ex(_mqseries_disc, NULL, PHP_MQSERIES_DESCRIPTOR_RES_NAME, module_number);
-	
+
 	le_mqseries_bytes = zend_register_list_destructors_ex(_mqseries_bytes, NULL, PHP_MQSERIES_BYTES_RES_NAME, module_number);
 
 #include "mqseries_init_const.h"
-	
+
 	ht_reason_texts = (HashTable *) malloc(sizeof(HashTable));
 	zend_hash_init(ht_reason_texts, 0, NULL, NULL, 1);
 
@@ -339,16 +339,16 @@ PHP_MINFO_FUNCTION(mqseries)
 	You need either the Channel-Table (usualy in /var/mqm)
 	or set the environment var MQSERVER=<channel>/<proto>/<host>[(port)] MQSERVER=example/TCP/mqs.example.com
 
-PHP sample:	
-	
+PHP sample:
+
 	mqseries_conn('QM_donald', $conn, $compcode, $reason);
-	
+
 	if ($compcode !== MQSERIES_MQCC_OK) {
 		printf("CompCode:%d Reason:%d Text:%s\n", $compcode, $reason, mqseries_strerror($reason));
-		
+
 	}
-	
-MQ call:	
+
+MQ call:
 	MQCONN ( QMgrName   -- input  : QManager name
 			, Hconn     -- output : Connection Handle
 			, CompCode  -- output : completion code
@@ -373,7 +373,7 @@ PHP_FUNCTION(mqseries_conn)
 	}
 	if (!is_called_by_ref(z_conn, "conn")) return;
 	if (!is_compcode_reason_ref(z_comp_code, z_reason)) return;
-	
+
 	strncpy(qManagerName, name, sizeof(MQCHAR48));
 
 	mqdesc = (mqseries_descriptor *) emalloc(sizeof(mqseries_descriptor));
@@ -381,7 +381,7 @@ PHP_FUNCTION(mqseries_conn)
 
 	ZVAL_LONG(z_comp_code, comp_code);
 	ZVAL_LONG(z_reason, reason);
-	
+
 	if (comp_code == MQCC_OK) {
 		ZEND_REGISTER_RESOURCE(z_conn, mqdesc, le_mqseries_conn);
 		mqdesc->id = Z_RESVAL_P(z_conn);
@@ -395,7 +395,7 @@ PHP_FUNCTION(mqseries_conn)
 	The mqseries_connx call is similar to the mqseries_conn call, except that mqseries_connx allows options to be specified to control the way that the call works.*/
 /*
 
-PHP sample:	
+PHP sample:
 	$mqcno = array(
 				'StrucId' => MQSERIES_MQCNO_STRUC_ID,
 				'Version' => MQSERIES_MQCNO_VERSION_2,
@@ -403,7 +403,7 @@ PHP sample:
 				'MQCD' => array('ChannelName' => 'D800MQ.CLIENT'
 								,'ConnectionName' => 'localhost'
 								,'TransportType' => MQSERIES_MQXPT_TCP
--- SSL configuration with one Authorisation Information Record is also posible								
+-- SSL configuration with one Authorisation Information Record is also posible
 --								,'MQSCO' => array('MQAIR' => array() )
 								)
 				);
@@ -419,7 +419,7 @@ PHP sample:
 		exit;
 	}
 
-MQ call:		
+MQ call:
 	The MQCONNX call is similar to the MQCONN call, except that MQCONNX allows
 	options to be specified to control the way that the call works.
 	MQCONNX ( QMgrName   	-- input  		 : QManager name
@@ -451,11 +451,11 @@ PHP_FUNCTION(mqseries_connx)
 
 	if (!is_called_by_ref(z_conn, "conn")) return;
 	if (!is_compcode_reason_ref(z_comp_code, z_reason)) return;
-	
+
 	set_connect_opts_from_array(z_connect_opts, &connect_opts, &channel_definition, &ssl_configuration, &authentication_information_record, LDAPUserName);
-		
+
 	mqdesc = (mqseries_descriptor *) emalloc(sizeof(mqseries_descriptor));
-	
+
 	MQCONNX(name, &connect_opts, &mqdesc->conn, &comp_code, &reason);
 
 /*
@@ -478,7 +478,7 @@ PHP_FUNCTION(mqseries_connx)
 	Open a Queue. */
 /*
 
-	
+
 PHP sample
 	mqseries_open(
 		$conn,
@@ -487,13 +487,13 @@ PHP sample
 		$obj,
 		$comp_code,
 		$reason);
-		
+
 	if ($comp_code !== MQSERIES_MQCC_OK) {
 		printf("CompCode:%d Reason:%d Text:%s<br>\n", $comp_code, $reason, mqseries_strerror($reason));
 		exit;
 	}
 
-MQ call:	
+MQ call:
 	MQOPEN (Hconn, -- input : connection handle
 		ObjDesc,   -- input/output : object description
 		Options,   -- input : open options
@@ -522,11 +522,11 @@ PHP_FUNCTION(mqseries_open)
 	if (!is_compcode_reason_ref(z_comp_code, z_reason)) return;
 
 	ZEND_FETCH_RESOURCE(mqdesc, mqseries_descriptor *, &z_mqdesc, -1, PHP_MQSERIES_DESCRIPTOR_RES_NAME, le_mqseries_conn);
-	
+
 	set_obj_desc_from_array(z_obj_desc, &obj_desc);
 
 	mqobj = (mqseries_obj *) emalloc(sizeof(mqseries_obj));
-	
+
 	MQOPEN(mqdesc->conn, &obj_desc, open_options, &mqobj->obj, &comp_code, &reason);
 
 	ZVAL_LONG(z_comp_code, comp_code);
@@ -540,7 +540,7 @@ PHP_FUNCTION(mqseries_open)
 		mqobj->id = Z_RESVAL_P(z_obj);
 	} else {
 		/* So we don't register the ref. But we already allocated some memory lets free that */
-		efree(mqobj);		
+		efree(mqobj);
 	}
 }
 /* }}} */
@@ -567,13 +567,13 @@ mqseries_get(
 	$data_length,
 	$comp_code,
 	$reason);
-	
+
 if ($comp_code !== MQSERIES_MQCC_OK) {
 	printf("CompCode:%d Reason:%d Text:%s<br>", $comp_code, $reason, mqseries_strerror($reason));
 }
-	
-	
-MQ call:	
+
+
+MQ call:
 	MQGET ( Hconn, 			-- input
 			Hobj, 			-- input
 			MsgDesc, 		-- input/output
@@ -585,14 +585,14 @@ MQ call:
 			, Reason)   -- output : reason code
 
 Note: MQMD - Message Descriptor fields are first set to MQMD_DEFAULT. Before the
-      values of the array are taken.			
+      values of the array are taken.
 */
 PHP_FUNCTION(mqseries_get)
 {
 	mqseries_descriptor *mqdesc;
 	mqseries_obj *mqobj;
 	zval *z_mqdesc, *z_mqobj, *z_msg_desc, *z_get_msg_opts, *z_comp_code, *z_reason, *z_data_length, *z_buffer;
-	
+
 	MQLONG comp_code;
 	MQLONG reason;
 	MQLONG buf_len = 0L, data_length = 0L;
@@ -605,11 +605,11 @@ PHP_FUNCTION(mqseries_get)
 		== FAILURE) {
 		return;
 	}
-	
+
 	if (!is_called_by_ref(z_data_length, "datalength")) return;
 	if (!is_called_by_ref(z_buffer, "buffer")) return;
 	if (!is_compcode_reason_ref(z_comp_code, z_reason)) return;
-	
+
 
 	ZEND_FETCH_RESOURCE(mqdesc, mqseries_descriptor *, &z_mqdesc, -1, PHP_MQSERIES_DESCRIPTOR_RES_NAME, le_mqseries_conn);
 	ZEND_FETCH_RESOURCE(mqobj, mqseries_obj *, &z_mqobj, -1, PHP_MQSERIES_OBJ_RES_NAME, le_mqseries_obj);
@@ -659,7 +659,7 @@ PHP_FUNCTION(mqseries_get)
 
 /* {{{ proto mqseries_put(resource mqdesc, resource mqobj, array msg_desc, array put_msg_opts, string msg, resourceref compcode, resourceref reason)
 	The MQPUT call puts a message on a queue or distribution list. The queue or distribution list must already be open. */
-/*	
+/*
 
 PHP sample:
 $md = 	array(
@@ -678,7 +678,7 @@ mqseries_put($conn,
 				'Ping',
 				$comp_code,
 				$reason);
-	
+
 if ($comp_code !== MQSERIES_MQCC_OK) {
 	printf("CompCode:%d Reason:%d Text:%s<br>\n", $comp_code, $reason, mqseries_strerror($reason));
 }
@@ -697,8 +697,8 @@ MQ call:
 			, Reason)   	-- output : reason code
 
 Note: MQMD - Message Descriptor fields are first set to MQMD_DEFAULT. Before the
-      values of the array are taken.			
-	
+      values of the array are taken.
+
 */
 PHP_FUNCTION(mqseries_put)
 {
@@ -707,7 +707,7 @@ PHP_FUNCTION(mqseries_put)
 	zval *z_mqdesc, *z_mqobj, *z_msg_desc, *z_put_msg_opts, *z_comp_code, *z_reason;
 	char  *msg;
 	MQLONG msg_len;
-	
+
 	MQMD msg_desc = {MQMD_DEFAULT}; /* Message descriptor */
 	MQPMO put_msg_opts = {MQPMO_DEFAULT}; /* Options which control the MQPUT call */
 	MQLONG comp_code;
@@ -736,7 +736,7 @@ PHP_FUNCTION(mqseries_put)
 	}
 	if (PZVAL_IS_REF(z_put_msg_opts)) {
 		set_array_from_put_msg_opts(z_put_msg_opts, &put_msg_opts);
-	}	
+	}
 
 }
 /* }}} */
@@ -751,7 +751,7 @@ PHP sample:
 	mqseries_begin($conn,
 					array("Options" -> MQSERIES_MQBO_NONE),
 					$comp_code,
-					$reason)	
+					$reason)
 
 MQ call:
 	MQBEGIN (Hconn         	-- input  : Connection handle
@@ -776,7 +776,7 @@ PHP_FUNCTION(mqseries_begin)
 		&z_array, &z_comp_code, &z_reason) == FAILURE) {
 		return;
 	}
-	
+
 	if (!is_compcode_reason_ref(z_comp_code, z_reason)) return;
 
 	ZEND_FETCH_RESOURCE(mqdesc, mqseries_descriptor *, &z_mqdesc, -1, PHP_MQSERIES_DESCRIPTOR_RES_NAME, le_mqseries_conn);
@@ -798,7 +798,7 @@ PHP_FUNCTION(mqseries_begin)
 	}
 
 	MQBEGIN(mqdesc->conn, &begin_opts, &comp_code, &reason);
-	
+
 	ZVAL_LONG(z_comp_code, comp_code);
 	ZVAL_LONG(z_reason, reason);
 }
@@ -811,18 +811,18 @@ PHP_FUNCTION(mqseries_begin)
 	a unit of work are made available to other applications; messages retrieved
 	as part of a unit of work are deleted. */
 /*
-	
+
 PHP sample:
 	mqseries_cmit($conn,
 				&$comp_code,
 				&$reason);
-	
+
 MQ call:
 
 	MQCMIT (Hconn			-- input  : Connection handle
 			, CompCode  	-- output : completion code
 			, Reason)   	-- output : reason code
-	
+
 */
 PHP_FUNCTION(mqseries_cmit)
 {
@@ -842,7 +842,7 @@ PHP_FUNCTION(mqseries_cmit)
 	ZEND_FETCH_RESOURCE(mqdesc, mqseries_descriptor *, &z_mqdesc, -1, PHP_MQSERIES_DESCRIPTOR_RES_NAME, le_mqseries_conn);
 
 	MQCMIT(mqdesc->conn, &comp_code, &reason);
-	
+
 	ZVAL_LONG(z_comp_code, comp_code);
 	ZVAL_LONG(z_reason, reason);
 
@@ -855,8 +855,8 @@ PHP_FUNCTION(mqseries_cmit)
 	Messages put as part of a unit of work are deleted; messages retrieved as
 	part of a unit of work are reinstated on the queue.	*/
 /*
-	
-PHP sample:	
+
+PHP sample:
 
 MQ call:
 
@@ -882,7 +882,7 @@ PHP_FUNCTION(mqseries_back)
 	ZEND_FETCH_RESOURCE(mqdesc, mqseries_descriptor *, &z_mqdesc, -1, PHP_MQSERIES_DESCRIPTOR_RES_NAME, le_mqseries_conn);
 
 	MQBACK(mqdesc->conn, &comp_code, &reason);
-	
+
 	ZVAL_LONG(z_comp_code, comp_code);
 	ZVAL_LONG(z_reason, reason);
 
@@ -895,18 +895,18 @@ PHP_FUNCTION(mqseries_back)
 /*
 
 Note the way it now works is that an internal delete of the resources is done
-this will dan trigger the php delete mechanism	
-	
+this will dan trigger the php delete mechanism
+
 PHP sample:
 	mqseries_close($conn, $obj, MQSERIES_MQCO_NONE, $comp_code, $reason);
-	
+
 MQ call:
 	MQCLOSE (Hconn, 		-- input
 			Hobj, 			-- input
 			Options, 		-- input
 			, CompCode  	-- output : completion code
 			, Reason)   	-- output : reason code
-			
+
 */
 PHP_FUNCTION(mqseries_close)
 {
@@ -917,7 +917,7 @@ PHP_FUNCTION(mqseries_close)
 	mqseries_obj *mqobj;
 	mqseries_descriptor *mqdesc;
 	zval *z_mqdesc, *z_mqobj, *z_comp_code, *z_reason;
-	
+
 	zend_output_debug_string(1, "%s", "MQClose - start");
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rrlzz", &z_mqdesc, &z_mqobj, &close_options, &z_comp_code, &z_reason) == FAILURE) {
@@ -931,12 +931,12 @@ PHP_FUNCTION(mqseries_close)
 
 	ZEND_FETCH_RESOURCE(mqdesc, mqseries_descriptor *, &z_mqdesc, -1, PHP_MQSERIES_DESCRIPTOR_RES_NAME, le_mqseries_conn);
 	ZEND_FETCH_RESOURCE(mqobj, mqseries_obj *, &z_mqobj, -1, PHP_MQSERIES_OBJ_RES_NAME, le_mqseries_obj);
-	
+
 	MQCLOSE(mqdesc->conn, &mqobj->obj, close_options, &comp_code, &reason);
-	
+
 	ZVAL_LONG(z_comp_code, comp_code);
 	ZVAL_LONG(z_reason, reason);
-	
+
 	zend_list_delete(mqobj->id);
 	zend_output_debug_string(1, "%s", "MQClose - end");
 
@@ -952,22 +952,22 @@ static void _mqseries_close(zend_rsrc_list_entry *rsrc TSRMLS_DC)
 
 	if (mqobj->obj != MQHO_UNUSABLE_HOBJ) {        /* Already closed */
 		if (*mqobj->conn != MQHC_UNUSABLE_HCONN) { /* Already disconeccted */
-												   /* Should not be posible but just in case */	
+												   /* Should not be posible but just in case */
 			MQCLOSE(*mqobj->conn,
 				&mqobj->obj,
 				MQCO_NONE,
 				&comp_code,
 				&reason);
-		
+
 			if ((comp_code != MQCC_OK) || (reason != MQRC_NONE && reason)) {
 				switch(reason) {
 					case MQRC_CONNECTION_BROKEN:
 					case MQRC_HCONN_ERROR:
 					case MQRC_HOBJ_ERROR:
 						break;
-		
+
 					default:
-#if defined(MQ_64_BIT)						
+#if defined(MQ_64_BIT)
 						zend_error(E_WARNING, "_mqseries_close Error %d %d\n", comp_code, reason);
 #else
 						zend_error(E_WARNING, "_mqseries_close Error %ld %ld\n", comp_code, reason);
@@ -976,7 +976,7 @@ static void _mqseries_close(zend_rsrc_list_entry *rsrc TSRMLS_DC)
 		    }
 		}
 	}
-	
+
 	efree(mqobj);
 }
 /* }}} */
@@ -985,19 +985,19 @@ static void _mqseries_close(zend_rsrc_list_entry *rsrc TSRMLS_DC)
 	The MQDISC call breaks the connection between the queue manager and the
 	application program, and is the inverse of the MQCONN or MQCONNX call.*/
 /*
-			
+
 PHP sample:
 
 mqseries_disc($conn, $compcode, $reason);
 if ($compcode !== MQSERIES_MQCC_OK) {
 	printf("CompCode:%d Reason:%d Text:%s<br>\n", $compcode, $reason, mqseries_strerror($reason));
 }
-	
+
 MQ call:
 	MQDISC (Hconn
 			, CompCode  	-- output : completion code
 			, Reason)   	-- output : reason code
-	
+
 */
 PHP_FUNCTION(mqseries_disc)
 {
@@ -1008,11 +1008,11 @@ PHP_FUNCTION(mqseries_disc)
 	zval *z_mqdesc, *z_comp_code, *z_reason;
 
 	zend_output_debug_string(1, "%s", "MQDisc - start");
-	
+
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rzz", &z_mqdesc, &z_comp_code, &z_reason) == FAILURE) {
 		return;
 	}
-	if (!is_compcode_reason_ref(z_comp_code, z_reason)) return;	
+	if (!is_compcode_reason_ref(z_comp_code, z_reason)) return;
 
 	ZEND_FETCH_RESOURCE(mqdesc, mqseries_descriptor *, &z_mqdesc, -1, PHP_MQSERIES_DESCRIPTOR_RES_NAME, le_mqseries_conn);
 
@@ -1044,13 +1044,13 @@ static void _mqseries_disc(zend_rsrc_list_entry *rsrc TSRMLS_DC)
 			&mqdesc->conn,
 			&comp_code,
 			&reason);
-	
+
 		if ((comp_code != MQCC_OK) || (reason != MQRC_NONE)) {
 			switch(reason) {
 				case MQRC_CONNECTION_BROKEN:
 				case MQRC_HCONN_ERROR:
 					break;
-	
+
 				default:
 #if defined(MQ_64_BIT)
 					zend_error(E_WARNING, "_mqseries_disc Error %d %d\n", comp_code, reason);
@@ -1096,13 +1096,13 @@ MQ call:
 		MsgDesc (MQMD) 					-- input/output
 		PutMsgOpts (MQPMO) 				-- input/output
 		BufferLength (MQLONG) 			-- input
-		Buffer (MQBYTE×BufferLength) 	-- input		
+		Buffer (MQBYTE×BufferLength) 	-- input
 		CompCode, 						-- output
 		Reason)							-- output
-		
+
 Note: MQMD - Message Descriptor fields are first set to MQMD_DEFAULT. Before the
-      values of the array are taken.			
-	
+      values of the array are taken.
+
 */
 PHP_FUNCTION(mqseries_put1)
 {
@@ -1125,16 +1125,16 @@ PHP_FUNCTION(mqseries_put1)
 	if (!is_compcode_reason_ref(z_comp_code, z_reason)) return;
 
 	ZEND_FETCH_RESOURCE(mqdesc, mqseries_descriptor *, &z_mqdesc, -1, PHP_MQSERIES_DESCRIPTOR_RES_NAME, le_mqseries_conn);
-	
+
 	set_obj_desc_from_array(z_obj_desc, &obj_desc);
 	set_msg_desc_from_array(z_msg_desc, &msg_desc TSRMLS_CC);
 	set_put_msg_opts_from_array(z_put_msg_opts, &put_msg_opts TSRMLS_CC);
-	
+
 	MQPUT1(mqdesc->conn, &obj_desc, &msg_desc, &put_msg_opts, msg_len, msg, &comp_code, &reason);
-	
+
 	ZVAL_LONG(z_comp_code, comp_code);
 	ZVAL_LONG(z_reason, reason);
-	
+
 	if (PZVAL_IS_REF(z_obj_desc)) {
 		set_array_from_obj_desc(z_obj_desc, &obj_desc);
 	}
@@ -1144,7 +1144,7 @@ PHP_FUNCTION(mqseries_put1)
 	if (PZVAL_IS_REF(z_put_msg_opts)) {
 		set_array_from_put_msg_opts(z_put_msg_opts, &put_msg_opts);
 	}
-	
+
 
 }
 /* }}} */
@@ -1154,14 +1154,14 @@ PHP_FUNCTION(mqseries_put1)
 /*
 
 PHP Sample:
-	mqseries_inq($conn, $obj, 1, array(MQSERIES_MQCA_Q_MGR_NAME), 0, &$int_attr, 48, &$char_attr, &$comp_code, &$reason);	
-	
+	mqseries_inq($conn, $obj, 1, array(MQSERIES_MQCA_Q_MGR_NAME), 0, &$int_attr, 48, &$char_attr, &$comp_code, &$reason);
+
 	The following types of object are valid:
 	- Queue
 	- Namelist
 	- Process definition
 	- Queue manager
-	
+
 MQINQ (Hconn 			-- input
 	, Hobj				-- input
 	, SelectorCount		-- input
@@ -1171,7 +1171,7 @@ MQINQ (Hconn 			-- input
 	, CharAttrLength	-- input
 	, CharAttrs 		-- output
 	, CompCode			-- output
-	, Reason			-- output)	
+	, Reason			-- output)
 */
 PHP_FUNCTION(mqseries_inq)
 {
@@ -1184,8 +1184,8 @@ PHP_FUNCTION(mqseries_inq)
 	MQLONG *intAttrs = NULL;
 	MQLONG comp_code;
 	MQLONG reason;
-	
-	
+
+
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rrlalzlzzz",
 			&z_mqdesc,
@@ -1207,9 +1207,9 @@ PHP_FUNCTION(mqseries_inq)
 
 	ZEND_FETCH_RESOURCE(mqdesc, mqseries_descriptor *, &z_mqdesc, -1, PHP_MQSERIES_DESCRIPTOR_RES_NAME, le_mqseries_conn);
 	ZEND_FETCH_RESOURCE(mqobj,  mqseries_obj *, &z_mqobj, -1, PHP_MQSERIES_OBJ_RES_NAME, le_mqseries_obj);
-	
+
 	selectors = (MQLONG *) emalloc(selectorCount * sizeof(MQLONG));
-	
+
 	zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(z_selectors), &pos);
 	while (zend_hash_get_current_data_ex(Z_ARRVAL_P(z_selectors), (void **)&option_val, &pos) == SUCCESS) {
 		if (current < selectorCount) {
@@ -1217,8 +1217,8 @@ PHP_FUNCTION(mqseries_inq)
 		}
 		zend_hash_move_forward_ex(Z_ARRVAL_P(z_selectors), &pos);
 	}
-	
-	
+
+
 	if (charAttrLength > 0) { /* Are charAttr requested */
 		charAttrs = (MQCHAR *) emalloc(charAttrLength+1);
 		memset(charAttrs, 0, charAttrLength+1); // set to zero
@@ -1226,7 +1226,7 @@ PHP_FUNCTION(mqseries_inq)
 	if (intAttrLength > 0) { /*  Are intAttr requested */
 		intAttrs = (MQLONG *) emalloc(intAttrLength+sizeof(MQLONG));
 	}
-	
+
 	MQINQ(
 		mqdesc->conn,
 		mqobj->obj,
@@ -1238,10 +1238,10 @@ PHP_FUNCTION(mqseries_inq)
 		charAttrs,
 		&comp_code,
 		&reason);
-		
+
 	ZVAL_LONG(z_comp_code, comp_code);
 	ZVAL_LONG(z_reason, reason);
-	
+
 	if (comp_code == MQCC_OK) {
 		if (charAttrLength > 0) { /* set only when charAttrs where requested */
 			ZVAL_STRING(z_charAttrs, charAttrs, 1);
@@ -1268,7 +1268,7 @@ PHP_FUNCTION(mqseries_inq)
 /* {{{ proto resource mqseries_set(resource connection resource object_handle, int selector_count, array selectors, int int_attribute_count, array int_attribute, int char_attr_length, array char_attr, resourceref compcode, resourceref reason)
 	The MQSET call is used to change the attributes of an object represented by a handle. The object must be a queue. */
 /*
-	
+
 	MQSET (
 		Hconn,
 		Hobj,
@@ -1311,9 +1311,9 @@ PHP_FUNCTION(mqseries_set)
 
 	ZEND_FETCH_RESOURCE(mqdesc, mqseries_descriptor *, &z_mqdesc, -1, PHP_MQSERIES_DESCRIPTOR_RES_NAME, le_mqseries_conn);
 	ZEND_FETCH_RESOURCE(mqobj,  mqseries_obj *, &z_mqobj, -1, PHP_MQSERIES_OBJ_RES_NAME, le_mqseries_obj);
-	
+
 	selectors = (MQLONG *) emalloc(selectorCount * sizeof(MQLONG));
-	
+
 	zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(z_selectors), &pos);
 	current = 0;
 	while (zend_hash_get_current_data_ex(Z_ARRVAL_P(z_selectors), (void **)&option_val, &pos) == SUCCESS) {
@@ -1322,7 +1322,7 @@ PHP_FUNCTION(mqseries_set)
 		}
 		zend_hash_move_forward_ex(Z_ARRVAL_P(z_selectors), &pos);
 	}
-	
+
 	if (intAttrLength > 0) { /*  Are intAttr requested */
 		intAttrs = (MQLONG *) emalloc(intAttrLength+sizeof(MQLONG));
 		current = 0;
@@ -1335,7 +1335,7 @@ PHP_FUNCTION(mqseries_set)
 		}
 	}
 
-	
+
 	if (charAttrLength > 0) { /* Are charAttr requested */
 		charAttrs = (MQCHAR *) emalloc(charAttrLength+1);
 		current = 0;
@@ -1381,7 +1381,7 @@ PHP_FUNCTION(mqseries_set)
 PHP_FUNCTION(mqseries_bytes_val)
 {
     zval *z_bytes;
-	mqseries_bytes *bytes;	
+	mqseries_bytes *bytes;
 
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "r", &z_bytes) == FAILURE) {
 		return;
@@ -1492,7 +1492,7 @@ static void set_channel_definition_from_array(zval *array, PMQCD channel_definit
 	MQSERIES_SETOPT_STRING(channel_definition, MsgUserData);
 	MQSERIES_SETOPT_STRING(channel_definition, SendUserData);
 	MQSERIES_SETOPT_STRING(channel_definition, ReceiveUserData);
-	MQSERIES_SETOPT_STRING(channel_definition, UserIdentifier);	
+	MQSERIES_SETOPT_STRING(channel_definition, UserIdentifier);
 	MQSERIES_SETOPT_STRING(channel_definition, Password);
 	MQSERIES_SETOPT_STRING(channel_definition, MCAUserIdentifier);
 	MQSERIES_SETOPT_LONG(channel_definition, MCAType);
@@ -1512,7 +1512,7 @@ static void set_channel_definition_from_array(zval *array, PMQCD channel_definit
 	MQSERIES_SETOPT_LONG(channel_definition, SendExitsDefined);
 	MQSERIES_SETOPT_LONG(channel_definition, ReceiveExitsDefined);
 
-/* TODO: Do we need these? Or are they only needed during the creation of a channel?				
+/* TODO: Do we need these? Or are they only needed during the creation of a channel?
    MQPTR     MsgExitPtr;                 Address of first MsgExit field
    MQPTR     MsgUserDataPtr;             Address of first MsgUserData field
    MQPTR     SendExitPtr;                Address of first SendExit field
@@ -1609,7 +1609,7 @@ static void set_put_msg_opts_from_array(zval *array, PMQPMO put_msg_opts TSRMLS_
    MQPTR     PutMsgRecPtr;
    MQLONG    ResponseRecOffset;
    MQPTR     ResponseRecPtr;
-*/			
+*/
 }
 /* }}} */
 
@@ -1637,7 +1637,7 @@ static void set_array_from_put_msg_opts(zval *array, PMQPMO put_msg_opts) {
 
 Not supported:
 	AccountingToken
-		
+
 */
 static void set_msg_desc_from_array(zval *array, PMQMD msg_desc TSRMLS_DC)
 {
@@ -1677,16 +1677,16 @@ static void set_msg_desc_from_array(zval *array, PMQMD msg_desc TSRMLS_DC)
 static zval* make_reference(PMQBYTE bytes, MQLONG size TSRMLS_DC) {
 	mqseries_bytes *pBytes;
 	zval *z_byte24;
-	
+
 
 	MAKE_STD_ZVAL(z_byte24);
-	
+
 	pBytes = (mqseries_bytes *) emalloc(sizeof(mqseries_bytes));
 	pBytes->bytes = (PMQBYTE) emalloc(size*sizeof(MQBYTE));
 	memcpy(pBytes->bytes, bytes, size);
 	ZEND_REGISTER_RESOURCE(z_byte24, pBytes, le_mqseries_bytes);
 	pBytes->id = Z_RESVAL_P(z_byte24);
-	
+
 	return z_byte24;
 }
 /* }}} */
@@ -1699,7 +1699,7 @@ static  void set_array_from_msg_desc(zval *array, PMQMD msg_desc TSRMLS_DC) {
 
 	zval_dtor(array);
 	array_init(array);
-	
+
 	if (msg_desc->ApplIdentityData != NULL && strlen(msg_desc->ApplIdentityData) > 0) {
 		add_assoc_stringl(array, "ApplIdentityData", msg_desc->ApplIdentityData, sizeof(msg_desc->ApplIdentityData), 1);
 	}
@@ -1721,7 +1721,7 @@ static  void set_array_from_msg_desc(zval *array, PMQMD msg_desc TSRMLS_DC) {
 		add_assoc_stringl(array, "Format", msg_desc->Format, strlen(msg_desc->Format), 1);
 	}
 
-	
+
 	add_assoc_long(array, "Report", msg_desc->Report);
 	add_assoc_long(array, "MsgType", msg_desc->MsgType);
 	add_assoc_long(array, "Priority", msg_desc->Priority);
@@ -1734,20 +1734,20 @@ static  void set_array_from_msg_desc(zval *array, PMQMD msg_desc TSRMLS_DC) {
 
 	if (msg_desc->ReplyToQ != NULL && strlen(msg_desc->ReplyToQ)>0)
 		add_assoc_stringl(array, "ReplyToQ", msg_desc->ReplyToQ, sizeof(msg_desc->ReplyToQ), 1);
-	if (msg_desc->ReplyToQMgr != NULL && strlen(msg_desc->ReplyToQMgr)>0)	
+	if (msg_desc->ReplyToQMgr != NULL && strlen(msg_desc->ReplyToQMgr)>0)
 		add_assoc_stringl(array, "ReplyToQMgr", msg_desc->ReplyToQMgr, sizeof(msg_desc->ReplyToQMgr), 1);
-	if (msg_desc->UserIdentifier != NULL && strlen(msg_desc->UserIdentifier) >0)	
+	if (msg_desc->UserIdentifier != NULL && strlen(msg_desc->UserIdentifier) >0)
 		add_assoc_stringl(array, "UserIdentifier", msg_desc->UserIdentifier, sizeof(msg_desc->UserIdentifier), 1);
 
-	
+
 	add_assoc_long(array, "PutApplType", msg_desc->PutApplType);
 	if (msg_desc->PutApplName != NULL && strlen(msg_desc->PutApplName) >0)
 		add_assoc_stringl(array, "PutApplName", msg_desc->PutApplName, sizeof(msg_desc->PutApplName), 1);
-	if (msg_desc->PutDate != NULL && strlen(msg_desc->PutDate)>0)	
+	if (msg_desc->PutDate != NULL && strlen(msg_desc->PutDate)>0)
 		add_assoc_stringl(array, "PutDate", msg_desc->PutDate, sizeof(msg_desc->PutDate), 1);
-	if (msg_desc->PutTime != NULL && strlen(msg_desc->PutTime) >0)	
+	if (msg_desc->PutTime != NULL && strlen(msg_desc->PutTime) >0)
 		add_assoc_stringl(array, "PutTime", msg_desc->PutTime, sizeof(msg_desc->PutTime), 1);
-	
+
 	if (msg_desc->Version >= MQMD_VERSION_2) {
 		ref = make_reference(msg_desc->GroupId, 24 TSRMLS_CC);
 		add_assoc_resource(array, "GroupId", Z_RESVAL_P(ref));
@@ -1803,7 +1803,7 @@ static void set_array_from_obj_desc(zval *array, PMQOD obj_desc) {
 	add_assoc_long(array, "InvalidDestCount", obj_desc->InvalidDestCount);
 	add_assoc_string(array, "ResolvedQName", obj_desc->ResolvedQName, sizeof(obj_desc->ResolvedQName));
 	add_assoc_string(array, "ResolvedQMgrName", obj_desc->ResolvedQMgrName, sizeof(obj_desc->ResolvedQMgrName));
-	
+
 }
 /* }}} */
 
@@ -1844,7 +1844,7 @@ static void set_array_from_get_msg_opts(zval *array, PMQGMO get_msg_opts TSRMLS_
 
 	zval_dtor(array);
 	array_init(array);
-	
+
 	ref = make_reference(get_msg_opts->MsgToken, 16 TSRMLS_CC);
 	add_assoc_resource(array, "MsgToken", Z_RESVAL_P(ref));
 	zend_list_addref(Z_RESVAL_P(ref));
@@ -1861,7 +1861,7 @@ static void set_array_from_get_msg_opts(zval *array, PMQGMO get_msg_opts TSRMLS_
 	add_assoc_string(array, "Segmentation", str, sizeof(get_msg_opts->Segmentation));
 
 	add_assoc_long(array, "ReturnedLength", get_msg_opts->ReturnedLength);
-	
+
 }
 /* }}} */
 
@@ -1873,7 +1873,7 @@ static void set_array_from_get_msg_opts(zval *array, PMQGMO get_msg_opts TSRMLS_
  * frees memomory previuosly allocated
  */
 static void _mqseries_bytes(zend_rsrc_list_entry *rsrc TSRMLS_DC)
-{	
+{
 	efree(((mqseries_bytes *)rsrc->ptr)->bytes);
 	efree(rsrc->ptr);
 }

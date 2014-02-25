@@ -111,120 +111,136 @@ static HashTable *ht_reason_texts;
 /* }}} */
 
 /* {{{ arginfo */
+
+/****************************************************************/
+/*  Parameter usage in functions and structures                 */
+/*    I:    input                                               */
+/*    IB:   input, data buffer                                  */
+/*    IL:   input, length of data buffer                        */
+/*    IO:   input and output                                    */
+/*    IOB:  input and output, data buffer                       */
+/*    IOL:  input and output, length of data buffer             */
+/*    O:    output                                              */
+/*    OB:   output, data buffer                                 */
+/*    OC:   output, completion code                             */
+/*    OR:   output, reason code                                 */
+/*    FP:   function pointer                                    */
+/****************************************************************/
+
 ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_back, 0, 0, 3)
-	ZEND_ARG_INFO(0, hconn)
-	ZEND_ARG_INFO(1, compCode)
-	ZEND_ARG_INFO(1, reason)
+	ZEND_ARG_INFO(0, hconn)					/* I: Connection handle */
+	ZEND_ARG_INFO(1, compCode)				/* OC: Completion code */
+	ZEND_ARG_INFO(1, reason)				/* OR: Reason code qualifying CompCode */
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_begin, 0, 0, 4)
-	ZEND_ARG_INFO(0, hconn)
-	ZEND_ARG_ARRAY_INFO(0, beginOptions, 0)
-	ZEND_ARG_INFO(1, compCode)
-	ZEND_ARG_INFO(1, reason)
+	ZEND_ARG_INFO(0, hconn)					/* I: Connection handle */
+	ZEND_ARG_ARRAY_INFO(0, beginOptions, 0)	/* IO: Options that control the action of MQBEGIN */
+	ZEND_ARG_INFO(1, compCode)				/* OC: Completion code */
+	ZEND_ARG_INFO(1, reason) 				/* OR: Reason code qualifying CompCode */
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_close, 0, 0, 5)
-	ZEND_ARG_INFO(0, hconn)
-	ZEND_ARG_INFO(1, hobj)
-	ZEND_ARG_INFO(0, options)
-	ZEND_ARG_INFO(1, compCode)
-	ZEND_ARG_INFO(1, reason)
+	ZEND_ARG_INFO(0, hconn)					/* I: Connection handle */
+	ZEND_ARG_INFO(1, hobj)					/* IO: Object handle */
+	ZEND_ARG_INFO(0, options)				/* I: Options that control the action of MQCLOSE */
+	ZEND_ARG_INFO(1, compCode)				/* OC: Completion code */
+	ZEND_ARG_INFO(1, reason)				/* OR: Reason code qualifying CompCode */
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_cmit, 0, 0, 3)
-	ZEND_ARG_INFO(0, hconn)
-	ZEND_ARG_INFO(1, compCode)
-	ZEND_ARG_INFO(1, reason)
+	ZEND_ARG_INFO(0, hconn)					/* I: Connection handle */
+	ZEND_ARG_INFO(1, compCode)				/* OC: Completion code */
+	ZEND_ARG_INFO(1, reason)				/* OR: Reason code qualifying CompCode */
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_conn, 0, 0, 4)
-         ZEND_ARG_INFO(0, qMgrName)
-         ZEND_ARG_INFO(1, hconn)
-         ZEND_ARG_INFO(1, compCode)
-         ZEND_ARG_INFO(1, reason)
+	ZEND_ARG_INFO(0, qMgrName)				/* I: Name of queue manager */
+	ZEND_ARG_INFO(1, hconn)					/* O: Connection handle */
+	ZEND_ARG_INFO(1, compCode)				/* OC: Completion code */
+	ZEND_ARG_INFO(1, reason)				/* OR: Reason code qualifying CompCode */
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_connx, 0, 0, 5)
-         ZEND_ARG_INFO(0, qMgrName)
-         ZEND_ARG_ARRAY_INFO(1, connectOpts, 0)
-         ZEND_ARG_INFO(1, hconn)
-         ZEND_ARG_INFO(1, compCode)
-         ZEND_ARG_INFO(1, reason)
+	ZEND_ARG_INFO(0, qMgrName)				/* I: Name of queue manager */
+	ZEND_ARG_ARRAY_INFO(1, connectOpts, 0)	/* IO: Options that control the action of MQCONNX */
+	ZEND_ARG_INFO(1, hconn)					/* O: Connection handle */
+	ZEND_ARG_INFO(1, compCode)				/* OC: Completion code */
+	ZEND_ARG_INFO(1, reason)				/* OR: Reason code qualifying CompCode */
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_disc, 0, 0, 3)
-	ZEND_ARG_INFO(0, hconn)
-	ZEND_ARG_INFO(1, compCode)
-	ZEND_ARG_INFO(1, reason)
+	ZEND_ARG_INFO(0, hconn)					/* IO: Connection handle */
+	ZEND_ARG_INFO(1, compCode)				/* OC: Completion code */
+	ZEND_ARG_INFO(1, reason)				/* OR: Reason code qualifying CompCode */
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_get, 0, 0, 9)
-	ZEND_ARG_INFO(0, hconn)
-	ZEND_ARG_INFO(0, hobj)
-	ZEND_ARG_ARRAY_INFO(1, msgDesc, 0)
-	ZEND_ARG_ARRAY_INFO(1, getMsgOts, 0)
-	ZEND_ARG_INFO(0, bufferlength)
-	ZEND_ARG_INFO(1, buffer)
-	ZEND_ARG_INFO(1, dataLength)
-	ZEND_ARG_INFO(1, compCode)
-	ZEND_ARG_INFO(1, reason)
+	ZEND_ARG_INFO(0, hconn)					/* I: Connection handle */
+	ZEND_ARG_INFO(0, hobj)					/* I: Object handle */
+	ZEND_ARG_ARRAY_INFO(1, msgDesc, 0)		/* IO: Message descriptor */
+	ZEND_ARG_ARRAY_INFO(1, getMsgOts, 0)	/* IO: Options that control the action of MQGET */
+	ZEND_ARG_INFO(0, bufferlength)			/* IL: Length in bytes of the Buffer area */
+	ZEND_ARG_INFO(1, buffer)				/* OB: Area to contain the message data */
+	ZEND_ARG_INFO(1, dataLength)			/* O: Length of the message */
+	ZEND_ARG_INFO(1, compCode)				/* OC: Completion code */
+	ZEND_ARG_INFO(1, reason)				/* OR: Reason code qualifying CompCode */
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_inq, 0, 0, 10)
-	ZEND_ARG_INFO(0, hconn)
-	ZEND_ARG_INFO(0, hobj)
-	ZEND_ARG_INFO(0, selectorCount)
-	ZEND_ARG_ARRAY_INFO(0, selectors, 0)
-	ZEND_ARG_INFO(0, intAttrCount)
-	ZEND_ARG_INFO(1, intAttrs)
-	ZEND_ARG_INFO(0, charAttrLength)
-	ZEND_ARG_INFO(1, charAttrs)
-	ZEND_ARG_INFO(1, compCode)
-	ZEND_ARG_INFO(1, reason)
+	ZEND_ARG_INFO(0, hconn)					/* I: Connection handle */
+	ZEND_ARG_INFO(0, hobj)					/* I: Object handle */
+	ZEND_ARG_INFO(0, selectorCount)			/* I: Count of selectors */
+	ZEND_ARG_ARRAY_INFO(0, selectors, 0)	/* I: Array of attribute selectors */
+	ZEND_ARG_INFO(0, intAttrCount)			/* I: Count of integer attributes */
+	ZEND_ARG_INFO(1, intAttrs)				/* O: Array of integer attributes */
+	ZEND_ARG_INFO(0, charAttrLength)		/* IL: Length of character attributes buffer */
+	ZEND_ARG_INFO(1, charAttrs)				/* OB: Character attributes */
+	ZEND_ARG_INFO(1, compCode)				/* OC: Completion code */
+	ZEND_ARG_INFO(1, reason)				/* OR: Reason code qualifying CompCode */
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_open, 0, 0, 6)
-	ZEND_ARG_INFO(0, hconn)
-	ZEND_ARG_ARRAY_INFO(1, objDesc, 0)
-	ZEND_ARG_INFO(0, options)
-	ZEND_ARG_INFO(1, hobj)
-	ZEND_ARG_INFO(1, compCode)
-	ZEND_ARG_INFO(1, reason)
+	ZEND_ARG_INFO(0, hconn)					/* I: Connection handle */
+	ZEND_ARG_ARRAY_INFO(1, objDesc, 0)		/* IO: Object descriptor */
+	ZEND_ARG_INFO(0, options)				/* I: Options that control the action of MQOPEN */
+	ZEND_ARG_INFO(1, hobj)					/* O: Object handle */
+	ZEND_ARG_INFO(1, compCode)				/* OC: Completion code */
+	ZEND_ARG_INFO(1, reason)				/* OR: Reason code qualifying CompCode */
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_put, 0, 0, 7)
-	ZEND_ARG_INFO(0, hconn)
-	ZEND_ARG_INFO(0, hobj)
-	ZEND_ARG_ARRAY_INFO(1, msgDesc, 0)
-	ZEND_ARG_ARRAY_INFO(1, putMsgOpts, 0)
-	ZEND_ARG_INFO(0, buffer)
-	ZEND_ARG_INFO(1, compCode)
-	ZEND_ARG_INFO(1, reason)
+	ZEND_ARG_INFO(0, hconn)					/* I: Connection handle */
+	ZEND_ARG_INFO(0, hobj)					/* I: Object handle */
+	ZEND_ARG_ARRAY_INFO(1, msgDesc, 0)		/* IO: Message descriptor */
+	ZEND_ARG_ARRAY_INFO(1, putMsgOpts, 0)	/* IO: Options that control the action of MQPUT */
+	ZEND_ARG_INFO(0, buffer)				/* IB: Message data */
+	ZEND_ARG_INFO(1, compCode)				/* OC: Completion code */
+	ZEND_ARG_INFO(1, reason)				/* OR: Reason code qualifying CompCode */
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_put1, 0, 0, 7)
-	ZEND_ARG_INFO(0, hconn)
-	ZEND_ARG_ARRAY_INFO(0, objDesc, 0)
-	ZEND_ARG_ARRAY_INFO(1, msgDesc, 0)
-	ZEND_ARG_ARRAY_INFO(1, putMsgOpts, 0)
-	ZEND_ARG_INFO(0, buffer)
-	ZEND_ARG_INFO(1, compCode)
-	ZEND_ARG_INFO(1, reason)
+	ZEND_ARG_INFO(0, hconn)a				/* I: Connection handle */
+	ZEND_ARG_ARRAY_INFO(0, objDesc, 0)		/* IO: Object descriptor */
+	ZEND_ARG_ARRAY_INFO(1, msgDesc, 0)		/* IO: Message descriptor */
+	ZEND_ARG_ARRAY_INFO(1, putMsgOpts, 0)	/* IO: Options that control the action of MQPUT1 */
+	ZEND_ARG_INFO(0, buffer)				/* IB: Message data */
+	ZEND_ARG_INFO(1, compCode)				/* OC: Completion code */
+	ZEND_ARG_INFO(1, reason)				/* OR: Reason code qualifying CompCode */
 ZEND_END_ARG_INFO()
 
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_set, 0, 0, 10)
-	ZEND_ARG_INFO(0, hconn)
-	ZEND_ARG_INFO(0, hobj)
-	ZEND_ARG_INFO(0, selectorCount)
-	ZEND_ARG_ARRAY_INFO(0, selectors, 0)
-	ZEND_ARG_INFO(0, intAttrCount)
-	ZEND_ARG_ARRAY_INFO(0, intAttrs, 0)
-	ZEND_ARG_INFO(0, charAttrLength)
-	ZEND_ARG_ARRAY_INFO(0, charAttrs, 0)
-	ZEND_ARG_INFO(1, compCode)
-	ZEND_ARG_INFO(1, reason)
+	ZEND_ARG_INFO(0, hconn)					/* I: Connection handle */
+	ZEND_ARG_INFO(0, hobj)					/* I: Object handle */
+	ZEND_ARG_INFO(0, selectorCount)			/* I: Count of selectors */
+	ZEND_ARG_ARRAY_INFO(0, selectors, 0)	/* I: Array of attribute selectors */
+	ZEND_ARG_INFO(0, intAttrCount)			/* I: Count of integer attributes */
+	ZEND_ARG_ARRAY_INFO(0, intAttrs, 0)		/* I: Array of integer attributes */
+	ZEND_ARG_INFO(0, charAttrLength)		/* IL: Length of character attributes buffer */
+	ZEND_ARG_ARRAY_INFO(0, charAttrs, 0)	/* IB: Character attributes */
+	ZEND_ARG_INFO(1, compCode)				/* OC: Completion code */
+	ZEND_ARG_INFO(1, reason)				/* OR: Reason code qualifying CompCode */
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_strerror, 0, 0, 1)

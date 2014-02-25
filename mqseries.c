@@ -72,6 +72,9 @@ static void set_connect_opts_from_array(zval *array,
 
 static int is_compcode_reason_ref(zval *z_comp_code, zval *z_reason);
 static int is_called_by_ref(zval *param, char *param_name);
+
+static void set_sub_desc_from_array(zval *array, PMQSD sub_desc TSRMLS_DC);
+static void set_array_from_sub_desc(zval *array, PMQSD sub_desc TSRMLS_DC);
 /* }}} */
 
 /* If you declare any globals in php_mqseries.h uncomment this:
@@ -108,6 +111,22 @@ static HashTable *ht_reason_texts;
 			strncpy((MQCHAR *) s->m, Z_STRVAL_PP(tmp), sizeof(s->m)); \
 		} \
 	}
+
+#define MQSERIES_ADD_ASSOC_LONG(s, m) \
+	add_assoc_long(array, #m, s->m)
+
+#define MQSERIES_ADD_ASSOC_STRING(s, m) \
+	if (s->m != NULL && strlen(s->m) > 0) { \
+		add_assoc_stringl(array, #m, s->m, sizeof(s->m), 1); \
+	}
+#define MQSERIES_ADD_ASSOC_RESOURCE(s, m) \
+	do { \
+		ref = make_reference(s->m, sizeof(s->m) TSRMLS_CC); \
+	    add_assoc_resource(array, #m, Z_RESVAL_P(ref)); \
+		zend_list_addref(Z_RESVAL_P(ref)); \
+		zval_ptr_dtor(&ref); \
+	} while(0)
+
 /* }}} */
 
 /* {{{ arginfo */
@@ -220,7 +239,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_put, 0, 0, 7)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_put1, 0, 0, 7)
-	ZEND_ARG_INFO(0, hconn)a				/* I: Connection handle */
+	ZEND_ARG_INFO(0, hconn)					/* I: Connection handle */
 	ZEND_ARG_ARRAY_INFO(0, objDesc, 0)		/* IO: Object descriptor */
 	ZEND_ARG_ARRAY_INFO(1, msgDesc, 0)		/* IO: Message descriptor */
 	ZEND_ARG_ARRAY_INFO(1, putMsgOpts, 0)	/* IO: Options that control the action of MQPUT1 */
@@ -242,6 +261,17 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_set, 0, 0, 10)
 	ZEND_ARG_INFO(1, compCode)				/* OC: Completion code */
 	ZEND_ARG_INFO(1, reason)				/* OR: Reason code qualifying CompCode */
 ZEND_END_ARG_INFO()
+
+#ifdef HAVE_MQSERIESLIB_V7
+ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_sub, 0, 0, 6)
+	ZEND_ARG_INFO(0, hconn)					/* I: Connection handle */
+	ZEND_ARG_ARRAY_INFO(1, subDesc, 0)		/* IO: Subscription descriptor */
+	ZEND_ARG_INFO(1, hobj)					/* IO: Object handle */
+	ZEND_ARG_INFO(1, hsub)					/* O: Subscription object handle */
+	ZEND_ARG_INFO(1, compCode)				/* OC: Completion code */
+	ZEND_ARG_INFO(1, reason)				/* OR: Reason code qualifying CompCode */
+ZEND_END_ARG_INFO()
+#endif /* HAVE_MQSERIESLIB_V7 */
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_strerror, 0, 0, 1)
     ZEND_ARG_INFO(0, reason)
@@ -272,6 +302,9 @@ zend_function_entry mqseries_functions[] = {
 	PHP_FE(mqseries_set,		arginfo_mqseries_set)
 	PHP_FE(mqseries_strerror,	arginfo_mqseries_strerror)
 	PHP_FE(mqseries_bytes_val,	arginfo_mqseries_bytes_val)
+#ifdef HAVE_MQSERIESLIB_V7
+	PHP_FE(mqseries_sub,        arginfo_mqseries_sub)
+#endif /* HAVE_MQSERIESLIB_V7 */
 	{NULL, NULL, NULL}	/* Must be the last line in mqseries_functions[] */
 };
 /* }}} */
@@ -1413,6 +1446,74 @@ PHP_FUNCTION(mqseries_bytes_val)
 }
 /* }}} */
 
+#ifdef HAVE_MQSERIESLIB_V7
+/* {{{ proto resource mqseries_sub(resource connection, array msg_desc, resource object_handle, resource subscription_handle, resourceref compcode, resourceref reason)
+	The MQSUB call registers the applications subscription to a particular topic. */
+/*
+ MQSUB (
+ 	Hconn,		-- input
+  	pSubDesc,	-- input/output
+  	pHobj,		-- input/output
+	pHsub,		-- output
+	pCompCode,	-- output
+	pReason);	-- output
+*/
+PHP_FUNCTION(mqseries_sub)
+{
+	mqseries_descriptor *mqdesc;
+	mqseries_obj *mqobj, *mqsub;
+	zval *z_mqdesc,
+		 *z_sub_desc,
+		 *z_obj,
+		 *z_sub,
+		 *z_comp_code,
+		 *z_reason;
+
+	MQSD sub_desc = {MQSD_DEFAULT};
+	MQLONG comp_code;  /* Completion code	*/
+	MQLONG reason;     /* Qualifying reason */
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rarzzz", &z_mqdesc, &z_sub_desc,
+		&z_obj, &z_sub, &z_comp_code, &z_reason) == FAILURE) {
+		return;
+	}
+
+	if (!is_called_by_ref(z_obj, "hobj")) return;
+	if (!is_called_by_ref(z_obj, "hsub")) return;
+	if (!is_compcode_reason_ref(z_comp_code, z_reason)) return;
+
+	ZEND_FETCH_RESOURCE(mqdesc, mqseries_descriptor *, &z_mqdesc, -1, PHP_MQSERIES_DESCRIPTOR_RES_NAME, le_mqseries_conn);
+	set_sub_desc_from_array(z_sub_desc, &sub_desc TSRMLS_CC);
+
+	mqobj = (mqseries_obj *) emalloc(sizeof(mqseries_obj));
+	mqsub = (mqseries_obj *) emalloc(sizeof(mqseries_obj));
+
+	MQSUB(mqdesc->conn, &sub_desc, &mqobj->obj, &mqsub->obj, &comp_code, &reason);
+
+	ZVAL_LONG(z_comp_code, comp_code);
+	ZVAL_LONG(z_reason, reason);
+
+	if (PZVAL_IS_REF(z_sub_desc)) {
+		set_array_from_sub_desc(z_sub_desc, &sub_desc TSRMLS_CC);
+	}
+	if (comp_code == MQCC_OK) {
+		mqobj->conn = &mqdesc->conn;
+		ZEND_REGISTER_RESOURCE(z_obj, mqobj, le_mqseries_obj);
+		mqobj->id = Z_RESVAL_P(z_obj);
+
+		mqsub->conn = &mqdesc->conn;
+		ZEND_REGISTER_RESOURCE(z_sub, mqsub, le_mqseries_obj);
+		mqsub->id = Z_RESVAL_P(z_sub);
+	} else {
+		/* So we don't register the ref. But we already allocated some memory lets free that */
+		efree(mqobj);
+		efree(mqsub);
+	}
+}
+/* }}} */
+
+#endif /* HAVE_MQSERIESLIB_V7 */
+
 /******************************************************************************/
 /* Following are methods to make structs from arrays and vice verse           */
 /* TODO Check if all fields are specified (hopefully the MQ API will not      */
@@ -1880,6 +1981,62 @@ static void set_array_from_get_msg_opts(zval *array, PMQGMO get_msg_opts TSRMLS_
 
 }
 /* }}} */
+
+#ifdef HAVE_MQSERIESLIB_V7
+/* {{{ set_sub_desc_from_array
+ * sets the subscription description struct from an array.
+ */
+static void set_sub_desc_from_array(zval *array, PMQSD sub_desc TSRMLS_DC)
+{
+	HashTable *ht = Z_ARRVAL_P(array);
+	zval **tmp;
+	mqseries_bytes *byte24;
+
+	MQSERIES_SETOPT_LONG(sub_desc, Version);
+	MQSERIES_SETOPT_LONG(sub_desc, Options);
+	MQSERIES_SETOPT_STRING(sub_desc, ObjectName);
+	MQSERIES_SETOPT_STRING(sub_desc, AlternateUserId);
+	MQSERIES_SETOPT_LONG(sub_desc, SubExpiry);
+	MQSERIES_SETOPT_RESBYTES(sub_desc, SubCorrelId);
+	MQSERIES_SETOPT_LONG(sub_desc, PubPriority);
+	MQSERIES_SETOPT_STRING(sub_desc, PubApplIdentityData);
+	MQSERIES_SETOPT_LONG(sub_desc, SubLevel);
+
+/* TODO: Implement this ?
+
+   MQBYTE40  AlternateSecurityId;
+   MQCHARV   ObjectString;
+   MQCHARV   SubName;
+   MQCHARV   SubUserData;
+   MQBYTE32  PubAccountingToken;
+   MQCHARV   SelectionString;
+   MQCHARV   ResObjectString;
+*/
+}
+/* }}} */
+
+/* {{{ set_array_from_sub_desc
+ * Builds an array from the subscription description struct for output
+ */
+static void set_array_from_sub_desc(zval* array, PMQSD sub_desc TSRMLS_DC)
+{
+	zval *ref;
+
+	zval_dtor(array);
+	array_init(array);
+
+	MQSERIES_ADD_ASSOC_LONG(sub_desc, Version);
+	MQSERIES_ADD_ASSOC_LONG(sub_desc, Options);
+	MQSERIES_ADD_ASSOC_STRING(sub_desc, ObjectName);
+	MQSERIES_ADD_ASSOC_STRING(sub_desc, AlternateUserId);
+	MQSERIES_ADD_ASSOC_LONG(sub_desc, SubExpiry);
+	MQSERIES_ADD_ASSOC_RESOURCE(sub_desc, SubCorrelId);
+	MQSERIES_ADD_ASSOC_LONG(sub_desc, PubPriority);
+	MQSERIES_ADD_ASSOC_STRING(sub_desc, PubApplIdentityData);
+	MQSERIES_ADD_ASSOC_LONG(sub_desc, SubLevel);
+}
+/* }}} */
+#endif /* HAVE_MQSERIESLIB_V7 */
 
 /******************************************************************************/
 /* End of conversion methods                                                  */

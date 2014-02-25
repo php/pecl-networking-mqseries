@@ -102,19 +102,19 @@ PHP_FUNCTION(mqseries_strerror);
 PHP_FUNCTION(mqseries_bytes_val);
 
 #ifdef HAVE_MQSERIESLIB_V7
-# PHP_FUNCTION(mqseries_bufmh);
-# PHP_FUNCTION(mqseries_cb);
-# PHP_FUNCTION(mqseries_cb_function);
-# PHP_FUNCTION(mqseries_crtmh);
-# PHP_FUNCTION(mqseries_ctl);
-# PHP_FUNCTION(mqseries_dltmh);
-# PHP_FUNCTION(mqseries_dltmp);
-# PHP_FUNCTION(mqseries_inqmp);
-# PHP_FUNCTION(mqseries_mhbuf);
-# PHP_FUNCTION(mqseries_setmp);
-# PHP_FUNCTION(mqseries_stat);
-# PHP_FUNCTION(mqseries_sub);
-# PHP_FUNCTION(mqseries_subrq);
+// PHP_FUNCTION(mqseries_bufmh);
+// PHP_FUNCTION(mqseries_cb);
+// PHP_FUNCTION(mqseries_cb_function);
+// PHP_FUNCTION(mqseries_crtmh);
+// PHP_FUNCTION(mqseries_ctl);
+// PHP_FUNCTION(mqseries_dltmh);
+// PHP_FUNCTION(mqseries_dltmp);
+// PHP_FUNCTION(mqseries_inqmp);
+// PHP_FUNCTION(mqseries_mhbuf);
+// PHP_FUNCTION(mqseries_setmp);
+// PHP_FUNCTION(mqseries_stat);
+PHP_FUNCTION(mqseries_sub);
+// PHP_FUNCTION(mqseries_subrq);
 #endif /* HAVE_MQSERIESLIB_V7 */
 
 #ifdef ZTS

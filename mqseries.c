@@ -121,7 +121,7 @@ static HashTable *ht_reason_texts;
 	}
 #define MQSERIES_ADD_ASSOC_RESOURCE(s, m) \
 	do { \
-		ref = create_mqseries_bytes_resource(s->m, sizeof(s->m) TSRMLS_CC); \
+		zval *ref = create_mqseries_bytes_resource(s->m, sizeof(s->m) TSRMLS_CC); \
 	    add_assoc_resource(array, #m, Z_RESVAL_P(ref)); \
 		zend_list_addref(Z_RESVAL_P(ref)); \
 		zval_ptr_dtor(&ref); \
@@ -1742,9 +1742,9 @@ static void set_array_from_put_msg_opts(zval *array, PMQPMO put_msg_opts) {
 	if (put_msg_opts->ResolvedQMgrName != NULL && strlen(put_msg_opts->ResolvedQMgrName) >0) {
 		add_assoc_stringl(array, "ResolvedQMgrName", put_msg_opts->ResolvedQMgrName, strlen(put_msg_opts->ResolvedQMgrName), 1);
 	}
-	add_assoc_long(array, "KnownDestCount", put_msg_opts->KnownDestCount);
-	add_assoc_long(array, "UnknownDestCount", put_msg_opts->UnknownDestCount);
-	add_assoc_long(array, "InvalidDestCount", put_msg_opts->InvalidDestCount);
+	MQSERIES_ADD_ASSOC_LONG(put_msg_opts, KnownDestCount);
+	MQSERIES_ADD_ASSOC_LONG(put_msg_opts, UnknownDestCount);
+	MQSERIES_ADD_ASSOC_LONG(put_msg_opts, InvalidDestCount);
 }
 /* }}} */
 
@@ -1811,69 +1811,46 @@ static zval* create_mqseries_bytes_resource(PMQBYTE bytes, size_t size TSRMLS_DC
 /* {{{ set_array_from_msg_desc
  * makes an array from the message descriptor struct for output.
  */
-static  void set_array_from_msg_desc(zval *array, PMQMD msg_desc TSRMLS_DC) {
-	zval *ref;
-
+static  void set_array_from_msg_desc(zval *array, PMQMD msg_desc TSRMLS_DC)
+{
 	zval_dtor(array);
 	array_init(array);
 
-	if (msg_desc->ApplIdentityData != NULL && strlen(msg_desc->ApplIdentityData) > 0) {
-		add_assoc_stringl(array, "ApplIdentityData", msg_desc->ApplIdentityData, sizeof(msg_desc->ApplIdentityData), 1);
-	}
-	if (msg_desc->ApplOriginData != NULL && strlen(msg_desc->ApplOriginData) > 0) {
-		add_assoc_stringl(array, "ApplOriginData", msg_desc->ApplOriginData, sizeof(msg_desc->ApplOriginData), 1);
-	}
-	add_assoc_long(array, "BackoutCount", msg_desc->BackoutCount);
-	add_assoc_long(array, "CodedCharSetId", msg_desc->CodedCharSetId);
+	MQSERIES_ADD_ASSOC_STRING(msg_desc, ApplIdentityData);
+	MQSERIES_ADD_ASSOC_STRING(msg_desc, ApplOriginData);
+	MQSERIES_ADD_ASSOC_LONG(msg_desc, BackoutCount);
+	MQSERIES_ADD_ASSOC_LONG(msg_desc, CodedCharSetId);
 
-	ref = create_mqseries_bytes_resource(msg_desc->CorrelId, sizeof(msg_desc->CorrelId) TSRMLS_CC);
-	add_assoc_resource(array, "CorrelId", Z_RESVAL_P(ref));
-	zend_list_addref(Z_RESVAL_P(ref));
-	zval_ptr_dtor(&ref);
+	MQSERIES_ADD_ASSOC_RESOURCE(msg_desc, CorrelId);
 
-	add_assoc_long(array, "Encoding", msg_desc->Encoding);
-	add_assoc_long(array, "Expiry", msg_desc->Expiry);
-	add_assoc_long(array, "Feedback", msg_desc->Feedback);
-	if (msg_desc->Format != NULL && strlen(msg_desc->Format) > 0) {
-		add_assoc_stringl(array, "Format", msg_desc->Format, strlen(msg_desc->Format), 1);
-	}
+	MQSERIES_ADD_ASSOC_LONG(msg_desc, Encoding);
+	MQSERIES_ADD_ASSOC_LONG(msg_desc, Expiry);
+	MQSERIES_ADD_ASSOC_LONG(msg_desc, Feedback);
+	MQSERIES_ADD_ASSOC_STRING(msg_desc, Format);
 
+	MQSERIES_ADD_ASSOC_LONG(msg_desc, Report);
+	MQSERIES_ADD_ASSOC_LONG(msg_desc, MsgType);
+	MQSERIES_ADD_ASSOC_LONG(msg_desc, Priority);
+	MQSERIES_ADD_ASSOC_LONG(msg_desc, Persistence);
 
-	add_assoc_long(array, "Report", msg_desc->Report);
-	add_assoc_long(array, "MsgType", msg_desc->MsgType);
-	add_assoc_long(array, "Priority", msg_desc->Priority);
-	add_assoc_long(array, "Persistence", msg_desc->Persistence);
+	MQSERIES_ADD_ASSOC_RESOURCE(msg_desc, MsgId);
 
-	ref = create_mqseries_bytes_resource(msg_desc->MsgId, sizeof(msg_desc->MsgId) TSRMLS_CC);
-	add_assoc_resource(array, "MsgId", Z_RESVAL_P(ref));
-	zend_list_addref(Z_RESVAL_P(ref));
-	zval_ptr_dtor(&ref);
+	MQSERIES_ADD_ASSOC_STRING(msg_desc, ReplyToQ);
+	MQSERIES_ADD_ASSOC_STRING(msg_desc, ReplyToQMgr);
+	MQSERIES_ADD_ASSOC_STRING(msg_desc, UserIdentifier);
 
-	if (msg_desc->ReplyToQ != NULL && strlen(msg_desc->ReplyToQ)>0)
-		add_assoc_stringl(array, "ReplyToQ", msg_desc->ReplyToQ, sizeof(msg_desc->ReplyToQ), 1);
-	if (msg_desc->ReplyToQMgr != NULL && strlen(msg_desc->ReplyToQMgr)>0)
-		add_assoc_stringl(array, "ReplyToQMgr", msg_desc->ReplyToQMgr, sizeof(msg_desc->ReplyToQMgr), 1);
-	if (msg_desc->UserIdentifier != NULL && strlen(msg_desc->UserIdentifier) >0)
-		add_assoc_stringl(array, "UserIdentifier", msg_desc->UserIdentifier, sizeof(msg_desc->UserIdentifier), 1);
+	MQSERIES_ADD_ASSOC_LONG(msg_desc, PutApplType);
 
-
-	add_assoc_long(array, "PutApplType", msg_desc->PutApplType);
-	if (msg_desc->PutApplName != NULL && strlen(msg_desc->PutApplName) >0)
-		add_assoc_stringl(array, "PutApplName", msg_desc->PutApplName, sizeof(msg_desc->PutApplName), 1);
-	if (msg_desc->PutDate != NULL && strlen(msg_desc->PutDate)>0)
-		add_assoc_stringl(array, "PutDate", msg_desc->PutDate, sizeof(msg_desc->PutDate), 1);
-	if (msg_desc->PutTime != NULL && strlen(msg_desc->PutTime) >0)
-		add_assoc_stringl(array, "PutTime", msg_desc->PutTime, sizeof(msg_desc->PutTime), 1);
+	MQSERIES_ADD_ASSOC_STRING(msg_desc, PutApplName);
+	MQSERIES_ADD_ASSOC_STRING(msg_desc, PutDate);
+	MQSERIES_ADD_ASSOC_STRING(msg_desc, PutTime);
 
 	if (msg_desc->Version >= MQMD_VERSION_2) {
-		ref = create_mqseries_bytes_resource(msg_desc->GroupId, sizeof(msg_desc->GroupId) TSRMLS_CC);
-		add_assoc_resource(array, "GroupId", Z_RESVAL_P(ref));
-		zend_list_addref(Z_RESVAL_P(ref));
-		zval_ptr_dtor(&ref);
+		MQSERIES_ADD_ASSOC_RESOURCE(msg_desc, GroupId);
 
-		add_assoc_long(array, "MsgSeqNumber", msg_desc->MsgSeqNumber);
-		add_assoc_long(array, "MsgFlags", msg_desc->MsgFlags);
-		add_assoc_long(array, "OriginalLength", msg_desc->OriginalLength);
+		MQSERIES_ADD_ASSOC_LONG(msg_desc, MsgSeqNumber);
+		MQSERIES_ADD_ASSOC_LONG(msg_desc, MsgFlags);
+		MQSERIES_ADD_ASSOC_LONG(msg_desc, OriginalLength);
 	}
 }
 /* }}} */
@@ -1915,9 +1892,9 @@ static void set_array_from_obj_desc(zval *array, PMQOD obj_desc) {
 
 	add_assoc_string(array, "ObjectQMgrName", obj_desc->ObjectQMgrName, sizeof(obj_desc->ObjectQMgrName));
 	add_assoc_string(array, "ObjectName", obj_desc->ObjectName, sizeof(obj_desc->ObjectName));
-	add_assoc_long(array, "KnownDestCount", obj_desc->KnownDestCount);
-	add_assoc_long(array, "UnknownDestCount", obj_desc->UnknownDestCount);
-	add_assoc_long(array, "InvalidDestCount", obj_desc->InvalidDestCount);
+	MQSERIES_ADD_ASSOC_LONG(obj_desc, KnownDestCount);
+	MQSERIES_ADD_ASSOC_LONG(obj_desc, UnknownDestCount);
+	MQSERIES_ADD_ASSOC_LONG(obj_desc, InvalidDestCount);
 	add_assoc_string(array, "ResolvedQName", obj_desc->ResolvedQName, sizeof(obj_desc->ResolvedQName));
 	add_assoc_string(array, "ResolvedQMgrName", obj_desc->ResolvedQMgrName, sizeof(obj_desc->ResolvedQMgrName));
 
@@ -1956,20 +1933,14 @@ static void set_get_msg_opts_from_array(zval *array, PMQGMO get_msg_opts  TSRMLS
  * Builds an array from the get message options struct for output
  */
 static void set_array_from_get_msg_opts(zval *array, PMQGMO get_msg_opts TSRMLS_DC) {
-	zval *ref;
 	char str[2];
 
 	zval_dtor(array);
 	array_init(array);
 
-	ref = create_mqseries_bytes_resource(get_msg_opts->MsgToken, sizeof(get_msg_opts->MsgToken) TSRMLS_CC);
-	add_assoc_resource(array, "MsgToken", Z_RESVAL_P(ref));
-	zend_list_addref(Z_RESVAL_P(ref));
-	zval_ptr_dtor(&ref);
+	MQSERIES_ADD_ASSOC_RESOURCE(get_msg_opts, MsgToken);
 
-	if (get_msg_opts->ResolvedQName != NULL && strlen(get_msg_opts->ResolvedQName) > 0) {
-		add_assoc_stringl(array, "ResolvedQName", get_msg_opts->ResolvedQName, sizeof(get_msg_opts->ResolvedQName), 1);
-	}
+	MQSERIES_ADD_ASSOC_STRING(get_msg_opts, ResolvedQName);
 	sprintf(str, "%c", get_msg_opts->GroupStatus);
 	add_assoc_string(array, "GroupStatus", str, sizeof(get_msg_opts->GroupStatus));
 	sprintf(str, "%c", get_msg_opts->SegmentStatus);
@@ -1977,7 +1948,7 @@ static void set_array_from_get_msg_opts(zval *array, PMQGMO get_msg_opts TSRMLS_
 	sprintf(str, "%c", get_msg_opts->Segmentation);
 	add_assoc_string(array, "Segmentation", str, sizeof(get_msg_opts->Segmentation));
 
-	add_assoc_long(array, "ReturnedLength", get_msg_opts->ReturnedLength);
+	MQSERIES_ADD_ASSOC_LONG(get_msg_opts, ReturnedLength);
 
 }
 /* }}} */
@@ -2020,8 +1991,6 @@ static void set_sub_desc_from_array(zval *array, PMQSD sub_desc TSRMLS_DC)
  */
 static void set_array_from_sub_desc(zval* array, PMQSD sub_desc TSRMLS_DC)
 {
-	zval *ref;
-
 	zval_dtor(array);
 	array_init(array);
 

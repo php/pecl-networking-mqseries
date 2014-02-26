@@ -691,14 +691,17 @@ PHP_FUNCTION(mqseries_get)
 		MQRFH rfh = {MQRFH_DEFAULT};
 		memcpy(&rfh, buf, MQRFH_STRUC_LENGTH_FIXED);
 		data = buf + rfh.StrucLength;
+		buf_len -= rfh.StrucLength;
 	} else if (!strncmp(msg_desc.Format, MQFMT_RF_HEADER_2, sizeof(msg_desc.Format))) {
 		MQRFH2 rfh2 = {MQRFH2_DEFAULT};
 		memcpy(&rfh2, buf, MQRFH_STRUC_LENGTH_FIXED_2);
 		data = buf + rfh2.StrucLength;
+		buf_len -= rfh2.StrucLength;
 	} else if (!strncmp(msg_desc.Format, MQFMT_MD_EXTENSION, sizeof(msg_desc.Format))) {
 		MQMDE rfhe = { MQMDE_DEFAULT };
 		memcpy(&rfhe, buf, MQMDE_LENGTH_2);
 		data = buf + rfhe.StrucLength;
+		buf_len -= rfhe.StrucLength;
 	}
 
 	ZVAL_LONG(z_comp_code, comp_code);
@@ -706,7 +709,7 @@ PHP_FUNCTION(mqseries_get)
 	ZVAL_LONG(z_data_length, data_length);
 
 	zval_dtor(z_buffer);
-	ZVAL_STRINGL(z_buffer, (char *) data, data_length, 1);
+	ZVAL_STRINGL(z_buffer, (char *) data, (buf_len > 0) ? (buf_len < data_length ? buf_len : data_length) : 0, 1);
 	efree(buf);
 
 	if (PZVAL_IS_REF(z_msg_desc)) {

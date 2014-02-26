@@ -7,3 +7,5 @@
 	ZVAL_LONG(z_comp_code, comp_code);
 
 - Add MQSERIES_MQCNO_HANDLE_SHARE_BLOCK in the constant list
+
+- Make the MQSUB hObj in/out

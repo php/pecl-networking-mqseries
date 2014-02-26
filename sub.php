@@ -61,9 +61,9 @@ echo 'WAITING ', PHP_EOL;
 do {
     $messageFilter = array(
     );
-    $bytesLength = 10000;
+    $bytesLength = 10;
     mqseries_get($connection, $queue, $messageFilter, $gmo, $bytesLength, $messageContent, $data_length, $completionCode, $reason);
-    var_dump($messageContent);die();
+    var_dump($messageContent, $data_length);die();
 } while($completionCode !== MQSERIES_MQCC_OK);
 
 die('FIN');

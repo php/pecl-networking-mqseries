@@ -102,9 +102,9 @@ static HashTable *ht_reason_texts;
 #define MQSERIES_SETOPT_RESBYTES(s,m) \
 	if (zend_hash_find(ht, #m, sizeof(#m), (void**)&tmp) == SUCCESS) { \
 		if (Z_TYPE_PP(tmp) == IS_RESOURCE) { \
-			byte24 = (mqseries_bytes *) zend_fetch_resource(tmp TSRMLS_CC, -1, PHP_MQSERIES_BYTES_RES_NAME, NULL, 1, le_mqseries_bytes); \
-			if (byte24 != NULL) { \
-				memcpy(s->m, byte24->bytes, sizeof(s->m)); \
+			mqbytes = (mqseries_bytes *) zend_fetch_resource(tmp TSRMLS_CC, -1, PHP_MQSERIES_BYTES_RES_NAME, NULL, 1, le_mqseries_bytes); \
+			if (mqbytes != NULL) { \
+				memcpy(s->m, mqbytes->bytes, sizeof(s->m)); \
 			} \
 		} else if (Z_TYPE_PP(tmp) != IS_NULL) { \
 			convert_to_string(*tmp); \
@@ -121,7 +121,7 @@ static HashTable *ht_reason_texts;
 	}
 #define MQSERIES_ADD_ASSOC_RESOURCE(s, m) \
 	do { \
-		ref = make_reference(s->m, sizeof(s->m) TSRMLS_CC); \
+		ref = create_mqseries_bytes_resource(s->m, sizeof(s->m) TSRMLS_CC); \
 	    add_assoc_resource(array, #m, Z_RESVAL_P(ref)); \
 		zend_list_addref(Z_RESVAL_P(ref)); \
 		zval_ptr_dtor(&ref); \
@@ -1760,7 +1760,7 @@ static void set_msg_desc_from_array(zval *array, PMQMD msg_desc TSRMLS_DC)
 {
 	HashTable *ht = Z_ARRVAL_P(array);
 	zval **tmp;
-	mqseries_bytes *byte24;
+	mqseries_bytes *mqbytes;
 
 	MQSERIES_SETOPT_LONG(msg_desc, Version);
 	MQSERIES_SETOPT_LONG(msg_desc, Report);
@@ -1788,23 +1788,23 @@ static void set_msg_desc_from_array(zval *array, PMQMD msg_desc TSRMLS_DC)
 }
 /* }}} */
 
-/* {{{ make_reference
+/* {{{ create_mqseries_bytes_resource
  * makes an mqseries_bytes reference, needed when returning message and correlation id's
  */
-static zval* make_reference(PMQBYTE bytes, MQLONG size TSRMLS_DC) {
+static zval* create_mqseries_bytes_resource(PMQBYTE bytes, size_t size TSRMLS_DC)
+{
 	mqseries_bytes *pBytes;
-	zval *z_byte24;
+	zval *z_bytes;
 
-
-	MAKE_STD_ZVAL(z_byte24);
+	MAKE_STD_ZVAL(z_bytes);
 
 	pBytes = (mqseries_bytes *) emalloc(sizeof(mqseries_bytes));
 	pBytes->bytes = (PMQBYTE) emalloc(size*sizeof(MQBYTE));
 	memcpy(pBytes->bytes, bytes, size);
-	ZEND_REGISTER_RESOURCE(z_byte24, pBytes, le_mqseries_bytes);
-	pBytes->id = Z_RESVAL_P(z_byte24);
+	ZEND_REGISTER_RESOURCE(z_bytes, pBytes, le_mqseries_bytes);
+	pBytes->id = Z_RESVAL_P(z_bytes);
 
-	return z_byte24;
+	return z_bytes;
 }
 /* }}} */
 
@@ -1826,7 +1826,7 @@ static  void set_array_from_msg_desc(zval *array, PMQMD msg_desc TSRMLS_DC) {
 	add_assoc_long(array, "BackoutCount", msg_desc->BackoutCount);
 	add_assoc_long(array, "CodedCharSetId", msg_desc->CodedCharSetId);
 
-	ref = make_reference(msg_desc->CorrelId, 24 TSRMLS_CC);
+	ref = create_mqseries_bytes_resource(msg_desc->CorrelId, sizeof(msg_desc->CorrelId) TSRMLS_CC);
 	add_assoc_resource(array, "CorrelId", Z_RESVAL_P(ref));
 	zend_list_addref(Z_RESVAL_P(ref));
 	zval_ptr_dtor(&ref);
@@ -1844,7 +1844,7 @@ static  void set_array_from_msg_desc(zval *array, PMQMD msg_desc TSRMLS_DC) {
 	add_assoc_long(array, "Priority", msg_desc->Priority);
 	add_assoc_long(array, "Persistence", msg_desc->Persistence);
 
-	ref = make_reference(msg_desc->MsgId, 24 TSRMLS_CC);
+	ref = create_mqseries_bytes_resource(msg_desc->MsgId, sizeof(msg_desc->MsgId) TSRMLS_CC);
 	add_assoc_resource(array, "MsgId", Z_RESVAL_P(ref));
 	zend_list_addref(Z_RESVAL_P(ref));
 	zval_ptr_dtor(&ref);
@@ -1866,7 +1866,7 @@ static  void set_array_from_msg_desc(zval *array, PMQMD msg_desc TSRMLS_DC) {
 		add_assoc_stringl(array, "PutTime", msg_desc->PutTime, sizeof(msg_desc->PutTime), 1);
 
 	if (msg_desc->Version >= MQMD_VERSION_2) {
-		ref = make_reference(msg_desc->GroupId, 24 TSRMLS_CC);
+		ref = create_mqseries_bytes_resource(msg_desc->GroupId, sizeof(msg_desc->GroupId) TSRMLS_CC);
 		add_assoc_resource(array, "GroupId", Z_RESVAL_P(ref));
 		zend_list_addref(Z_RESVAL_P(ref));
 		zval_ptr_dtor(&ref);
@@ -1962,7 +1962,7 @@ static void set_array_from_get_msg_opts(zval *array, PMQGMO get_msg_opts TSRMLS_
 	zval_dtor(array);
 	array_init(array);
 
-	ref = make_reference(get_msg_opts->MsgToken, 16 TSRMLS_CC);
+	ref = create_mqseries_bytes_resource(get_msg_opts->MsgToken, sizeof(get_msg_opts->MsgToken) TSRMLS_CC);
 	add_assoc_resource(array, "MsgToken", Z_RESVAL_P(ref));
 	zend_list_addref(Z_RESVAL_P(ref));
 	zval_ptr_dtor(&ref);
@@ -1990,7 +1990,7 @@ static void set_sub_desc_from_array(zval *array, PMQSD sub_desc TSRMLS_DC)
 {
 	HashTable *ht = Z_ARRVAL_P(array);
 	zval **tmp;
-	mqseries_bytes *byte24;
+	mqseries_bytes *mqbytes;
 
 	MQSERIES_SETOPT_LONG(sub_desc, Version);
 	MQSERIES_SETOPT_LONG(sub_desc, Options);

@@ -46,7 +46,7 @@ $md = array(
 $pmo = array(
     'Options' => MQSERIES_MQPMO_FAIL_IF_QUIESCING
 );
-mqseries_put($connection, $queue, $md, $pmo, '1', $completionCode, $reason);
+mqseries_put($connection, $queue, $md, $pmo, 'Hello world', $completionCode, $reason);
 if ($completionCode !== MQSERIES_MQCC_OK) {
     die("Connx CompCode : {$completionCode} Reason : {$reason} Text : " . mqseries_strerror($reason));
 }

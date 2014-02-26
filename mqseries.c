@@ -679,7 +679,6 @@ PHP_FUNCTION(mqseries_get)
 	set_get_msg_opts_from_array(z_get_msg_opts, &get_msg_opts TSRMLS_CC);
 
 	data = buf = (MQBYTE *) emalloc(sizeof(MQBYTE) * buf_len);
-	php_printf("WAIT : %d\n", get_msg_opts.WaitInterval);
 	MQGET(mqdesc->conn, mqobj->obj, &msg_desc, &get_msg_opts, buf_len, buf, &data_length, &comp_code, &reason);
 
 /*
@@ -687,7 +686,6 @@ PHP_FUNCTION(mqseries_get)
  * There is no other way I can think of to get this to the user.
  * TODO: Other formatting headers, if there are any
  */
-	php_printf("FORMAT: %s\n", msg_desc.Format);
 
 	if (!strncmp(msg_desc.Format, MQFMT_RF_HEADER, sizeof(msg_desc.Format))) {
 		MQRFH rfh = {MQRFH_DEFAULT};
@@ -1984,7 +1982,6 @@ static void set_get_msg_opts_from_array(zval *array, PMQGMO get_msg_opts  TSRMLS
 	MQSERIES_SETOPT_LONG(get_msg_opts, Version);
 	MQSERIES_SETOPT_LONG(get_msg_opts, Options);
 	MQSERIES_SETOPT_LONG(get_msg_opts, WaitInterval);
-	get_msg_opts->WaitInterval = 10000;
 	MQSERIES_SETOPT_LONG(get_msg_opts, MatchOptions);
 	MQSERIES_SETOPT_LONG(get_msg_opts, Signal1);
 	MQSERIES_SETOPT_LONG(get_msg_opts, Signal2);

@@ -43,7 +43,7 @@ if ($completionCode !== MQSERIES_MQCC_OK) {
 const MQGMO_CONVERT = 16384;
 $gmo = array(
     'Options' => MQSERIES_MQGMO_WAIT,
-    'WaitInterval' => 100,
+    'WaitInterval' => 10000,
 );
 
 function inquireQname($connection, $queue, &$qname)
@@ -61,7 +61,7 @@ echo 'WAITING ', PHP_EOL;
 do {
     $messageFilter = array(
     );
-    $bytesLength = null;
+    $bytesLength = 10000;
     mqseries_get($connection, $queue, $messageFilter, $gmo, $bytesLength, $messageContent, $data_length, $completionCode, $reason);
     var_dump($messageContent);die();
 } while($completionCode !== MQSERIES_MQCC_OK);

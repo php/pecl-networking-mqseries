@@ -1553,6 +1553,26 @@ PHP_FUNCTION(mqseries_sub)
 /* TODO Check if all fields are specified (hopefully the MQ API will not      */
 /* change verry soon as we have to do this all over again). 'zucht'.          */
 /******************************************************************************/
+/* {{{ create_mqseries_bytes_resource
+ * makes an mqseries_bytes reference, needed when returning message and correlation id's
+ */
+static zval* create_mqseries_bytes_resource(PMQBYTE bytes, size_t size TSRMLS_DC)
+{
+	mqseries_bytes *pBytes;
+	zval *z_bytes;
+
+	MAKE_STD_ZVAL(z_bytes);
+
+	pBytes = (mqseries_bytes *) emalloc(sizeof(mqseries_bytes));
+	pBytes->bytes = (PMQBYTE) emalloc(size*sizeof(MQBYTE));
+	memcpy(pBytes->bytes, bytes, size);
+	ZEND_REGISTER_RESOURCE(z_bytes, pBytes, le_mqseries_bytes);
+	pBytes->id = Z_RESVAL_P(z_bytes);
+
+	return z_bytes;
+}
+/* }}} */
+
 /* {{{ set_authentication_information_record_from_array
  * set authenication information from an array
  */
@@ -1900,48 +1920,43 @@ static void set_msg_desc_from_array(zval *array, PMQMD msg_desc TSRMLS_DC)
 	zval **tmp;
 
 	MQSERIES_SETOPT_LONG(msg_desc, Version);
-	MQSERIES_SETOPT_LONG(msg_desc, Report);
-	MQSERIES_SETOPT_LONG(msg_desc, MsgType);
-	MQSERIES_SETOPT_LONG(msg_desc, Expiry);
-	MQSERIES_SETOPT_STRING(msg_desc, Format);
-	MQSERIES_SETOPT_LONG(msg_desc, Priority);
-	MQSERIES_SETOPT_LONG(msg_desc, Persistence);
-	MQSERIES_SETOPT_STRING(msg_desc, ReplyToQ);
-	MQSERIES_SETOPT_LONG(msg_desc, Feedback);
-	MQSERIES_SETOPT_LONG(msg_desc, Encoding);
-	MQSERIES_SETOPT_LONG(msg_desc, CodedCharSetId);
+	switch (msg_desc->Version) {
+#ifdef MQMD_VERSION_2
+		case MQMD_VERSION_2:
+			MQSERIES_SETOPT_RESBYTES(msg_desc, GroupId);
+			MQSERIES_SETOPT_LONG(msg_desc, MsgSeqNumber);
+			MQSERIES_SETOPT_LONG(msg_desc, Offset);
+			MQSERIES_SETOPT_LONG(msg_desc, MsgFlags);
+			MQSERIES_SETOPT_LONG(msg_desc, OriginalLength);
+			// no break intentional
+#endif /* MQMD_VERSION_2 */
 
-	MQSERIES_SETOPT_RESBYTES(msg_desc, MsgId);
-	MQSERIES_SETOPT_RESBYTES(msg_desc, CorrelId);
-
-	MQSERIES_SETOPT_STRING(msg_desc, ReplyToQMgr);
-	MQSERIES_SETOPT_LONG(msg_desc, PutApplType);
-
-	if (msg_desc->Version >=  MQMD_VERSION_2) {
-		MQSERIES_SETOPT_RESBYTES(msg_desc, GroupId);
-		MQSERIES_SETOPT_LONG(msg_desc, MsgSeqNumber);
-		MQSERIES_SETOPT_LONG(msg_desc, MsgFlags);
+#ifdef MQMD_VERSION_1
+		case MQMD_VERSION_1:
+			MQSERIES_SETOPT_LONG(msg_desc, Report);
+			MQSERIES_SETOPT_LONG(msg_desc, MsgType);
+			MQSERIES_SETOPT_LONG(msg_desc, Expiry);
+			MQSERIES_SETOPT_LONG(msg_desc, Feedback);
+			MQSERIES_SETOPT_LONG(msg_desc, Encoding);
+			MQSERIES_SETOPT_LONG(msg_desc, CodedCharSetId);
+			MQSERIES_SETOPT_STRING(msg_desc, Format);
+			MQSERIES_SETOPT_LONG(msg_desc, Priority);
+			MQSERIES_SETOPT_LONG(msg_desc, Persistence);
+			MQSERIES_SETOPT_RESBYTES(msg_desc, MsgId);
+			MQSERIES_SETOPT_RESBYTES(msg_desc, CorrelId);
+			MQSERIES_SETOPT_LONG(msg_desc, BackoutCount);
+			MQSERIES_SETOPT_STRING(msg_desc, ReplyToQ);
+			MQSERIES_SETOPT_STRING(msg_desc, ReplyToQMgr);
+			MQSERIES_SETOPT_STRING(msg_desc, UserIdentifier);
+			MQSERIES_SETOPT_RESBYTES(msg_desc, AccountingToken);
+			MQSERIES_SETOPT_STRING(msg_desc, ApplIdentityData);
+			MQSERIES_SETOPT_LONG(msg_desc, PutApplType);
+			MQSERIES_SETOPT_STRING(msg_desc, PutApplName);
+			MQSERIES_SETOPT_STRING(msg_desc, PutDate);
+			MQSERIES_SETOPT_STRING(msg_desc, PutTime);
+			MQSERIES_SETOPT_STRING(msg_desc, ApplOriginData);
+#endif /* MQMD_VERSION_1 */
 	}
-}
-/* }}} */
-
-/* {{{ create_mqseries_bytes_resource
- * makes an mqseries_bytes reference, needed when returning message and correlation id's
- */
-static zval* create_mqseries_bytes_resource(PMQBYTE bytes, size_t size TSRMLS_DC)
-{
-	mqseries_bytes *pBytes;
-	zval *z_bytes;
-
-	MAKE_STD_ZVAL(z_bytes);
-
-	pBytes = (mqseries_bytes *) emalloc(sizeof(mqseries_bytes));
-	pBytes->bytes = (PMQBYTE) emalloc(size*sizeof(MQBYTE));
-	memcpy(pBytes->bytes, bytes, size);
-	ZEND_REGISTER_RESOURCE(z_bytes, pBytes, le_mqseries_bytes);
-	pBytes->id = Z_RESVAL_P(z_bytes);
-
-	return z_bytes;
 }
 /* }}} */
 
@@ -1953,41 +1968,41 @@ static  void set_array_from_msg_desc(zval *array, PMQMD msg_desc TSRMLS_DC)
 	zval_dtor(array);
 	array_init(array);
 
-	MQSERIES_ADD_ASSOC_STRING(msg_desc, ApplIdentityData);
-	MQSERIES_ADD_ASSOC_STRING(msg_desc, ApplOriginData);
-	MQSERIES_ADD_ASSOC_LONG(msg_desc, BackoutCount);
-	MQSERIES_ADD_ASSOC_LONG(msg_desc, CodedCharSetId);
+	switch (msg_desc->Version) {
+#ifdef MQMD_VERSION_2
+		case MQMD_VERSION_2:
+			MQSERIES_ADD_ASSOC_RESOURCE(msg_desc, GroupId);
+			MQSERIES_ADD_ASSOC_LONG(msg_desc, MsgSeqNumber);
+			MQSERIES_ADD_ASSOC_LONG(msg_desc, Offset);
+			MQSERIES_ADD_ASSOC_LONG(msg_desc, MsgFlags);
+			MQSERIES_ADD_ASSOC_LONG(msg_desc, OriginalLength);
+#endif /* MQMD_VERSION_2 */
 
-	MQSERIES_ADD_ASSOC_RESOURCE(msg_desc, CorrelId);
-
-	MQSERIES_ADD_ASSOC_LONG(msg_desc, Encoding);
-	MQSERIES_ADD_ASSOC_LONG(msg_desc, Expiry);
-	MQSERIES_ADD_ASSOC_LONG(msg_desc, Feedback);
-	MQSERIES_ADD_ASSOC_STRING(msg_desc, Format);
-
-	MQSERIES_ADD_ASSOC_LONG(msg_desc, Report);
-	MQSERIES_ADD_ASSOC_LONG(msg_desc, MsgType);
-	MQSERIES_ADD_ASSOC_LONG(msg_desc, Priority);
-	MQSERIES_ADD_ASSOC_LONG(msg_desc, Persistence);
-
-	MQSERIES_ADD_ASSOC_RESOURCE(msg_desc, MsgId);
-
-	MQSERIES_ADD_ASSOC_STRING(msg_desc, ReplyToQ);
-	MQSERIES_ADD_ASSOC_STRING(msg_desc, ReplyToQMgr);
-	MQSERIES_ADD_ASSOC_STRING(msg_desc, UserIdentifier);
-
-	MQSERIES_ADD_ASSOC_LONG(msg_desc, PutApplType);
-
-	MQSERIES_ADD_ASSOC_STRING(msg_desc, PutApplName);
-	MQSERIES_ADD_ASSOC_STRING(msg_desc, PutDate);
-	MQSERIES_ADD_ASSOC_STRING(msg_desc, PutTime);
-
-	if (msg_desc->Version >= MQMD_VERSION_2) {
-		MQSERIES_ADD_ASSOC_RESOURCE(msg_desc, GroupId);
-
-		MQSERIES_ADD_ASSOC_LONG(msg_desc, MsgSeqNumber);
-		MQSERIES_ADD_ASSOC_LONG(msg_desc, MsgFlags);
-		MQSERIES_ADD_ASSOC_LONG(msg_desc, OriginalLength);
+#ifdef MQMD_VERSION_1
+		case MQMD_VERSION_1:
+			MQSERIES_ADD_ASSOC_LONG(msg_desc, Report);
+			MQSERIES_ADD_ASSOC_LONG(msg_desc, MsgType);
+			MQSERIES_ADD_ASSOC_LONG(msg_desc, Expiry);
+			MQSERIES_ADD_ASSOC_LONG(msg_desc, Feedback);
+			MQSERIES_ADD_ASSOC_LONG(msg_desc, Encoding);
+			MQSERIES_ADD_ASSOC_LONG(msg_desc, CodedCharSetId);
+			MQSERIES_ADD_ASSOC_STRING(msg_desc, Format);
+			MQSERIES_ADD_ASSOC_LONG(msg_desc, Priority);
+			MQSERIES_ADD_ASSOC_LONG(msg_desc, Persistence);
+			MQSERIES_ADD_ASSOC_RESOURCE(msg_desc, MsgId);
+			MQSERIES_ADD_ASSOC_RESOURCE(msg_desc, CorrelId);
+			MQSERIES_ADD_ASSOC_LONG(msg_desc, BackoutCount);
+			MQSERIES_ADD_ASSOC_STRING(msg_desc, ReplyToQ);
+			MQSERIES_ADD_ASSOC_STRING(msg_desc, ReplyToQMgr);
+			MQSERIES_ADD_ASSOC_STRING(msg_desc, UserIdentifier);
+			MQSERIES_ADD_ASSOC_RESOURCE(msg_desc, AccountingToken);
+			MQSERIES_ADD_ASSOC_STRING(msg_desc, ApplIdentityData);
+			MQSERIES_ADD_ASSOC_LONG(msg_desc, PutApplType);
+			MQSERIES_ADD_ASSOC_STRING(msg_desc, PutApplName);
+			MQSERIES_ADD_ASSOC_STRING(msg_desc, PutDate);
+			MQSERIES_ADD_ASSOC_STRING(msg_desc, PutTime);
+			MQSERIES_ADD_ASSOC_STRING(msg_desc, ApplOriginData);
+#endif /* MQMD_VERSION_1 */
 	}
 }
 /* }}} */

@@ -23,11 +23,9 @@ if ($completionCode !== MQSERIES_MQCC_OK) {
     die("Connx CompCode : {$completionCode} Reason : {$reason} Text : " . mqseries_strerror($reason));
 }
 
-const MQOD_VERSION_4 = 4;
-const MQOT_TOPIC     = 8;
 $objDesc = array(
-    'Version' => MQOD_VERSION_4,
-    'ObjectType' => MQOT_TOPIC,
+    'Version' => MQSERIES_MQOD_VERSION_4,
+    'ObjectType' => MQSERIES_MQOT_TOPIC,
 //    'ObjectName' => $cfg['ESB_QUEUE_NAME'],
     'ObjectString' => $cfg['ESB_TOPIC_STRING'],
 );

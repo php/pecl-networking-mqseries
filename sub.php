@@ -23,16 +23,10 @@ if ($completionCode !== MQSERIES_MQCC_OK) {
     die("Connx CompCode : {$completionCode} Reason : {$reason} Text : " . mqseries_strerror($reason));
 }
 
-
-const MQSO_CREATE = 2;
-const MQSO_MANAGED = 32;
-const MQSO_NON_DURABLE = 0;
-const MQSO_FAIL_IF_QUIESCING = 8192;
-
 $subDesc = array(
 //    'ObjectName' => $cfg['ESB_QUEUE_NAME'],
     'ObjectString' => $cfg['ESB_TOPIC_STRING'],
-    'Options' => MQSO_CREATE | MQSO_MANAGED | MQSO_NON_DURABLE | MQSO_FAIL_IF_QUIESCING,
+    'Options' => MQSERIES_MQSO_CREATE | MQSERIES_MQSO_MANAGED | MQSERIES_MQSO_NON_DURABLE | MQSERIES_MQSO_FAIL_IF_QUIESCING,
 );
 
 mqseries_sub($connection, $subDesc, $queue, $sub, $completionCode, $reason);
@@ -40,7 +34,6 @@ if ($completionCode !== MQSERIES_MQCC_OK) {
     die("Connx CompCode : {$completionCode} Reason : {$reason} Text : " . mqseries_strerror($reason));
 }
 
-const MQGMO_CONVERT = 16384;
 $gmo = array(
     'Options' => MQSERIES_MQGMO_WAIT,
     'WaitInterval' => 10000,

@@ -1,9 +1,0 @@
-- Rewrite MQSERIES_SETOPT_/MQSERIES_ADD_ASSOC macros and use them everywhere
-	- Use do {} while(0);
-	- Remove deps on external variables
-
-- In the code we use a lot of MQLONG and transform them to Zval, see if we can improve memory footprint by directly giving the long
-	pointer of the zval as MQLONG to avoid :
-	ZVAL_LONG(z_comp_code, comp_code);
-
-- Add MQSERIES_MQCNO_HANDLE_SHARE_BLOCK in the constant list

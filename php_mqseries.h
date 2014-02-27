@@ -112,7 +112,7 @@ PHP_FUNCTION(mqseries_bytes_val);
 // PHP_FUNCTION(mqseries_inqmp);
 // PHP_FUNCTION(mqseries_mhbuf);
 // PHP_FUNCTION(mqseries_setmp);
-// PHP_FUNCTION(mqseries_stat);
+PHP_FUNCTION(mqseries_stat);
 PHP_FUNCTION(mqseries_sub);
 // PHP_FUNCTION(mqseries_subrq);
 #endif /* HAVE_MQSERIESLIB_V7 */

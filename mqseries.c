@@ -75,6 +75,9 @@ static int is_called_by_ref(zval *param, char *param_name);
 
 static void set_sub_desc_from_array(zval *array, PMQSD sub_desc TSRMLS_DC);
 static void set_array_from_sub_desc(zval *array, PMQSD sub_desc TSRMLS_DC);
+
+static void set_status_from_array(zval *array, PMQSTS status);
+static void set_array_from_status(zval *array, PMQSTS status);
 /* }}} */
 
 /* If you declare any globals in php_mqseries.h uncomment this:
@@ -323,6 +326,15 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_sub, 0, 0, 6)
 	ZEND_ARG_INFO(1, compCode)				/* OC: Completion code */
 	ZEND_ARG_INFO(1, reason)				/* OR: Reason code qualifying CompCode */
 ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_stat, 0, 0, 5)
+	ZEND_ARG_INFO(0, hconn)					/* I: Connection handle */
+	ZEND_ARG_INFO(0, type)					/* I: Status information type */
+	ZEND_ARG_ARRAY_INFO(1, status, 0)       /* IO: Status information */
+	ZEND_ARG_INFO(1, compCode)				/* OC: Completion code */
+	ZEND_ARG_INFO(1, reason)				/* OR: Reason code qualifying CompCode */
+ZEND_END_ARG_INFO()
+
 #endif /* HAVE_MQSERIESLIB_V7 */
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_strerror, 0, 0, 1)
@@ -356,6 +368,7 @@ zend_function_entry mqseries_functions[] = {
 	PHP_FE(mqseries_bytes_val,	arginfo_mqseries_bytes_val)
 #ifdef HAVE_MQSERIESLIB_V7
 	PHP_FE(mqseries_sub,        arginfo_mqseries_sub)
+	PHP_FE(mqseries_stat,       arginfo_mqseries_stat)
 #endif /* HAVE_MQSERIESLIB_V7 */
 	{NULL, NULL, NULL}	/* Must be the last line in mqseries_functions[] */
 };
@@ -433,8 +446,8 @@ PHP_MINFO_FUNCTION(mqseries)
 }
 /* }}} */
 
-/* {{{ proto mqseries_conn(string name, resourceref connection, resourceref compcode, resourceref reason )
-	Connect to the Queue-Manager with the given name. */
+/* {{{ proto void mqseries_conn(string name, resource &hconn, int &compcode, int &reason)
+   The mqseries_conn call connects an application program to a queue manager. */
 /*
 
 	You need either the Channel-Table (usualy in /var/mqm)
@@ -492,8 +505,8 @@ PHP_FUNCTION(mqseries_conn)
 }
 /* }}} */
 
-/* {{{ proto mqseries_connx(string name, array connect_opts, resourceref connextion, resourceref compcode, resourceref reason )
-	The mqseries_connx call is similar to the mqseries_conn call, except that mqseries_connx allows options to be specified to control the way that the call works.*/
+/* {{{ proto void mqseries_connx(string name, array &connect_opts, resource &hconn, int &compCode, int &reason)
+	The mqseries_connx call connects an application program to a queue manager. It provides a queue manager connection handle, which is used by the application on subsequent MQ calls. */
 /*
 
 PHP sample:
@@ -575,8 +588,8 @@ PHP_FUNCTION(mqseries_connx)
 }
 /* }}} */
 
-/* {{{ proto mqseries_open(resource connection, array obj_desc, int options, resourceref object_handle, resourceref compcode, resourceref reason)
-	Open a Queue. */
+/* {{{ proto void mqseries_open(resource hconn, array &objDesc, int options, resource &hobj, int &compCode, int &reason)
+	The mq_open call establishes access to an object. */
 /*
 
 
@@ -646,11 +659,9 @@ PHP_FUNCTION(mqseries_open)
 }
 /* }}} */
 
-/* {{{ proto mqseries_get(resource mqdesc, resource mqobj,resourceref msg_desc, resourceref get_msg_opts, int buf_len, resourceref buffer, resourceref data_length, resourceref compcode, resourceref reason)
-	Read data from an opened queue. */
+/* {{{ proto void mqseries_get(resource hconn, resource hobj, array &msgDesc, array &getMsgOpts, int bufferLength, string &buffer, int &dataLength, int &compCode, int &reason)
+	The mqseries_get call retrieves a message from a local queue that has been opened using the mqseries_open call. */
 /*
-
-
 PHP sample
 
 -- Make default message description the get method will fill this in with defaults.
@@ -762,8 +773,8 @@ PHP_FUNCTION(mqseries_get)
 }
 /* }}} */
 
-/* {{{ proto mqseries_put(resource mqdesc, resource mqobj, array msg_desc, array put_msg_opts, string msg, resourceref compcode, resourceref reason)
-	The MQPUT call puts a message on a queue or distribution list. The queue or distribution list must already be open. */
+/* {{{ proto void mqseries_put(resource hconn, resource hobj, array &msgDesc, array &putMsgOpts, string buffer, int &compCode, int &reason)
+   The mqseries_put call puts a message on a queue or distribution list, or to a topic. The queue, distribution list or topic must already be open. */
 /*
 
 PHP sample:
@@ -846,10 +857,9 @@ PHP_FUNCTION(mqseries_put)
 }
 /* }}} */
 
-/* {{{ proto mqseries_begin(resource mqdesc, array begin_opts, resourceref compcode, resourceref reason)
-	The MQBEGIN call begins a unit of work that is coordinated by the queue manager, and that may involve external resource managers. */
+/* {{{ proto void mqseries_begin(resource hconn, array &beginOptions, int &compCode, int &reason)
+	The mqseries_begin call begins a unit of work that is coordinated by the queue manager, and that may involve external resource managers. */
 /*
-
 
 PHP sample:
 
@@ -909,12 +919,9 @@ PHP_FUNCTION(mqseries_begin)
 }
 /* }}} */
 
-/* {{{ proto  mqseries_cmit(resource mqdesc, resourceref compcode, resourceref reason)
-	The MQCMIT call indicates to the queue manager that the application has reached
-	a syncpoint, and that all of the message gets and puts that have occurred
-	since the last syncpoint are to be made permanent. Messages put as part of
-	a unit of work are made available to other applications; messages retrieved
-	as part of a unit of work are deleted. */
+/* {{{ proto void mqseries_cmit(resource hconn, int &compCode, int &reason)
+   The mqseries_cmit call indicates to the queue manager that the application has reached a syncpoint, and that all the message
+   gets and puts that have occurred since the last syncpoint are to be made permanent. */
 /*
 
 PHP sample:
@@ -954,11 +961,8 @@ PHP_FUNCTION(mqseries_cmit)
 }
 /* }}} */
 
-/* {{{ proto mqseries_back(resource mqdesc, resourceref compcode, resourceref reason)
-	The MQBACK call indicates to the queue manager that all the message gets and
-	puts that have occurred since the last syncpoint are to be backed out.
-	Messages put as part of a unit of work are deleted; messages retrieved as
-	part of a unit of work are reinstated on the queue.	*/
+/* {{{ proto void mqseries_back(resource hconn, int &compcode, int &reason)
+   The mqseries_back call indicates to the queue manager that all the message gets and puts that have occurred since the last syncpoint are to be backed out. */
 /*
 
 PHP sample:
@@ -994,9 +998,8 @@ PHP_FUNCTION(mqseries_back)
 }
 /* }}} */
 
-/* {{{ proto mqseries_close(resoure mqobj, resourceref compcode, resourceref reason)
-	The MQCLOSE call relinquishes access to an object,
-	and is the inverse of the MQOPEN call.	*/
+/* {{{ proto void mqseries_close(resoure hconn, resource &hobj, int options, int &compCode, int &reason)
+   The mqseries_close call relinquishes access to an object, and is the inverse of the mqseries_open and mqseries_sub calls. */
 /*
 
 Note the way it now works is that an internal delete of the resources is done
@@ -1086,9 +1089,9 @@ static void _mqseries_close(zend_rsrc_list_entry *rsrc TSRMLS_DC)
 }
 /* }}} */
 
-/* {{{ proto mqseries_disc(resource mqdesc, resourceref compcode , resourceref reason)
-	The MQDISC call breaks the connection between the queue manager and the
-	application program, and is the inverse of the MQCONN or MQCONNX call.*/
+/* {{{ proto void mqseries_disc(resource &hconn, int &compCode, int &reason)
+   The mqseries_disc call breaks the connection between the queue manager and the application program, and is
+   the inverse of the mqseries_conn or mqseries_connx call. */
 /*
 
 PHP sample:
@@ -1170,7 +1173,7 @@ static void _mqseries_disc(zend_rsrc_list_entry *rsrc TSRMLS_DC)
 }
 /* }}} */
 
-/* {{{ proto string mqseries_strerror(resource reason)
+/* {{{ proto string mqseries_strerror(int reason)
 	Returns the detailed error text for the given reason code. */
 PHP_FUNCTION(mqseries_strerror)
 {
@@ -1190,8 +1193,8 @@ PHP_FUNCTION(mqseries_strerror)
 }
 /* }}} */
 
-/* {{{ proto mqseries_put1(resource mqdesc, array obj_desc, array msg_desc, array put_msg_opts, string msg, resourceref compcode, resourceref reason)
-	The MQPUT1 call puts one message on a queue. The queue need not be open. */
+/* {{{ proto void mqseries_put1(resource hconn, array &objDesc, array &msgDesc, array &putMsgOpts, string buffer, int &compCode, int &reason)
+   The mqseries_put1 call puts one message on a queue, or distribution list, or to a topic. */
 /*
 
 MQ call:
@@ -1254,8 +1257,8 @@ PHP_FUNCTION(mqseries_put1)
 }
 /* }}} */
 
-/* {{{ proto mqseries_inq(resource mqdesc, resource mqobj, int selectorCount, array selectors, int intAttrCount, int charAttrLength, resourceref compcode, resourceref reason)
-	The MQINQ call returns an array of integers and a set of character strings containing the attributes of an object. */
+/* {{{ proto void mqseries_inq(resource hconn, resource hobj, int selectorCount, array selectors, int intAttrCount, array &initAttrs, int charAttrLength, string &charAttrs, int &compCode, int &reason)
+	The mqseries_inc call returns an array of integers and a set of character strings containing the attributes of an object. */
 /*
 
 PHP Sample:
@@ -1370,8 +1373,8 @@ PHP_FUNCTION(mqseries_inq)
 }
 /* }}} */
 
-/* {{{ proto resource mqseries_set(resource connection resource object_handle, int selector_count, array selectors, int int_attribute_count, array int_attribute, int char_attr_length, array char_attr, resourceref compcode, resourceref reason)
-	The MQSET call is used to change the attributes of an object represented by a handle. The object must be a queue. */
+/* {{{ proto void mqseries_set(resource hconn, resource hobj, int selectorCount, array selectors, int intAttrCount, array intAttrs, int charAttrLength, array &charAttrs, int &compCode, int &reason)
+	Use the mqseries_set call to change the attributes of an object represented by a handle. The object must be a queue. */
 /*
 
 	MQSET (
@@ -1503,8 +1506,8 @@ PHP_FUNCTION(mqseries_bytes_val)
 /* }}} */
 
 #ifdef HAVE_MQSERIESLIB_V7
-/* {{{ proto resource mqseries_sub(resource connection, array msg_desc, resource object_handle, resource subscription_handle, resourceref compcode, resourceref reason)
-	The MQSUB call registers the applications subscription to a particular topic. */
+/* {{{ proto void mqseries_sub(resource hconn, array &subDesc, resource &hobj, resource &hsub, int &compCode, int &reason)
+	The mqseries_sub call registers the applications subscription to a particular topic. */
 /*
  MQSUB (
  	Hconn,		-- input
@@ -1573,6 +1576,39 @@ PHP_FUNCTION(mqseries_sub)
 	}
 }
 /* }}} */
+
+/* {{{ proto void mqseries_stat(resource hconn, int type, array &status, int &compCode, int &reason)
+   Use the mqseries_stat call to retrieve status information. The type of status information returned is determined by the Type value specified on the call. */
+PHP_FUNCTION(mqseries_stat)
+{
+	mqseries_descriptor *mqdesc;
+	MQLONG z_type, comp_code, reason;
+	zval *z_mqdesc,
+		 *z_status,
+		 *z_comp_code,
+		 *z_reason;
+
+	MQSTS status = {MQSTS_DEFAULT};
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rlazz", &z_mqdesc, &z_type, &z_status, &z_comp_code,
+		&z_reason) == FAILURE) {
+		return;
+	}
+
+	if (!is_called_by_ref(z_status, "status") || !is_compcode_reason_ref(z_comp_code, z_reason)) return;
+
+	ZEND_FETCH_RESOURCE(mqdesc, mqseries_descriptor *, &z_mqdesc, -1, PHP_MQSERIES_DESCRIPTOR_RES_NAME, le_mqseries_conn);
+	set_status_from_array(z_status, &status);
+
+	MQSTAT(mqdesc->conn, z_type, &status, &comp_code, &reason);
+
+	ZVAL_LONG(z_comp_code, comp_code);
+	ZVAL_LONG(z_reason, reason);
+
+	set_array_from_status(z_status, &status);
+}
+/* }}} */
+
 
 #endif /* HAVE_MQSERIESLIB_V7 */
 
@@ -2303,6 +2339,85 @@ static void set_array_from_sub_desc(zval* array, PMQSD sub_desc TSRMLS_DC)
 	MQSERIES_ADD_ASSOC_CHARV(sub_desc, SelectionString);
 	MQSERIES_ADD_ASSOC_LONG(sub_desc, SubLevel);
 	MQSERIES_ADD_ASSOC_CHARV(sub_desc, ResObjectString);
+}
+/* }}} */
+
+/* {{{ set_status_from_array
+ *  update the status struct from an array.
+ */
+static void set_status_from_array(zval *array, PMQSTS status)
+{
+	HashTable *ht = Z_ARRVAL_P(array);
+	zval **tmp;
+
+	MQSERIES_SETOPT_LONG(status, Version);
+	switch (status->Version) {
+		default:
+			zend_error(E_WARNING, "MQSTS_VERSION_%d not supported, using MQSTS_VERSION_%d instead.\n", status->Version, MQSTS_CURRENT_VERSION);
+
+#ifdef MQSTS_VERSION_2
+		case MQSTS_VERSION_2:
+			MQSERIES_SETOPT_CHARV(status, ObjectString);
+			MQSERIES_SETOPT_CHARV(status, SubName);
+			MQSERIES_SETOPT_LONG(status, OpenOptions);
+			MQSERIES_SETOPT_LONG(status, SubOptions);
+			// no break intentional
+#endif /* MQSTS_VERSION_2 */
+
+#ifdef MQSTS_VERSION_1
+		case MQSTS_VERSION_1:
+			MQSERIES_SETOPT_LONG(status, CompCode);
+			MQSERIES_SETOPT_LONG(status, Reason);
+			MQSERIES_SETOPT_LONG(status, PutSuccessCount);
+			MQSERIES_SETOPT_LONG(status, PutWarningCount);
+			MQSERIES_SETOPT_LONG(status, PutFailureCount);
+			MQSERIES_SETOPT_LONG(status, ObjectType);
+			MQSERIES_SETOPT_STRING(status, ObjectName);
+			MQSERIES_SETOPT_STRING(status, ObjectQMgrName);
+			MQSERIES_SETOPT_STRING(status, ResolvedObjectName);
+			MQSERIES_SETOPT_STRING(status, ResolvedQMgrName);
+			// no break intentional
+#endif /* MQSTS_VERSION_1 */
+	}
+}
+/* }}} */
+
+/* {{{ set_array_from_status
+ * Builds an array from the status struct for output
+ */
+static void set_array_from_status(zval *array, PMQSTS status)
+{
+	zval_dtor(array);
+	array_init(array);
+
+	switch (status->Version) {
+		default:
+			zend_error(E_WARNING, "MQSTS_VERSION_%d not supported, using MQSTS_VERSION_%d instead.\n", status->Version, MQSTS_CURRENT_VERSION);
+
+#ifdef MQSTS_VERSION_2
+		case MQSTS_VERSION_2:
+			MQSERIES_ADD_ASSOC_CHARV(status, ObjectString);
+			MQSERIES_ADD_ASSOC_CHARV(status, SubName);
+			MQSERIES_ADD_ASSOC_LONG(status, OpenOptions);
+			MQSERIES_ADD_ASSOC_LONG(status, SubOptions);
+			// no break intentional
+#endif /* MQSTS_VERSION_2 */
+
+#ifdef MQSTS_VERSION_1
+		case MQSTS_VERSION_1:
+			MQSERIES_ADD_ASSOC_LONG(status, CompCode);
+			MQSERIES_ADD_ASSOC_LONG(status, Reason);
+			MQSERIES_ADD_ASSOC_LONG(status, PutSuccessCount);
+			MQSERIES_ADD_ASSOC_LONG(status, PutWarningCount);
+			MQSERIES_ADD_ASSOC_LONG(status, PutFailureCount);
+			MQSERIES_ADD_ASSOC_LONG(status, ObjectType);
+			MQSERIES_ADD_ASSOC_STRING(status, ObjectName);
+			MQSERIES_ADD_ASSOC_STRING(status, ObjectQMgrName);
+			MQSERIES_ADD_ASSOC_STRING(status, ResolvedObjectName);
+			MQSERIES_ADD_ASSOC_STRING(status, ResolvedQMgrName);
+			// no break intentional
+#endif /* MQSTS_VERSION_1 */
+	}
 }
 /* }}} */
 #endif /* HAVE_MQSERIESLIB_V7 */

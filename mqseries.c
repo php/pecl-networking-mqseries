@@ -68,7 +68,7 @@ static void set_connect_opts_from_array(zval *array,
 						PMQCD channel_definition,
 						PMQSCO ssl_configuration,
 						PMQAIR auth_inf_record,
-						PMQCHAR LDAPUserName);
+						PMQCHAR LDAPUserName TSRMLS_DC);
 
 static int is_compcode_reason_ref(zval *z_comp_code, zval *z_reason);
 static int is_called_by_ref(zval *param, char *param_name);
@@ -102,7 +102,7 @@ static HashTable *ht_reason_texts;
 #define MQSERIES_SETOPT_RESBYTES(s,m) \
 	if (zend_hash_find(ht, #m, sizeof(#m), (void**)&tmp) == SUCCESS) { \
 		if (Z_TYPE_PP(tmp) == IS_RESOURCE) { \
-			mqbytes = (mqseries_bytes *) zend_fetch_resource(tmp TSRMLS_CC, -1, PHP_MQSERIES_BYTES_RES_NAME, NULL, 1, le_mqseries_bytes); \
+			mqseries_bytes *mqbytes = (mqseries_bytes *) zend_fetch_resource(tmp TSRMLS_CC, -1, PHP_MQSERIES_BYTES_RES_NAME, NULL, 1, le_mqseries_bytes); \
 			if (mqbytes != NULL) { \
 				memcpy(s->m, mqbytes->bytes, sizeof(s->m)); \
 			} \
@@ -111,6 +111,10 @@ static HashTable *ht_reason_texts;
 			strncpy((MQCHAR *) s->m, Z_STRVAL_PP(tmp), sizeof(s->m)); \
 		} \
 	}
+#define MQSERIES_SETOPT_PTR(s,m) \
+	if (zend_hash_find(ht, #m, sizeof(#m), (void**)&tmp) == SUCCESS) {\
+		zend_error(E_WARNING, "'%s' is not yet supported.", #m); \
+	}
 #define MQSERIES_SETOPT_CHARV(s,m) \
 	if (zend_hash_find(ht, #m, sizeof(#m), (void**)&tmp) == SUCCESS && \
 		Z_TYPE_PP(tmp) == IS_STRING) { \
@@ -118,6 +122,14 @@ static HashTable *ht_reason_texts;
 		s->m.VSOffset = 0; \
 		s->m.VSLength = Z_STRLEN_PP(tmp); \
 		s->m.VSBufSize = Z_STRLEN_PP(tmp) + 1; \
+	}
+#define MQSERIES_SETOPT_HOBJ(s,m) \
+	if (zend_hash_find(ht, #m, sizeof(#m), (void**)&tmp) == SUCCESS && \
+		Z_TYPE_PP(tmp) == IS_RESOURCE) { \
+			mqseries_obj *mqobj = (mqseries_obj *) zend_fetch_resource(tmp TSRMLS_CC, -1, PHP_MQSERIES_OBJ_RES_NAME, NULL, 1, le_mqseries_obj); \
+			if (mqobj != NULL) { \
+				s->m = mqobj->obj; \
+			} \
 	}
 
 #define MQSERIES_ADD_ASSOC_LONG(s, m) \
@@ -510,10 +522,10 @@ PHP_FUNCTION(mqseries_connx)
 		return;
 	}
 
-	if (!is_called_by_ref(z_conn, "conn")) return;
+	if (!is_called_by_ref(z_conn, "hconn")) return;
 	if (!is_compcode_reason_ref(z_comp_code, z_reason)) return;
 
-	set_connect_opts_from_array(z_connect_opts, &connect_opts, &channel_definition, &ssl_configuration, &authentication_information_record, LDAPUserName);
+	set_connect_opts_from_array(z_connect_opts, &connect_opts, &channel_definition, &ssl_configuration, &authentication_information_record, LDAPUserName TSRMLS_CC);
 
 	mqdesc = (mqseries_descriptor *) emalloc(sizeof(mqseries_descriptor));
 
@@ -579,7 +591,7 @@ PHP_FUNCTION(mqseries_open)
 		return;
 	}
 
-	if (!is_called_by_ref(z_obj, "obj")) return;
+	if (!is_called_by_ref(z_obj, "hobj")) return;
 	if (!is_compcode_reason_ref(z_comp_code, z_reason)) return;
 
 	ZEND_FETCH_RESOURCE(mqdesc, mqseries_descriptor *, &z_mqdesc, -1, PHP_MQSERIES_DESCRIPTOR_RES_NAME, le_mqseries_conn);
@@ -667,7 +679,7 @@ PHP_FUNCTION(mqseries_get)
 		return;
 	}
 
-	if (!is_called_by_ref(z_data_length, "datalength")) return;
+	if (!is_called_by_ref(z_data_length, "dataLength")) return;
 	if (!is_called_by_ref(z_buffer, "buffer")) return;
 	if (!is_compcode_reason_ref(z_comp_code, z_reason)) return;
 
@@ -1596,90 +1608,151 @@ static void set_ssl_configuration_from_array(zval *array,
  * connx call?
  *
  */
-static void set_channel_definition_from_array(zval *array, PMQCD channel_definition)
+static void set_channel_definition_from_array(zval *array, PMQCD channel_definition TSRMLS_DC)
 {
 	HashTable *ht = Z_ARRVAL_P(array);
 	zval **tmp;
 
 	MQSERIES_SETOPT_LONG(channel_definition, Version);
-	MQSERIES_SETOPT_STRING(channel_definition, ChannelName);
-	MQSERIES_SETOPT_STRING(channel_definition, ConnectionName);
-	MQSERIES_SETOPT_LONG(channel_definition, TransportType);
-	MQSERIES_SETOPT_LONG(channel_definition, ChannelType);
-	MQSERIES_SETOPT_STRING(channel_definition, Desc);
-	MQSERIES_SETOPT_STRING(channel_definition, QMgrName);
-	MQSERIES_SETOPT_STRING(channel_definition, XmitQName);
-	MQSERIES_SETOPT_STRING(channel_definition, ShortConnectionName);
-	MQSERIES_SETOPT_STRING(channel_definition, MCAName);
-	MQSERIES_SETOPT_STRING(channel_definition, ModeName);
-	MQSERIES_SETOPT_STRING(channel_definition, TpName);
-	MQSERIES_SETOPT_LONG(channel_definition, BatchSize);
-	MQSERIES_SETOPT_LONG(channel_definition, DiscInterval);
-	MQSERIES_SETOPT_LONG(channel_definition, ShortRetryCount);
-	MQSERIES_SETOPT_LONG(channel_definition, ShortRetryInterval);
-	MQSERIES_SETOPT_LONG(channel_definition, LongRetryCount);
-	MQSERIES_SETOPT_LONG(channel_definition, LongRetryInterval);
-	MQSERIES_SETOPT_STRING(channel_definition, SecurityExit);
-	MQSERIES_SETOPT_STRING(channel_definition, MsgExit);
-	MQSERIES_SETOPT_STRING(channel_definition, SendExit);
-	MQSERIES_SETOPT_STRING(channel_definition, ReceiveExit);
-	MQSERIES_SETOPT_LONG(channel_definition, SeqNumberWrap);
-	MQSERIES_SETOPT_LONG(channel_definition, MaxMsgLength);
-	MQSERIES_SETOPT_LONG(channel_definition, PutAuthority);
-	MQSERIES_SETOPT_LONG(channel_definition, DataConversion);
-	MQSERIES_SETOPT_STRING(channel_definition, SecurityUserData);
-	MQSERIES_SETOPT_STRING(channel_definition, MsgUserData);
-	MQSERIES_SETOPT_STRING(channel_definition, SendUserData);
-	MQSERIES_SETOPT_STRING(channel_definition, ReceiveUserData);
-	MQSERIES_SETOPT_STRING(channel_definition, UserIdentifier);
-	MQSERIES_SETOPT_STRING(channel_definition, Password);
-	MQSERIES_SETOPT_STRING(channel_definition, MCAUserIdentifier);
-	MQSERIES_SETOPT_LONG(channel_definition, MCAType);
-	MQSERIES_SETOPT_STRING(channel_definition, RemoteUserIdentifier);
-	MQSERIES_SETOPT_STRING(channel_definition, RemotePassword);
-	MQSERIES_SETOPT_STRING(channel_definition, MsgRetryExit);
-	MQSERIES_SETOPT_STRING(channel_definition, MsgRetryUserData);
-	MQSERIES_SETOPT_LONG(channel_definition, MsgRetryCount);
-	MQSERIES_SETOPT_LONG(channel_definition, MsgRetryInterval);
-	MQSERIES_SETOPT_LONG(channel_definition, HeartbeatInterval);
-	MQSERIES_SETOPT_LONG(channel_definition, BatchInterval);
-	MQSERIES_SETOPT_LONG(channel_definition, NonPersistentMsgSpeed);
-	MQSERIES_SETOPT_LONG(channel_definition, StrucLength);
-	MQSERIES_SETOPT_LONG(channel_definition, ExitNameLength);
-	MQSERIES_SETOPT_LONG(channel_definition, ExitDataLength);
-	MQSERIES_SETOPT_LONG(channel_definition, MsgExitsDefined);
-	MQSERIES_SETOPT_LONG(channel_definition, SendExitsDefined);
-	MQSERIES_SETOPT_LONG(channel_definition, ReceiveExitsDefined);
 
-/* TODO: Do we need these? Or are they only needed during the creation of a channel?
-   MQPTR     MsgExitPtr;                 Address of first MsgExit field
-   MQPTR     MsgUserDataPtr;             Address of first MsgUserData field
-   MQPTR     SendExitPtr;                Address of first SendExit field
-   MQPTR     SendUserDataPtr;            Address of first SendUserData field
-   MQPTR     ReceiveExitPtr;             Address of first ReceiveExit field
-   MQPTR     ReceiveUserDataPtr;         Address of first ReceiveUserData field
-   MQPTR     ClusterPtr;                 Address of a list of cluster names
- */
+	switch (channel_definition->Version) {
 
-	MQSERIES_SETOPT_LONG(channel_definition, ClustersDefined);
-	MQSERIES_SETOPT_LONG(channel_definition, NetworkPriority);
-	MQSERIES_SETOPT_LONG(channel_definition, LongMCAUserIdLength);
-	MQSERIES_SETOPT_LONG(channel_definition, LongRemoteUserIdLength);
+#ifdef MQCD_VERSION_10
+		case MQCD_VERSION_10:
+			MQSERIES_SETOPT_LONG(channel_definition, BatchDataLimit);
+			MQSERIES_SETOPT_LONG(channel_definition, UseDLQ);
+			MQSERIES_SETOPT_LONG(channel_definition, DefReconnect);
+			// no break intentional
+#endif /* MQCD_VERSION_10 */
 
-/*   MQPTR     LongMCAUserIdPtr;           Address of long MCA user identifier
-   MQPTR     LongRemoteUserIdPtr;        Address of long remote user identifier
-   MQBYTE40  MCASecurityId;              MCA security identifier
-   MQBYTE40  RemoteSecurityId;           Remote security identifier
-			} else if (!strcmp(string_key, "SSLCipherSpec")) {
-				strncpy(channel_definition->SSLCipherSpec, Z_STRVAL_PP(option_val), sizeof(channel_definition->SSLCipherSpec));
-   MQPTR     SSLPeerNamePtr;             Address of SSL peer name
- */
-	MQSERIES_SETOPT_STRING(channel_definition, SSLCipherSpec);
-	MQSERIES_SETOPT_LONG(channel_definition, SSLPeerNameLength);
-	MQSERIES_SETOPT_LONG(channel_definition, SSLClientAuth);
-	MQSERIES_SETOPT_LONG(channel_definition, KeepAliveInterval);
-	MQSERIES_SETOPT_STRING(channel_definition, LocalAddress);
-	MQSERIES_SETOPT_LONG(channel_definition, BatchHeartbeat);
+#ifdef MQCD_VERSION_9
+		case MQCD_VERSION_9:
+			MQSERIES_SETOPT_LONG(channel_definition, SharingConversations);
+			MQSERIES_SETOPT_LONG(channel_definition, PropertyControl);
+			MQSERIES_SETOPT_LONG(channel_definition, MaxInstances);
+			MQSERIES_SETOPT_LONG(channel_definition, MaxInstancesPerClient);
+			MQSERIES_SETOPT_LONG(channel_definition, ClientChannelWeight);
+			MQSERIES_SETOPT_LONG(channel_definition, ConnectionAffinity);
+			// no break intentional
+#endif /* MQCD_VERSION_9 */
+
+#ifdef MQCD_VERSION_8
+		case MQCD_VERSION_8:
+			// HdrCompList
+			// MsgCompList
+			MQSERIES_SETOPT_LONG(channel_definition, CLWLChannelRank);
+			MQSERIES_SETOPT_LONG(channel_definition, CLWLChannelPriority);
+			MQSERIES_SETOPT_LONG(channel_definition, CLWLChannelWeight);
+			MQSERIES_SETOPT_LONG(channel_definition, ChannelMonitoring);
+			MQSERIES_SETOPT_LONG(channel_definition, ChannelStatistics);
+			// no break intentional
+#endif /* MQCD_VERSION_8 */
+
+#ifdef MQCD_VERSION_7
+		case MQCD_VERSION_7:
+			MQSERIES_SETOPT_STRING(channel_definition, SSLCipherSpec);
+			MQSERIES_SETOPT_PTR(channel_definition, SSLPeerNamePtr);
+			MQSERIES_SETOPT_LONG(channel_definition, SSLPeerNameLength);
+			MQSERIES_SETOPT_LONG(channel_definition, SSLClientAuth);
+			MQSERIES_SETOPT_LONG(channel_definition, KeepAliveInterval);
+			MQSERIES_SETOPT_STRING(channel_definition, LocalAddress);
+			MQSERIES_SETOPT_LONG(channel_definition, BatchHeartbeat);
+			// no break intentional
+#endif /* MQCD_VERSION_7 */
+
+#ifdef MQCD_VERSION_6
+		case MQCD_VERSION_6:
+			MQSERIES_SETOPT_LONG(channel_definition, LongMCAUserIdLength);
+			MQSERIES_SETOPT_LONG(channel_definition, LongRemoteUserIdLength);
+			MQSERIES_SETOPT_PTR(channel_definition, LongMCAUserIdPtr);
+			MQSERIES_SETOPT_PTR(channel_definition, LongRemoteUserIdPtr);
+			MQSERIES_SETOPT_RESBYTES(channel_definition, MCASecurityId);
+			MQSERIES_SETOPT_RESBYTES(channel_definition, RemoteSecurityId);
+			// no break intentional
+#endif /* MQCD_VERSION_6 */
+
+#ifdef MQCD_VERSION_5
+		case MQCD_VERSION_5:
+			MQSERIES_SETOPT_PTR(channel_definition, ClusterPtr);
+			MQSERIES_SETOPT_LONG(channel_definition, ClustersDefined);
+			MQSERIES_SETOPT_LONG(channel_definition, NetworkPriority);
+			// no break intentional
+#endif /* MQCD_VERSION_5 */
+
+#ifdef MQCD_VERSION_4
+		case MQCD_VERSION_4:
+			MQSERIES_SETOPT_LONG(channel_definition, HeartbeatInterval);
+			MQSERIES_SETOPT_LONG(channel_definition, BatchInterval);
+			MQSERIES_SETOPT_LONG(channel_definition, NonPersistentMsgSpeed);
+			MQSERIES_SETOPT_LONG(channel_definition, StrucLength);
+			MQSERIES_SETOPT_LONG(channel_definition, ExitNameLength);
+			MQSERIES_SETOPT_LONG(channel_definition, ExitDataLength);
+			MQSERIES_SETOPT_LONG(channel_definition, MsgExitsDefined);
+			MQSERIES_SETOPT_LONG(channel_definition, SendExitsDefined);
+			MQSERIES_SETOPT_LONG(channel_definition, ReceiveExitsDefined);
+			MQSERIES_SETOPT_PTR(channel_definition, MsgExitPtr);
+			MQSERIES_SETOPT_PTR(channel_definition, MsgUserDataPtr);
+			MQSERIES_SETOPT_PTR(channel_definition, SendExitPtr);
+			MQSERIES_SETOPT_PTR(channel_definition, SendUserDataPtr);
+			MQSERIES_SETOPT_PTR(channel_definition, ReceiveExitPtr);
+			MQSERIES_SETOPT_PTR(channel_definition, ReceiveUserDataPtr);
+			// no break intentional
+#endif /* MQCD_VERSION_4 */
+
+#ifdef MQCD_VERSION_3
+		case MQCD_VERSION_3:
+			MQSERIES_SETOPT_STRING(channel_definition, MsgRetryExit);
+			MQSERIES_SETOPT_STRING(channel_definition, MsgRetryUserData);
+			MQSERIES_SETOPT_LONG(channel_definition, MsgRetryCount);
+			MQSERIES_SETOPT_LONG(channel_definition, MsgRetryInterval);
+			// no break intentional
+#endif /* MQCD_VERSION_3 */
+
+#ifdef MQCD_VERSION_2
+		case MQCD_VERSION_2:
+			MQSERIES_SETOPT_STRING(channel_definition, UserIdentifier);
+			MQSERIES_SETOPT_STRING(channel_definition, Password);
+			MQSERIES_SETOPT_STRING(channel_definition, MCAUserIdentifier);
+			MQSERIES_SETOPT_LONG(channel_definition, MCAType);
+			MQSERIES_SETOPT_STRING(channel_definition, ConnectionName);
+			MQSERIES_SETOPT_STRING(channel_definition, RemoteUserIdentifier);
+			MQSERIES_SETOPT_STRING(channel_definition, RemotePassword);
+			// no break intentional
+#endif /* MQCD_VERSION_2 */
+
+#ifdef MQCD_VERSION_1
+		case MQCD_VERSION_1:
+			MQSERIES_SETOPT_STRING(channel_definition, ChannelName);
+			MQSERIES_SETOPT_LONG(channel_definition, ChannelType);
+			MQSERIES_SETOPT_LONG(channel_definition, TransportType);
+			MQSERIES_SETOPT_STRING(channel_definition, Desc);
+			MQSERIES_SETOPT_STRING(channel_definition, QMgrName);
+			MQSERIES_SETOPT_STRING(channel_definition, XmitQName);
+			MQSERIES_SETOPT_STRING(channel_definition, ShortConnectionName);
+			MQSERIES_SETOPT_STRING(channel_definition, MCAName);
+			MQSERIES_SETOPT_STRING(channel_definition, ModeName);
+			MQSERIES_SETOPT_STRING(channel_definition, TpName);
+			MQSERIES_SETOPT_LONG(channel_definition, BatchSize);
+			MQSERIES_SETOPT_LONG(channel_definition, DiscInterval);
+			MQSERIES_SETOPT_LONG(channel_definition, ShortRetryCount);
+			MQSERIES_SETOPT_LONG(channel_definition, ShortRetryInterval);
+			MQSERIES_SETOPT_LONG(channel_definition, LongRetryCount);
+			MQSERIES_SETOPT_LONG(channel_definition, LongRetryInterval);
+			MQSERIES_SETOPT_STRING(channel_definition, SecurityExit);
+			MQSERIES_SETOPT_STRING(channel_definition, MsgExit);
+			MQSERIES_SETOPT_STRING(channel_definition, SendExit);
+			MQSERIES_SETOPT_STRING(channel_definition, ReceiveExit);
+			MQSERIES_SETOPT_LONG(channel_definition, SeqNumberWrap);
+			MQSERIES_SETOPT_LONG(channel_definition, MaxMsgLength);
+			MQSERIES_SETOPT_LONG(channel_definition, PutAuthority);
+			MQSERIES_SETOPT_LONG(channel_definition, DataConversion);
+			MQSERIES_SETOPT_STRING(channel_definition, SecurityUserData);
+			MQSERIES_SETOPT_STRING(channel_definition, MsgUserData);
+			MQSERIES_SETOPT_STRING(channel_definition, SendUserData);
+			MQSERIES_SETOPT_STRING(channel_definition, ReceiveUserData);
+			break;
+#endif /* MQCD_VERSION_1 */
+	}
 }
 /* }}} */
 
@@ -1694,7 +1767,7 @@ static void set_connect_opts_from_array(zval *array,
 				PMQCD channel_definition,
 				PMQSCO ssl_configuration,
 				PMQAIR authentication_information_record,
-				PMQCHAR LDAPUserName)
+				PMQCHAR LDAPUserName TSRMLS_DC)
 {
 	HashTable *ht = Z_ARRVAL_P(array);
 	zval **tmp;
@@ -1704,7 +1777,7 @@ static void set_connect_opts_from_array(zval *array,
 
 	if (zend_hash_find(ht, "MQCD", sizeof("MQCD"), (void**)&tmp) == SUCCESS &&
 		Z_TYPE_PP(tmp) == IS_ARRAY) {
-		set_channel_definition_from_array(*tmp, channel_definition);
+		set_channel_definition_from_array(*tmp, channel_definition TSRMLS_CC);
 		connect_opts->ClientConnPtr = channel_definition;
 	}
 
@@ -1728,27 +1801,44 @@ static void set_put_msg_opts_from_array(zval *array, PMQPMO put_msg_opts TSRMLS_
 {
 	HashTable *ht = Z_ARRVAL_P(array);
 	zval **tmp;
-	mqseries_obj *mqobj;
 
-	MQSERIES_SETOPT_LONG(put_msg_opts, Options);
 	MQSERIES_SETOPT_LONG(put_msg_opts, Version);
 
-	if (zend_hash_find(ht, "Context", sizeof("Context"), (void**)&tmp) == SUCCESS &&
-		Z_TYPE_PP(tmp) == IS_RESOURCE) {
-		mqobj = (mqseries_obj *) zend_fetch_resource(tmp TSRMLS_CC, -1, PHP_MQSERIES_OBJ_RES_NAME, NULL, 1, le_mqseries_obj);
-		if (mqobj != NULL) {
-			put_msg_opts->Context = mqobj->obj;
-		}
-	}
+	switch (put_msg_opts->Version) {
 
-/* input fields not supported yet
-   MQLONG    RecsPresent;
-   MQLONG    PutMsgRecFields;
-   MQLONG    PutMsgRecOffset;
-   MQPTR     PutMsgRecPtr;
-   MQLONG    ResponseRecOffset;
-   MQPTR     ResponseRecPtr;
-*/
+#ifdef MQPMO_VERSION_3
+		case MQPMO_VERSION_3:
+			// MQHMSG    OriginalMsgHandle;
+			// MQHMSG    NewMsgHandle;
+			MQSERIES_SETOPT_LONG(put_msg_opts, Action);
+			MQSERIES_SETOPT_LONG(put_msg_opts, PubLevel);
+			// no break intentional
+#endif /* MQPMO_VERSION_3 */
+
+#ifdef MQPMO_VERSION_2
+		case MQPMO_VERSION_2:
+			MQSERIES_SETOPT_LONG(put_msg_opts, RecsPresent);
+			MQSERIES_SETOPT_LONG(put_msg_opts, PutMsgRecFields);
+			MQSERIES_SETOPT_LONG(put_msg_opts, PutMsgRecOffset);
+			MQSERIES_SETOPT_LONG(put_msg_opts, ResponseRecOffset);
+			MQSERIES_SETOPT_PTR(put_msg_opts, PutMsgRecPtr);
+			MQSERIES_SETOPT_PTR(put_msg_opts, ResponseRecPtr);
+			// no break intentional
+#endif /* MQPMO_VERSION_2 */
+
+#ifdef MQPMO_VERSION_1
+		case MQPMO_VERSION_1:
+			MQSERIES_SETOPT_LONG(put_msg_opts, Options);
+			MQSERIES_SETOPT_LONG(put_msg_opts, Timeout);
+			MQSERIES_SETOPT_HOBJ(put_msg_opts, Context);
+			MQSERIES_SETOPT_LONG(put_msg_opts, KnownDestCount);
+			MQSERIES_SETOPT_LONG(put_msg_opts, UnknownDestCount);
+			MQSERIES_SETOPT_LONG(put_msg_opts, InvalidDestCount);
+			MQSERIES_SETOPT_STRING(put_msg_opts, ResolvedQName);
+			MQSERIES_SETOPT_STRING(put_msg_opts, ResolvedQMgrName);
+#endif /* MQPMO_VERSION_1 */
+			break;
+	}
 }
 /* }}} */
 
@@ -1758,15 +1848,41 @@ static void set_put_msg_opts_from_array(zval *array, PMQPMO put_msg_opts TSRMLS_
 static void set_array_from_put_msg_opts(zval *array, PMQPMO put_msg_opts) {
 	zval_dtor(array);
 	array_init(array);
-	if (put_msg_opts->ResolvedQName != NULL && strlen(put_msg_opts->ResolvedQName) > 0) {
-		add_assoc_stringl(array, "ResolvedQName", put_msg_opts->ResolvedQName, strlen(put_msg_opts->ResolvedQName), 1);
+
+	switch (put_msg_opts->Version) {
+
+#ifdef MQPMO_VERSION_3
+		case MQPMO_VERSION_3:
+			// MQHMSG    OriginalMsgHandle;
+			// MQHMSG    NewMsgHandle;
+			MQSERIES_ADD_ASSOC_LONG(put_msg_opts, Action);
+			MQSERIES_ADD_ASSOC_LONG(put_msg_opts, PubLevel);
+			// no break intentional
+#endif /* MQPMO_VERSION_3 */
+
+#ifdef MQPMO_VERSION_2
+		case MQPMO_VERSION_2:
+			MQSERIES_ADD_ASSOC_LONG(put_msg_opts, RecsPresent);
+			MQSERIES_ADD_ASSOC_LONG(put_msg_opts, PutMsgRecFields);
+			MQSERIES_ADD_ASSOC_LONG(put_msg_opts, PutMsgRecOffset);
+			MQSERIES_ADD_ASSOC_LONG(put_msg_opts, ResponseRecOffset);
+			// MQSERIES_SETOPT_PTR(put_msg_opts, PutMsgRecPtr);
+			// MQSERIES_SETOPT_PTR(put_msg_opts, ResponseRecPtr);
+			// no break intentional
+#endif /* MQPMO_VERSION_2 */
+
+#ifdef MQPMO_VERSION_1
+		case MQPMO_VERSION_1:
+			MQSERIES_ADD_ASSOC_LONG(put_msg_opts, Version);
+			MQSERIES_ADD_ASSOC_LONG(put_msg_opts, Timeout);
+			// MQHOBJ Context
+			MQSERIES_ADD_ASSOC_LONG(put_msg_opts, KnownDestCount);
+			MQSERIES_ADD_ASSOC_LONG(put_msg_opts, UnknownDestCount);
+			MQSERIES_ADD_ASSOC_LONG(put_msg_opts, InvalidDestCount);
+			MQSERIES_ADD_ASSOC_STRING(put_msg_opts, ResolvedQName);
+			MQSERIES_ADD_ASSOC_STRING(put_msg_opts, ResolvedQMgrName);
+#endif /* MQPMO_VERSION_1 */
 	}
-	if (put_msg_opts->ResolvedQMgrName != NULL && strlen(put_msg_opts->ResolvedQMgrName) >0) {
-		add_assoc_stringl(array, "ResolvedQMgrName", put_msg_opts->ResolvedQMgrName, strlen(put_msg_opts->ResolvedQMgrName), 1);
-	}
-	MQSERIES_ADD_ASSOC_LONG(put_msg_opts, KnownDestCount);
-	MQSERIES_ADD_ASSOC_LONG(put_msg_opts, UnknownDestCount);
-	MQSERIES_ADD_ASSOC_LONG(put_msg_opts, InvalidDestCount);
 }
 /* }}} */
 
@@ -1782,7 +1898,6 @@ static void set_msg_desc_from_array(zval *array, PMQMD msg_desc TSRMLS_DC)
 {
 	HashTable *ht = Z_ARRVAL_P(array);
 	zval **tmp;
-	mqseries_bytes *mqbytes;
 
 	MQSERIES_SETOPT_LONG(msg_desc, Version);
 	MQSERIES_SETOPT_LONG(msg_desc, Report);
@@ -2040,7 +2155,6 @@ static void set_sub_desc_from_array(zval *array, PMQSD sub_desc TSRMLS_DC)
 {
 	HashTable *ht = Z_ARRVAL_P(array);
 	zval **tmp;
-	mqseries_bytes *mqbytes;
 
 	MQSERIES_SETOPT_LONG(sub_desc, Version);
 	MQSERIES_SETOPT_LONG(sub_desc, Options);

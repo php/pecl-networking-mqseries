@@ -1477,7 +1477,7 @@ PHP_FUNCTION(mqseries_bytes_val)
 PHP_FUNCTION(mqseries_sub)
 {
 	mqseries_descriptor *mqdesc;
-	mqseries_obj *mqobj, *mqsub;
+	mqseries_obj *mqobj = NULL, *mqsub;
 	zval *z_mqdesc,
 		 *z_sub_desc,
 		 *z_obj,
@@ -1494,14 +1494,18 @@ PHP_FUNCTION(mqseries_sub)
 		return;
 	}
 
-	if (!is_called_by_ref(z_obj, "hobj")) return;
-	if (!is_called_by_ref(z_obj, "hsub")) return;
-	if (!is_compcode_reason_ref(z_comp_code, z_reason)) return;
+	if (Z_TYPE_P(z_obj) == IS_RESOURCE) {
+		ZEND_FETCH_RESOURCE(mqobj, mqseries_obj *, &z_obj, -1, PHP_MQSERIES_OBJ_RES_NAME, le_mqseries_obj);
+	} else if (!is_called_by_ref(z_obj, "hobj")) {
+		return;
+	} else {
+		mqobj = (mqseries_obj *) emalloc(sizeof(mqseries_obj));
+	}
+	if (!is_called_by_ref(z_obj, "hsub") || !is_compcode_reason_ref(z_comp_code, z_reason)) return;
 
 	ZEND_FETCH_RESOURCE(mqdesc, mqseries_descriptor *, &z_mqdesc, -1, PHP_MQSERIES_DESCRIPTOR_RES_NAME, le_mqseries_conn);
 	set_sub_desc_from_array(z_sub_desc, &sub_desc TSRMLS_CC);
 
-	mqobj = (mqseries_obj *) emalloc(sizeof(mqseries_obj));
 	mqsub = (mqseries_obj *) emalloc(sizeof(mqseries_obj));
 
 	MQSUB(mqdesc->conn, &sub_desc, &mqobj->obj, &mqsub->obj, &comp_code, &reason);
@@ -1513,9 +1517,11 @@ PHP_FUNCTION(mqseries_sub)
 		set_array_from_sub_desc(z_sub_desc, &sub_desc TSRMLS_CC);
 	}
 	if (comp_code == MQCC_OK) {
-		mqobj->conn = &mqdesc->conn;
-		ZEND_REGISTER_RESOURCE(z_obj, mqobj, le_mqseries_obj);
-		mqobj->id = Z_RESVAL_P(z_obj);
+		if (Z_TYPE_P(z_obj) != IS_RESOURCE) {
+			mqobj->conn = &mqdesc->conn;
+			ZEND_REGISTER_RESOURCE(z_obj, mqobj, le_mqseries_obj);
+			mqobj->id = Z_RESVAL_P(z_obj);
+		}
 
 		mqsub->conn = &mqdesc->conn;
 		ZEND_REGISTER_RESOURCE(z_sub, mqsub, le_mqseries_obj);

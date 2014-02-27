@@ -90,60 +90,75 @@ static HashTable *ht_reason_texts;
 
 /* {{{ Macros */
 #define MQSERIES_SETOPT_LONG(s,m) \
-    if (zend_hash_find(ht, #m, sizeof(#m), (void**)&tmp) == SUCCESS) {\
-        convert_to_long(*tmp); \
-        s->m = Z_LVAL_PP(tmp); \
-    }
-#define MQSERIES_SETOPT_STRING(s,m) \
-    if (zend_hash_find(ht, #m, sizeof(#m), (void**)&tmp) == SUCCESS && \
-        Z_TYPE_PP(tmp) == IS_STRING) { \
-        strncpy(s->m, Z_STRVAL_PP(tmp), sizeof(s->m)); \
-    }
-#define MQSERIES_SETOPT_CHAR(s, m) \
-	if (zend_hash_find(ht, #m, sizeof(#m), (void**)&tmp) == SUCCESS && \
-		Z_TYPE_PP(tmp) == IS_STRING && Z_STRLEN_PP(tmp) > 0) { \
-		s->m = Z_STRVAL_PP(tmp)[0]; \
-	}
-#define MQSERIES_SETOPT_RESBYTES(s,m) \
-	if (zend_hash_find(ht, #m, sizeof(#m), (void**)&tmp) == SUCCESS) { \
-		if (Z_TYPE_PP(tmp) == IS_RESOURCE) { \
-			mqseries_bytes *mqbytes = (mqseries_bytes *) zend_fetch_resource(tmp TSRMLS_CC, -1, PHP_MQSERIES_BYTES_RES_NAME, NULL, 1, le_mqseries_bytes); \
-			if (mqbytes != NULL) { \
-				memcpy(s->m, mqbytes->bytes, sizeof(s->m)); \
-			} \
-		} else if (Z_TYPE_PP(tmp) != IS_NULL) { \
-			convert_to_string(*tmp); \
-			strncpy((MQCHAR *) s->m, Z_STRVAL_PP(tmp), sizeof(s->m)); \
+	do { \
+		if (zend_hash_find(ht, #m, sizeof(#m), (void**)&tmp) == SUCCESS) {\
+			convert_to_long(*tmp); \
+			s->m = Z_LVAL_PP(tmp); \
 		} \
-	}
-#define MQSERIES_SETOPT_PTR(s,m) \
-	if (zend_hash_find(ht, #m, sizeof(#m), (void**)&tmp) == SUCCESS) {\
-		zend_error(E_WARNING, "'%s' is not yet supported.", #m); \
-	}
-#define MQSERIES_SETOPT_CHARV(s,m) \
-	if (zend_hash_find(ht, #m, sizeof(#m), (void**)&tmp) == SUCCESS && \
-		Z_TYPE_PP(tmp) == IS_STRING) { \
-		s->m.VSPtr = Z_STRVAL_PP(tmp); \
-		s->m.VSOffset = 0; \
-		s->m.VSLength = Z_STRLEN_PP(tmp); \
-		s->m.VSBufSize = Z_STRLEN_PP(tmp) + 1; \
-	}
-#define MQSERIES_SETOPT_HOBJ(s,m) \
-	if (zend_hash_find(ht, #m, sizeof(#m), (void**)&tmp) == SUCCESS && \
-		Z_TYPE_PP(tmp) == IS_RESOURCE) { \
-			mqseries_obj *mqobj = (mqseries_obj *) zend_fetch_resource(tmp TSRMLS_CC, -1, PHP_MQSERIES_OBJ_RES_NAME, NULL, 1, le_mqseries_obj); \
-			if (mqobj != NULL) { \
-				s->m = mqobj->obj; \
+	} while(0)
+#define MQSERIES_SETOPT_STRING(s,m) \
+	do { \
+		if (zend_hash_find(ht, #m, sizeof(#m), (void**)&tmp) == SUCCESS && \
+			Z_TYPE_PP(tmp) == IS_STRING) { \
+			strncpy(s->m, Z_STRVAL_PP(tmp), sizeof(s->m)); \
+		} \
+	} while(0)
+#define MQSERIES_SETOPT_CHAR(s, m) \
+	do { \
+		if (zend_hash_find(ht, #m, sizeof(#m), (void**)&tmp) == SUCCESS && \
+			Z_TYPE_PP(tmp) == IS_STRING && Z_STRLEN_PP(tmp) > 0) { \
+			s->m = Z_STRVAL_PP(tmp)[0]; \
+		} \
+	} while(0)
+#define MQSERIES_SETOPT_RESBYTES(s,m) \
+	do { \
+		if (zend_hash_find(ht, #m, sizeof(#m), (void**)&tmp) == SUCCESS) { \
+			if (Z_TYPE_PP(tmp) == IS_RESOURCE) { \
+				mqseries_bytes *mqbytes = (mqseries_bytes *) zend_fetch_resource(tmp TSRMLS_CC, -1, PHP_MQSERIES_BYTES_RES_NAME, NULL, 1, le_mqseries_bytes); \
+				if (mqbytes != NULL) { \
+					memcpy(s->m, mqbytes->bytes, sizeof(s->m)); \
+				} \
+			} else if (Z_TYPE_PP(tmp) != IS_NULL) { \
+				convert_to_string(*tmp); \
+				strncpy((MQCHAR *) s->m, Z_STRVAL_PP(tmp), sizeof(s->m)); \
 			} \
-	}
-
+		} \
+	} while(0)
+#define MQSERIES_SETOPT_PTR(s,m) \
+	do { \
+		if (zend_hash_find(ht, #m, sizeof(#m), (void**)&tmp) == SUCCESS) {\
+			zend_error(E_WARNING, "'%s' is not yet supported.", #m); \
+		} \
+	} while(0)
+#define MQSERIES_SETOPT_CHARV(s,m) \
+	do { \
+		if (zend_hash_find(ht, #m, sizeof(#m), (void**)&tmp) == SUCCESS && \
+			Z_TYPE_PP(tmp) == IS_STRING) { \
+			s->m.VSPtr = Z_STRVAL_PP(tmp); \
+			s->m.VSOffset = 0; \
+			s->m.VSLength = Z_STRLEN_PP(tmp); \
+			s->m.VSBufSize = Z_STRLEN_PP(tmp) + 1; \
+		} \
+	} while(0)
+#define MQSERIES_SETOPT_HOBJ(s,m) \
+	do { \
+		if (zend_hash_find(ht, #m, sizeof(#m), (void**)&tmp) == SUCCESS && \
+			Z_TYPE_PP(tmp) == IS_RESOURCE) { \
+				mqseries_obj *mqobj = (mqseries_obj *) zend_fetch_resource(tmp TSRMLS_CC, -1, PHP_MQSERIES_OBJ_RES_NAME, NULL, 1, le_mqseries_obj); \
+				if (mqobj != NULL) { \
+					s->m = mqobj->obj; \
+				} \
+		} \
+	} while(0)
 #define MQSERIES_ADD_ASSOC_LONG(s, m) \
 	add_assoc_long(array, #m, s->m)
 
 #define MQSERIES_ADD_ASSOC_STRING(s, m) \
-	if (s->m != NULL && strlen(s->m) > 0) { \
-		add_assoc_stringl(array, #m, s->m, sizeof(s->m), 1); \
-	}
+	do { \
+		if (s->m != NULL && strlen(s->m) > 0) { \
+			add_assoc_stringl(array, #m, s->m, sizeof(s->m), 1); \
+		} \
+	} while(0)
 #define MQSERIES_ADD_ASSOC_RESOURCE(s, m) \
 	do { \
 		zval *ref = create_mqseries_bytes_resource(s->m, sizeof(s->m) TSRMLS_CC); \
@@ -152,9 +167,11 @@ static HashTable *ht_reason_texts;
 		zval_ptr_dtor(&ref); \
 	} while(0)
 #define MQSERIES_ADD_ASSOC_CHARV(s, m) \
-	if (s->m.VSPtr != NULL && s->m.VSLength > 0) { \
-		add_assoc_stringl(array, #m, (char *) s->m.VSPtr, s->m.VSLength, 1); \
-	}
+	do { \
+		if (s->m.VSPtr != NULL && s->m.VSLength > 0) { \
+			add_assoc_stringl(array, #m, (char *) s->m.VSPtr, s->m.VSLength, 1); \
+		} \
+	} while(0)
 #define MQSERIES_ADD_ASSOC_CHAR(s, m) \
 	do { \
 		char str[2]; \

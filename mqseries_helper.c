@@ -45,6 +45,9 @@ Author: Michael Bretterklieber <mbretter@jawa.at>
 #include "php_mqseries.h"
 
 /* {{{ Macros */
+#define MQSERIES_UNSUPPRTED_VERSION(n,s) \
+	zend_error(E_WARNING, #n "_VERSION_%d not supported, using " #n "_VERSION_%d instead", s->Version, n ## _CURRENT_VERSION)
+
 #define MQSERIES_SETOPT_LONG(s,m) \
 	do { \
 		if (zend_hash_find(ht, #m, sizeof(#m), (void**)&tmp) == SUCCESS) {\
@@ -210,7 +213,7 @@ static void _mqseries_set_channel_definition_from_array(zval *array, PMQCD chann
 
 	switch (channel_definition->Version) {
 		default:
-			zend_error(E_WARNING, "MQCD_VERSION_%d not supported, using MQCD_VERSION_%d instead.\n", channel_definition->Version, MQCD_CURRENT_VERSION);
+			MQSERIES_UNSUPPRTED_VERSION(MQCD, channel_definition);
 
 #ifdef MQCD_VERSION_10
 		case MQCD_VERSION_10:
@@ -382,7 +385,7 @@ void _mqseries_set_mqpmo_from_array(zval *array, PMQPMO put_msg_opts TSRMLS_DC) 
 
 	switch (put_msg_opts->Version) {
 		default:
-			zend_error(E_WARNING, "MQPMO_VERSION_%d not supported, using MQPMO_VERSION_%d instead.\n", put_msg_opts->Version, MQPMO_CURRENT_VERSION);
+			MQSERIES_UNSUPPRTED_VERSION(MQPMO, put_msg_opts);
 
 #ifdef MQPMO_VERSION_3
 		case MQPMO_VERSION_3:
@@ -426,7 +429,7 @@ void _mqseries_set_array_from_mqpmo(zval *array, PMQPMO put_msg_opts) { /* {{{ *
 
 	switch (put_msg_opts->Version) {
 		default:
-			zend_error(E_WARNING, "MQPMO_VERSION_%d not supported, using MQPMO_VERSION_%d instead.\n", put_msg_opts->Version, MQPMO_CURRENT_VERSION);
+			MQSERIES_UNSUPPRTED_VERSION(MQPMO, put_msg_opts);
 
 #ifdef MQPMO_VERSION_3
 		case MQPMO_VERSION_3:
@@ -472,7 +475,7 @@ void _mqseries_set_mqmd_from_array(zval *array, PMQMD msg_desc TSRMLS_DC) /* {{{
 	MQSERIES_SETOPT_LONG(msg_desc, Version);
 	switch (msg_desc->Version) {
 		default:
-			zend_error(E_WARNING, "MQMD_VERSION_%d not supported, using MQMD_VERSION_%d instead.\n", msg_desc->Version, MQMD_CURRENT_VERSION);
+			MQSERIES_UNSUPPRTED_VERSION(MQMD, msg_desc);
 
 #ifdef MQMD_VERSION_2
 		case MQMD_VERSION_2:
@@ -521,7 +524,7 @@ void _mqseries_set_array_from_mqmd(zval *array, PMQMD msg_desc TSRMLS_DC) /* {{{
 
 	switch (msg_desc->Version) {
 		default:
-			zend_error(E_WARNING, "MQMD_VERSION_%d not supported, using MQMD_VERSION_%d instead.\n", msg_desc->Version, MQMD_CURRENT_VERSION);
+			MQSERIES_UNSUPPRTED_VERSION(MQMD, msg_desc);
 
 #ifdef MQMD_VERSION_2
 		case MQMD_VERSION_2:
@@ -569,7 +572,7 @@ void _mqseries_set_mqod_from_array(zval *array, PMQOD obj_desc TSRMLS_DC) /* {{{
 	MQSERIES_SETOPT_LONG(obj_desc, Version);
 	switch (obj_desc->Version) {
 		default:
-			zend_error(E_WARNING, "MQOD_VERSION_%d not supported, using MQOD_VERSION_%d instead.\n", obj_desc->Version, MQOD_CURRENT_VERSION);
+			MQSERIES_UNSUPPRTED_VERSION(MQOD, obj_desc);
 
 #ifdef MQOD_VERSION_4
 		case MQOD_VERSION_4:
@@ -618,7 +621,7 @@ void _mqseries_set_array_from_mqod(zval *array, PMQOD obj_desc TSRMLS_DC) /* {{{
 
 	switch(obj_desc->Version) {
 		default:
-			zend_error(E_WARNING, "MQOD_VERSION_%d not supported, using MQOD_VERSION_%d instead.\n", obj_desc->Version, MQOD_CURRENT_VERSION);
+			MQSERIES_UNSUPPRTED_VERSION(MQOD, obj_desc);
 
 #ifdef MQOD_VERSION_4
 		case MQOD_VERSION_4:
@@ -668,7 +671,7 @@ void _mqseries_set_mqgmo_from_array(zval *array, PMQGMO get_msg_opts  TSRMLS_DC)
 	MQSERIES_SETOPT_LONG(get_msg_opts, Version);
 	switch (get_msg_opts->Version) {
 		default:
-			zend_error(E_WARNING, "MQGMO_VERSION_%d not supported, using MQGMO_VERSION_%d instead.\n", get_msg_opts->Version, MQGMO_CURRENT_VERSION);
+			MQSERIES_UNSUPPRTED_VERSION(MQGMO, get_msg_opts);
 
 #ifdef MQGMO_VERSION_4
 		case MQGMO_VERSION_4:
@@ -714,7 +717,7 @@ void _mqseries_set_array_from_mqgmo(zval *array, PMQGMO get_msg_opts TSRMLS_DC) 
 
 	switch (get_msg_opts->Version) {
 		default:
-			zend_error(E_WARNING, "MQGMO_VERSION_%d not supported, using MQGMO_VERSION_%d instead.\n", get_msg_opts->Version, MQGMO_CURRENT_VERSION);
+			MQSERIES_UNSUPPRTED_VERSION(MQGMO, get_msg_opts);
 
 #ifdef MQGMO_VERSION_4
 		case MQGMO_VERSION_4:
@@ -811,7 +814,7 @@ void _mqseries_set_mqsts_from_array(zval *array, PMQSTS status) /* {{{ */
 	MQSERIES_SETOPT_LONG(status, Version);
 	switch (status->Version) {
 		default:
-			zend_error(E_WARNING, "MQSTS_VERSION_%d not supported, using MQSTS_VERSION_%d instead.\n", status->Version, MQSTS_CURRENT_VERSION);
+			MQSERIES_UNSUPPRTED_VERSION(MQSTS, status);
 
 #ifdef MQSTS_VERSION_2
 		case MQSTS_VERSION_2:
@@ -847,7 +850,7 @@ void _mqseries_set_array_from_mqsts(zval *array, PMQSTS status) /* {{{ */
 
 	switch (status->Version) {
 		default:
-			zend_error(E_WARNING, "MQSTS_VERSION_%d not supported, using MQSTS_VERSION_%d instead.\n", status->Version, MQSTS_CURRENT_VERSION);
+			MQSERIES_UNSUPPRTED_VERSION(MQSTS, status);
 
 #ifdef MQSTS_VERSION_2
 		case MQSTS_VERSION_2:

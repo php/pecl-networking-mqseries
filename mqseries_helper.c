@@ -55,6 +55,7 @@ Author: Michael Bretterklieber <mbretter@jawa.at>
 			s->m = Z_LVAL_PP(tmp); \
 		} \
 	} while(0)
+
 #define MQSERIES_SETOPT_STRING(s,m) \
 	do { \
 		if (zend_hash_find(ht, #m, sizeof(#m), (void**)&tmp) == SUCCESS && \
@@ -62,6 +63,7 @@ Author: Michael Bretterklieber <mbretter@jawa.at>
 			strncpy(s->m, Z_STRVAL_PP(tmp), sizeof(s->m)); \
 		} \
 	} while(0)
+
 #define MQSERIES_SETOPT_CHAR(s, m) \
 	do { \
 		if (zend_hash_find(ht, #m, sizeof(#m), (void**)&tmp) == SUCCESS && \
@@ -69,6 +71,7 @@ Author: Michael Bretterklieber <mbretter@jawa.at>
 			s->m = Z_STRVAL_PP(tmp)[0]; \
 		} \
 	} while(0)
+
 #define MQSERIES_SETOPT_RESBYTES(s,m) \
 	do { \
 		if (zend_hash_find(ht, #m, sizeof(#m), (void**)&tmp) == SUCCESS) { \
@@ -83,12 +86,14 @@ Author: Michael Bretterklieber <mbretter@jawa.at>
 			} \
 		} \
 	} while(0)
+
 #define MQSERIES_SETOPT_PTR(s,m) \
 	do { \
 		if (zend_hash_find(ht, #m, sizeof(#m), (void**)&tmp) == SUCCESS) {\
 			zend_error(E_WARNING, "'%s' is not yet supported.", #m); \
 		} \
 	} while(0)
+
 #define MQSERIES_SETOPT_CHARV(s,m) \
 	do { \
 		if (zend_hash_find(ht, #m, sizeof(#m), (void**)&tmp) == SUCCESS && \
@@ -99,6 +104,7 @@ Author: Michael Bretterklieber <mbretter@jawa.at>
 			s->m.VSBufSize = Z_STRLEN_PP(tmp) + 1; \
 		} \
 	} while(0)
+
 #define MQSERIES_SETOPT_HOBJ(s,m) \
 	do { \
 		if (zend_hash_find(ht, #m, sizeof(#m), (void**)&tmp) == SUCCESS && \
@@ -109,6 +115,7 @@ Author: Michael Bretterklieber <mbretter@jawa.at>
 				} \
 		} \
 	} while(0)
+
 #define MQSERIES_ADD_ASSOC_LONG(s, m) \
 	add_assoc_long(array, #m, s->m)
 
@@ -118,6 +125,7 @@ Author: Michael Bretterklieber <mbretter@jawa.at>
 			add_assoc_stringl(array, #m, s->m, sizeof(s->m), 1); \
 		} \
 	} while(0)
+
 #define MQSERIES_ADD_ASSOC_RESOURCE(s, m) \
 	do { \
 		zval *ref = create_mqseries_bytes_resource(s->m, sizeof(s->m) TSRMLS_CC); \
@@ -125,12 +133,14 @@ Author: Michael Bretterklieber <mbretter@jawa.at>
 		zend_list_addref(Z_RESVAL_P(ref)); \
 		zval_ptr_dtor(&ref); \
 	} while(0)
+
 #define MQSERIES_ADD_ASSOC_CHARV(s, m) \
 	do { \
 		if (s->m.VSPtr != NULL && s->m.VSLength > 0) { \
 			add_assoc_stringl(array, #m, (char *) s->m.VSPtr, s->m.VSLength, 1); \
 		} \
 	} while(0)
+
 #define MQSERIES_ADD_ASSOC_CHAR(s, m) \
 	do { \
 		char str[2]; \
@@ -537,6 +547,7 @@ void _mqseries_set_array_from_mqmd(zval *array, PMQMD msg_desc TSRMLS_DC) /* {{{
 
 #ifdef MQMD_VERSION_1
 		case MQMD_VERSION_1:
+			MQSERIES_ADD_ASSOC_LONG(msg_desc, Version);
 			MQSERIES_ADD_ASSOC_LONG(msg_desc, Report);
 			MQSERIES_ADD_ASSOC_LONG(msg_desc, MsgType);
 			MQSERIES_ADD_ASSOC_LONG(msg_desc, Expiry);
@@ -745,6 +756,7 @@ void _mqseries_set_array_from_mqgmo(zval *array, PMQGMO get_msg_opts TSRMLS_DC) 
 
 #ifdef MQGMO_VERSION_1
 		case MQGMO_VERSION_1:
+			MQSERIES_ADD_ASSOC_LONG(get_msg_opts, Version);
 			MQSERIES_ADD_ASSOC_LONG(get_msg_opts, Options);
 			MQSERIES_ADD_ASSOC_LONG(get_msg_opts, WaitInterval);
 			MQSERIES_ADD_ASSOC_LONG(get_msg_opts, Signal1);
@@ -782,21 +794,29 @@ void _mqseries_set_mqsd_from_array(zval *array, PMQSD sub_desc TSRMLS_DC) /* {{{
 	zval **tmp;
 
 	MQSERIES_SETOPT_LONG(sub_desc, Version);
-	MQSERIES_SETOPT_LONG(sub_desc, Options);
-	MQSERIES_SETOPT_STRING(sub_desc, ObjectName);
-	MQSERIES_SETOPT_STRING(sub_desc, AlternateUserId);
-	MQSERIES_SETOPT_RESBYTES(sub_desc, AlternateSecurityId);
-	MQSERIES_SETOPT_LONG(sub_desc, SubExpiry);
-	MQSERIES_SETOPT_CHARV(sub_desc, ObjectString);
-	MQSERIES_SETOPT_CHARV(sub_desc, SubName);
-	MQSERIES_SETOPT_CHARV(sub_desc, SubUserData);
-	MQSERIES_SETOPT_RESBYTES(sub_desc, SubCorrelId);
-	MQSERIES_SETOPT_LONG(sub_desc, PubPriority);
-	MQSERIES_SETOPT_RESBYTES(sub_desc, PubAccountingToken);
-	MQSERIES_SETOPT_STRING(sub_desc, PubApplIdentityData);
-	MQSERIES_SETOPT_CHARV(sub_desc, SelectionString);
-	MQSERIES_SETOPT_LONG(sub_desc, SubLevel);
-	MQSERIES_SETOPT_CHARV(sub_desc, ResObjectString);
+	switch (sub_desc->Version) {
+		default:
+			MQSERIES_UNSUPPRTED_VERSION(MQSD, sub_desc);
+
+#ifdef MQSD_VERSION_1
+		case MQSD_VERSION_1:
+			MQSERIES_SETOPT_LONG(sub_desc, Options);
+			MQSERIES_SETOPT_STRING(sub_desc, ObjectName);
+			MQSERIES_SETOPT_STRING(sub_desc, AlternateUserId);
+			MQSERIES_SETOPT_RESBYTES(sub_desc, AlternateSecurityId);
+			MQSERIES_SETOPT_LONG(sub_desc, SubExpiry);
+			MQSERIES_SETOPT_CHARV(sub_desc, ObjectString);
+			MQSERIES_SETOPT_CHARV(sub_desc, SubName);
+			MQSERIES_SETOPT_CHARV(sub_desc, SubUserData);
+			MQSERIES_SETOPT_RESBYTES(sub_desc, SubCorrelId);
+			MQSERIES_SETOPT_LONG(sub_desc, PubPriority);
+			MQSERIES_SETOPT_RESBYTES(sub_desc, PubAccountingToken);
+			MQSERIES_SETOPT_STRING(sub_desc, PubApplIdentityData);
+			MQSERIES_SETOPT_CHARV(sub_desc, SelectionString);
+			MQSERIES_SETOPT_LONG(sub_desc, SubLevel);
+			MQSERIES_SETOPT_CHARV(sub_desc, ResObjectString);
+	}
+#endif /* MQSD_VERSION_1 */
 }
 /* }}} */
 
@@ -805,22 +825,30 @@ void _mqseries_set_array_from_mqsd(zval *array, PMQSD sub_desc TSRMLS_DC) /* {{{
 	zval_dtor(array);
 	array_init(array);
 
-	MQSERIES_ADD_ASSOC_LONG(sub_desc, Version);
-	MQSERIES_ADD_ASSOC_LONG(sub_desc, Options);
-	MQSERIES_ADD_ASSOC_STRING(sub_desc, ObjectName);
-	MQSERIES_ADD_ASSOC_STRING(sub_desc, AlternateUserId);
-	MQSERIES_ADD_ASSOC_RESOURCE(sub_desc, AlternateSecurityId);
-	MQSERIES_ADD_ASSOC_LONG(sub_desc, SubExpiry);
-	MQSERIES_ADD_ASSOC_CHARV(sub_desc, ObjectString);
-	MQSERIES_ADD_ASSOC_CHARV(sub_desc, SubName);
-	MQSERIES_ADD_ASSOC_CHARV(sub_desc, SubUserData);
-	MQSERIES_ADD_ASSOC_RESOURCE(sub_desc, SubCorrelId);
-	MQSERIES_ADD_ASSOC_LONG(sub_desc, PubPriority);
-	MQSERIES_ADD_ASSOC_RESOURCE(sub_desc, PubAccountingToken);
-	MQSERIES_ADD_ASSOC_STRING(sub_desc, PubApplIdentityData);
-	MQSERIES_ADD_ASSOC_CHARV(sub_desc, SelectionString);
-	MQSERIES_ADD_ASSOC_LONG(sub_desc, SubLevel);
-	MQSERIES_ADD_ASSOC_CHARV(sub_desc, ResObjectString);
+	switch (sub_desc->Version) {
+		default:
+			MQSERIES_UNSUPPRTED_VERSION(MQSD, sub_desc);
+
+#ifdef MQSD_VERSION_1
+		case MQSD_VERSION_1:
+			MQSERIES_ADD_ASSOC_LONG(sub_desc, Version);
+			MQSERIES_ADD_ASSOC_LONG(sub_desc, Options);
+			MQSERIES_ADD_ASSOC_STRING(sub_desc, ObjectName);
+			MQSERIES_ADD_ASSOC_STRING(sub_desc, AlternateUserId);
+			MQSERIES_ADD_ASSOC_RESOURCE(sub_desc, AlternateSecurityId);
+			MQSERIES_ADD_ASSOC_LONG(sub_desc, SubExpiry);
+			MQSERIES_ADD_ASSOC_CHARV(sub_desc, ObjectString);
+			MQSERIES_ADD_ASSOC_CHARV(sub_desc, SubName);
+			MQSERIES_ADD_ASSOC_CHARV(sub_desc, SubUserData);
+			MQSERIES_ADD_ASSOC_RESOURCE(sub_desc, SubCorrelId);
+			MQSERIES_ADD_ASSOC_LONG(sub_desc, PubPriority);
+			MQSERIES_ADD_ASSOC_RESOURCE(sub_desc, PubAccountingToken);
+			MQSERIES_ADD_ASSOC_STRING(sub_desc, PubApplIdentityData);
+			MQSERIES_ADD_ASSOC_CHARV(sub_desc, SelectionString);
+			MQSERIES_ADD_ASSOC_LONG(sub_desc, SubLevel);
+			MQSERIES_ADD_ASSOC_CHARV(sub_desc, ResObjectString);
+#endif /* MQSD_VERSION_1 */
+	}
 }
 /* }}} */
 

@@ -38,10 +38,10 @@ http://pear.php.net/dtd/package-2.0.xsd">
  </stability>
  <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
  <notes>
-- Add support for the MQFMT_MD_EXTENSION Format to remove the 
-  MQMDE from the message. (Pierrick)
-- Add support for the SSLCipherSpec and OCSPResponderURL.
-  (Dieter Devlieghere, Pierrick)
+- Add support for the MQFMT_MD_EXTENSION Format to remove the MQMDE from the message. (Pierrick)
+- Add support for the SSLCipherSpec and OCSPResponderURL. (Dieter Devlieghere, Pierrick)
+- Update all implemented mqseries_* functions to expose WebSphere v7 parameters (Pierrick)
+- Add mqseries_sub and mqseries_stat functions from WebSphere v7 (Pierrick)
  </notes>
  <contents>
   <dir name="/">
@@ -65,6 +65,7 @@ http://pear.php.net/dtd/package-2.0.xsd">
    <file name="config.m4" role="src" />
    <file name="CREDITS" role="src" />
    <file name="mqseries.c" role="src" />
+   <file name="mqseries_helper.c" role="src" />
    <file name="mqseries.dsp" role="src" />
    <file name="mqseries_init_const.h" role="src" />
    <file name="mqseries_reason_texts.h" role="src" />

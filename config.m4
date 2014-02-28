@@ -58,5 +58,5 @@ if test "$PHP_MQSERIES" != "no"; then
 
   PHP_SUBST(MQSERIES_SHARED_LIBADD)
 
-  PHP_NEW_EXTENSION(mqseries, mqseries.c, $ext_shared)
+  PHP_NEW_EXTENSION(mqseries, mqseries.c mqseries_helper.c, $ext_shared)
 fi

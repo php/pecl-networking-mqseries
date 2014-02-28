@@ -63,6 +63,7 @@ typedef struct {
 	int id;
 	MQHCONN conn;
 } mqseries_descriptor;
+extern int le_mqseries_conn;
 #define PHP_MQSERIES_DESCRIPTOR_RES_NAME "mqseries_conn"
 
 typedef struct {
@@ -70,13 +71,37 @@ typedef struct {
 	MQHOBJ obj;
 	MQHCONN *conn;
 } mqseries_obj;
+extern int le_mqseries_obj;
 #define PHP_MQSERIES_OBJ_RES_NAME "mqseries_obj"
 
 typedef struct {
 	int id;
 	PMQBYTE bytes;
 } mqseries_bytes;
+extern int le_mqseries_bytes;
 #define PHP_MQSERIES_BYTES_RES_NAME "mqseries_bytes"
+
+/* {{{ Helper */
+void _mqseries_set_mqcno_from_array(zval *, PMQCNO, PMQCD, PMQSCO, PMQAIR, PMQCHAR TSRMLS_DC);
+
+void _mqseries_set_mqpmo_from_array(zval *, PMQPMO TSRMLS_DC);
+void _mqseries_set_array_from_mqpmo(zval *, PMQPMO);
+
+void _mqseries_set_mqmd_from_array(zval *, PMQMD TSRMLS_DC);
+void _mqseries_set_array_from_mqmd(zval *, PMQMD TSRMLS_DC);
+
+void _mqseries_set_mqod_from_array(zval *, PMQOD TSRMLS_DC);
+void _mqseries_set_array_from_mqod(zval *, PMQOD TSRMLS_DC);
+
+void _mqseries_set_mqgmo_from_array(zval *, PMQGMO TSRMLS_DC);
+void _mqseries_set_array_from_mqgmo(zval *, PMQGMO TSRMLS_DC);
+
+void _mqseries_set_mqsd_from_array(zval *, PMQSD TSRMLS_DC);
+void _mqseries_set_array_from_mqsd(zval *, PMQSD TSRMLS_DC);
+
+void _mqseries_set_mqsts_from_array(zval *, PMQSTS);
+void _mqseries_set_array_from_mqsts(zval *, PMQSTS);
+/* }}} */
 
 PHP_MINIT_FUNCTION(mqseries);
 PHP_MSHUTDOWN_FUNCTION(mqseries);
@@ -124,7 +149,6 @@ PHP_FUNCTION(mqseries_sub);
 #endif
 
 #endif	/* PHP_MQSERIES_H */
-
 
 /*
  * Local variables:

@@ -756,6 +756,24 @@ void _mqseries_set_array_from_mqgmo(zval *array, PMQGMO get_msg_opts TSRMLS_DC) 
 }
 /* }}} */
 
+void _mqseries_set_mqbo_from_array(zval *array, PMQBO mqbo) /* {{{ */
+{
+	HashTable *ht = Z_ARRVAL_P(array);
+	zval **tmp;
+
+	switch (mqbo->Version) {
+		default:
+			MQSERIES_UNSUPPRTED_VERSION(MQBO, mqbo);
+
+#ifdef MQBO_VERSION_1
+		case MQBO_VERSION_1:
+			MQSERIES_SETOPT_LONG(mqbo, Version);
+			MQSERIES_SETOPT_LONG(mqbo, Options);
+#endif /* MQBO_VERSION_1 */
+	}
+}
+/* }}} */
+
 #ifdef HAVE_MQSERIESLIB_V7
 
 void _mqseries_set_mqsd_from_array(zval *array, PMQSD sub_desc TSRMLS_DC) /* {{{ */

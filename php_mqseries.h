@@ -96,11 +96,17 @@ void _mqseries_set_array_from_mqod(zval *, PMQOD TSRMLS_DC);
 void _mqseries_set_mqgmo_from_array(zval *, PMQGMO TSRMLS_DC);
 void _mqseries_set_array_from_mqgmo(zval *, PMQGMO TSRMLS_DC);
 
+void _mqseries_set_mqbo_from_array(zval *, PMQBO);
+
+#ifdef HAVE_MQSERIESLIB_V7
+
 void _mqseries_set_mqsd_from_array(zval *, PMQSD TSRMLS_DC);
 void _mqseries_set_array_from_mqsd(zval *, PMQSD TSRMLS_DC);
 
 void _mqseries_set_mqsts_from_array(zval *, PMQSTS);
 void _mqseries_set_array_from_mqsts(zval *, PMQSTS);
+
+#endif /* HAVE_MQSERIESLIB_V7 */
 /* }}} */
 
 PHP_MINIT_FUNCTION(mqseries);

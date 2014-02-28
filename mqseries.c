@@ -376,6 +376,7 @@ PHP_FUNCTION(mqseries_conn)
 	ZVAL_LONG(z_reason, reason);
 
 	if (comp_code == MQCC_OK) {
+		zval_dtor(z_conn);
 		ZEND_REGISTER_RESOURCE(z_conn, mqdesc, le_mqseries_conn);
 		mqdesc->id = Z_RESVAL_P(z_conn);
 	} else {
@@ -448,6 +449,7 @@ PHP_FUNCTION(mqseries_connx)
 	ZVAL_LONG(z_reason, reason);
 
 	if (comp_code == MQCC_OK) {
+		zval_dtor(z_conn);
 		ZEND_REGISTER_RESOURCE(z_conn, mqdesc, le_mqseries_conn);
 		mqdesc->id = Z_RESVAL_P(z_conn);
 	} else {
@@ -517,6 +519,7 @@ PHP_FUNCTION(mqseries_open)
 		_mqseries_set_array_from_mqod(z_obj_desc, &obj_desc TSRMLS_CC);
 	}
 	if (comp_code == MQCC_OK) {
+		zval_dtor(z_obj);
 		mqobj->conn = &mqdesc->conn;
 		ZEND_REGISTER_RESOURCE(z_obj, mqobj, le_mqseries_obj);
 		mqobj->id = Z_RESVAL_P(z_obj);
@@ -1366,11 +1369,13 @@ PHP_FUNCTION(mqseries_sub)
 	}
 	if (comp_code == MQCC_OK) {
 		if (Z_TYPE_P(z_obj) != IS_RESOURCE) {
+			zval_dtor(z_obj);
 			mqobj->conn = &mqdesc->conn;
 			ZEND_REGISTER_RESOURCE(z_obj, mqobj, le_mqseries_obj);
 			mqobj->id = Z_RESVAL_P(z_obj);
 		}
 
+		zval_dtor(z_sub);
 		mqsub->conn = &mqdesc->conn;
 		ZEND_REGISTER_RESOURCE(z_sub, mqsub, le_mqseries_obj);
 		mqsub->id = Z_RESVAL_P(z_sub);

@@ -81,6 +81,14 @@ typedef struct {
 extern int le_mqseries_bytes;
 #define PHP_MQSERIES_BYTES_RES_NAME "mqseries_bytes"
 
+typedef struct {
+	zval *func_name;
+	zend_fcall_info_cache fci_cache;
+	zval *data;
+	MQLONG options;
+	void ***thread_ctx;
+} mqseries_callback;
+
 /* {{{ Helper */
 void _mqseries_set_mqcno_from_array(zval *, PMQCNO, PMQCD, PMQSCO, PMQAIR, PMQCHAR TSRMLS_DC);
 
@@ -106,7 +114,16 @@ void _mqseries_set_array_from_mqsd(zval *, PMQSD TSRMLS_DC);
 void _mqseries_set_mqsts_from_array(zval *, PMQSTS);
 void _mqseries_set_array_from_mqsts(zval *, PMQSTS);
 
+void _mqseries_set_mqcbd_from_array(zval *, PMQCBD TSRMLS_DC);
+
+void _mqseries_set_mqctlo_from_array(zval *, PMQCTLO);
+
+void _mqseries_set_array_from_mqcbc(zval *, PMQCBC TSRMLS_DC);
 #endif /* HAVE_MQSERIESLIB_V7 */
+/* }}} */
+
+/* {{{ Callback */
+MQLONG _mqseries_callback(MQHCONN, MQMD *, MQGMO *, MQBYTE *, MQCBC *);
 /* }}} */
 
 PHP_MINIT_FUNCTION(mqseries);
@@ -134,10 +151,9 @@ PHP_FUNCTION(mqseries_bytes_val);
 
 #ifdef HAVE_MQSERIESLIB_V7
 // PHP_FUNCTION(mqseries_bufmh);
-// PHP_FUNCTION(mqseries_cb);
-// PHP_FUNCTION(mqseries_cb_function);
+PHP_FUNCTION(mqseries_cb);
 // PHP_FUNCTION(mqseries_crtmh);
-// PHP_FUNCTION(mqseries_ctl);
+PHP_FUNCTION(mqseries_ctl);
 // PHP_FUNCTION(mqseries_dltmh);
 // PHP_FUNCTION(mqseries_dltmp);
 // PHP_FUNCTION(mqseries_inqmp);

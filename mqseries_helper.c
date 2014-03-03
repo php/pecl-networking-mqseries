@@ -147,7 +147,6 @@ Author: Michael Bretterklieber <mbretter@jawa.at>
 		sprintf(str, "%c", s->m); \
 		add_assoc_string(array, #m, str, sizeof(s->m)); \
 	} while(0)
-
 /* }}} */
 
 /* {{{ create_mqseries_bytes_resource
@@ -925,6 +924,124 @@ void _mqseries_set_array_from_mqsts(zval *array, PMQSTS status) /* {{{ */
 }
 /* }}} */
 
+void _mqseries_set_mqcbd_from_array(zval *array, PMQCBD cbd TSRMLS_DC) /* {{{ */
+{
+	HashTable *ht = Z_ARRVAL_P(array);
+	zval **tmp, **tmp2;
+	MQLONG options = 0;
+
+	MQSERIES_SETOPT_LONG(cbd, Version);
+	switch (cbd->Version) {
+		default:
+			MQSERIES_UNSUPPRTED_VERSION(MQCBD, cbd);
+
+#ifdef MQCBD_VERSION_1
+		case MQSTS_VERSION_1:
+			MQSERIES_SETOPT_LONG(cbd, CallbackType);
+			MQSERIES_SETOPT_LONG(cbd, Options);
+			MQSERIES_SETOPT_LONG(cbd, MaxMsgLength);
+
+			// We always want to call the C callback to make sure we free the memory
+			if (zend_hash_find(ht, "Options", sizeof("Options"), (void**)&tmp) == SUCCESS) {
+				convert_to_long(*tmp);
+				options = Z_LVAL_PP(tmp);
+			}
+			cbd->Options = options | MQCBDO_DEREGISTER_CALL | MQCBDO_STOP_CALL;
+
+			if (zend_hash_find(ht, "CallbackName", sizeof("CallbackName"), (void**)&tmp) == SUCCESS) {
+				zend_error(E_WARNING, "'CallbackName' is not yet supported.");
+			}
+			if (zend_hash_find(ht, "CallbackFunction", sizeof("CallbackFunction"), (void**)&tmp) == SUCCESS) {
+				mqseries_callback *cb = (mqseries_callback *) emalloc(sizeof(mqseries_callback));
+
+				zval_add_ref(tmp);
+				cb->func_name = *tmp;
+				cb->options = options;
+
+				cb->fci_cache = empty_fcall_info_cache;
+				TSRMLS_SET_CTX(cb->thread_ctx);
+
+				if (zend_hash_find(ht, "CallbackArea", sizeof("CallbackArea"), (void**)&tmp2) == SUCCESS) {
+					zval_add_ref(tmp2);
+					cb->data = *tmp2;
+				} else {
+					cb->data = NULL;
+				}
+
+				cbd->CallbackFunction = _mqseries_callback;
+				cbd->CallbackArea = cb;
+			}
+			// no break intentional
+#endif /* MQCBD_VERSION_1 */
+	}
+}
+/* }}} */
+
+void _mqseries_set_mqctlo_from_array(zval *array, PMQCTLO ctlo) /* {{{ */
+{
+	HashTable *ht = Z_ARRVAL_P(array);
+	zval **tmp;
+
+	MQSERIES_SETOPT_LONG(ctlo, Version);
+	switch (ctlo->Version) {
+		default:
+			MQSERIES_UNSUPPRTED_VERSION(MQCTLO, ctlo);
+
+#ifdef MQCTLO_VERSION_1
+		case MQCTLO_VERSION_1:
+			MQSERIES_SETOPT_LONG(ctlo, Reserved);
+			if (zend_hash_find(ht, "ConnectionArea", sizeof("ConnectionArea"), (void**)&tmp) == SUCCESS) {
+				zval_add_ref(tmp);
+				ctlo->ConnectionArea = *tmp;
+			} else {
+				ctlo->ConnectionArea = NULL;
+			}
+#endif
+	}
+}
+/* }}} */
+
+void _mqseries_set_array_from_mqcbc(zval *array, PMQCBC cbc TSRMLS_DC) /* {{{ */
+{
+	zval_dtor(array);
+	array_init(array);
+
+	switch(cbc->Version) {
+		default:
+			MQSERIES_UNSUPPRTED_VERSION(MQCBC, cbc);
+
+#ifdef MQCBC_VERSION_2
+		case MQCBC_VERSION_2:
+			MQSERIES_ADD_ASSOC_LONG(cbc, ReconnectDelay);
+#endif /* MQCBC_VERSION_2 */
+
+#ifdef MQCBC_VERSION_1
+		case MQCBC_VERSION_1:
+			MQSERIES_ADD_ASSOC_LONG(cbc, CallType);
+			MQSERIES_ADD_ASSOC_LONG(cbc, CompCode);
+			MQSERIES_ADD_ASSOC_LONG(cbc, Reason);
+			MQSERIES_ADD_ASSOC_LONG(cbc, State);
+			MQSERIES_ADD_ASSOC_LONG(cbc, DataLength);
+			MQSERIES_ADD_ASSOC_LONG(cbc, BufferLength);
+			MQSERIES_ADD_ASSOC_LONG(cbc, Flags);
+			if (cbc->CallbackArea) {
+				mqseries_callback *cb = (mqseries_callback *) cbc->CallbackArea;
+				if (cb->data) {
+					zval_add_ref(&cb->data);
+					add_assoc_zval(array, "CallbackArea", cb->data);
+				}
+			}
+			if (cbc->ConnectionArea) {
+				zval *data = (zval *) cbc->ConnectionArea;
+				zval_add_ref(&data);
+				add_assoc_zval(array, "ConnectionArea", data);
+			}
+			// TODO : Hobj
+#endif /* MQCBC_VERSION_1 */
+
+	}
+}
+/* }}}*/
 #endif /* HAVE_MQSERIESLIB_V7 */
 
 /*

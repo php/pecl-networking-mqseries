@@ -216,6 +216,25 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_stat, 0, 0, 5)
 	ZEND_ARG_INFO(1, reason)				/* OR: Reason code qualifying CompCode */
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_cb, 0, 0, 8)
+	ZEND_ARG_INFO(0, hconn)					/* I: Connection handle */
+	ZEND_ARG_INFO(0, operation) 			/* I: Operation */
+	ZEND_ARG_ARRAY_INFO(0, callbackDesc, 0) /* I: Callback descriptor */
+	ZEND_ARG_INFO(0, hobj) 		       	    /* I: Object handle */
+	ZEND_ARG_ARRAY_INFO(0, msgDesc, 1)      /* I: Message Descriptor */
+	ZEND_ARG_ARRAY_INFO(0, getMsgOpts, 1)   /* I: Get options */
+	ZEND_ARG_INFO(1, compCode)				/* OC: Completion code */
+	ZEND_ARG_INFO(1, reason)				/* OR: Reason code qualifying CompCode */
+ZEND_END_ARG_INFO();
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_ctl, 0, 0, 5)
+	ZEND_ARG_INFO(0, hconn)					/* I: Connection handle */
+	ZEND_ARG_INFO(0, operation)				/* I: Operation */
+	ZEND_ARG_ARRAY_INFO(0, controlOpts, 0)	/* I: Control options */
+	ZEND_ARG_INFO(1, compCode)				/* OC: Completion code */
+	ZEND_ARG_INFO(1, reason)				/* OR: Reason code qualifying CompCode */
+ZEND_END_ARG_INFO();
+
 #endif /* HAVE_MQSERIESLIB_V7 */
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_strerror, 0, 0, 1)
@@ -250,6 +269,8 @@ zend_function_entry mqseries_functions[] = {
 #ifdef HAVE_MQSERIESLIB_V7
 	PHP_FE(mqseries_sub,        arginfo_mqseries_sub)
 	PHP_FE(mqseries_stat,       arginfo_mqseries_stat)
+	PHP_FE(mqseries_cb, 		arginfo_mqseries_cb)
+	PHP_FE(mqseries_ctl,        arginfo_mqseries_ctl)
 #endif /* HAVE_MQSERIESLIB_V7 */
 	{NULL, NULL, NULL}	/* Must be the last line in mqseries_functions[] */
 };
@@ -900,9 +921,9 @@ static void _mqseries_close(zend_rsrc_list_entry *rsrc TSRMLS_DC)
 
 					default:
 #if defined(MQ_64_BIT)
-						zend_error(E_WARNING, "_mqseries_close Error %d %d\n", comp_code, reason);
+						zend_error(E_WARNING, "_mqseries_close Error %d %d", comp_code, reason);
 #else
-						zend_error(E_WARNING, "_mqseries_close Error %ld %ld\n", comp_code, reason);
+						zend_error(E_WARNING, "_mqseries_close Error %ld %ld", comp_code, reason);
 #endif
 				}
 		    }
@@ -981,9 +1002,9 @@ static void _mqseries_disc(zend_rsrc_list_entry *rsrc TSRMLS_DC)
 
 				default:
 #if defined(MQ_64_BIT)
-					zend_error(E_WARNING, "_mqseries_disc Error %d %d\n", comp_code, reason);
+					zend_error(E_WARNING, "_mqseries_disc Error %d %d", comp_code, reason);
 #else
-					zend_error(E_WARNING, "_mqseries_disc Error %ld %ld\n", comp_code, reason);
+					zend_error(E_WARNING, "_mqseries_disc Error %ld %ld", comp_code, reason);
 #endif
 			}
 	    }
@@ -1440,6 +1461,244 @@ PHP_FUNCTION(mqseries_stat)
 }
 /* }}} */
 
+/* {{{ internal used function for callback _mqseries_callback() */
+MQLONG _mqseries_callback(MQHCONN hConn, MQMD *pMsgDesc, MQGMO *pGetMsgOpts, MQBYTE *Buffer, MQCBC *pContext)
+{
+	MQLONG cb_return = 0;
+	mqseries_callback *cbd = (mqseries_callback *) pContext->CallbackArea;
+
+	if (
+		(pContext->CallType != MQCBCT_DEREGISTER_CALL || cbd->options & MQCBDO_DEREGISTER_CALL) &&
+		(pContext->CallType != MQCBCT_STOP_CALL || cbd->options & MQCBDO_STOP_CALL)
+	) {
+
+
+		zval **argv[5];
+		zval *z_hconn = NULL;
+		zval *z_msg_desc = NULL;
+		zval *z_get_msg_opts = NULL;
+		zval *z_buffer = NULL;
+		zval *z_context = NULL;
+
+		zval *retval_ptr;
+		int   error = 0;
+		zend_fcall_info fci;
+
+		TSRMLS_FETCH_FROM_CTX(cbd->thread_ctx);
+
+		zend_output_debug_string(1, "Execute callback function");
+		MAKE_STD_ZVAL(z_hconn);
+		MAKE_STD_ZVAL(z_msg_desc);
+		MAKE_STD_ZVAL(z_get_msg_opts);
+		MAKE_STD_ZVAL(z_buffer);
+		MAKE_STD_ZVAL(z_context);
+
+		ZVAL_NULL(z_msg_desc);
+		ZVAL_NULL(z_get_msg_opts);
+		ZVAL_NULL(z_hconn);
+		ZVAL_NULL(z_context);
+		ZVAL_NULL(z_buffer);
+
+		if (hConn) {
+			mqseries_descriptor *mqdesc = (mqseries_descriptor *) emalloc(sizeof(mqseries_descriptor));
+			ZEND_REGISTER_RESOURCE(z_hconn, mqdesc, le_mqseries_conn);
+			mqdesc->id = Z_RESVAL_P(z_hconn);
+		} else {
+			ZVAL_NULL(z_hconn);
+		}
+
+		if (Buffer) {
+			ZVAL_STRINGL(z_buffer, (char *)Buffer, pContext->DataLength, 1);
+		} else {
+			ZVAL_EMPTY_STRING(z_buffer);
+		}
+
+		_mqseries_set_array_from_mqcbc(z_context, pContext TSRMLS_CC);
+
+		argv[0] = &z_hconn;
+		argv[1] = &z_msg_desc;
+		argv[2] = &z_get_msg_opts;
+		argv[3] = &z_buffer;
+		argv[4] = &z_context;
+
+		fci.size = sizeof(fci);
+		fci.function_table = EG(function_table);
+		fci.function_name = cbd->func_name;
+		fci.object_ptr = NULL;
+		fci.retval_ptr_ptr = &retval_ptr;
+		fci.param_count = 5;
+		fci.params = argv;
+		fci.no_separation = 0;
+		fci.symbol_table = NULL;
+
+		error = zend_call_function(&fci, &cbd->fci_cache TSRMLS_CC);
+		if (error == FAILURE) {
+			  zval **method;
+			  zval **obj;
+			  if (Z_TYPE_P(cbd->func_name) == IS_STRING) {
+				  php_error_docref(NULL TSRMLS_CC, E_WARNING, "Unable to call the callback function %s()", Z_STRVAL_P(cbd->func_name));
+			  } else if (zend_hash_index_find(Z_ARRVAL_P(cbd->func_name), 0, (void **) &obj) == SUCCESS &&
+					  zend_hash_index_find(Z_ARRVAL_P(cbd->func_name), 1, (void **) &method) == SUCCESS &&
+					  Z_TYPE_PP(obj) == IS_OBJECT &&
+					  Z_TYPE_PP(method) == IS_STRING) {
+				  php_error_docref(NULL TSRMLS_CC, E_WARNING, "Unable to call the callback function %s::%s()", Z_OBJCE_PP(obj)->name, Z_STRVAL_PP(method));
+			  } else {
+				  php_error_docref(NULL TSRMLS_CC, E_WARNING, "Unable to call the callback function");
+			  }
+		} else if (retval_ptr) {
+			if (Z_TYPE_P(retval_ptr) != IS_LONG) {
+				convert_to_long_ex(&retval_ptr);
+			}
+			cb_return = Z_LVAL_P(retval_ptr);
+			zval_ptr_dtor(&retval_ptr);
+		}
+
+		zval_ptr_dtor(argv[0]);
+		zval_ptr_dtor(argv[1]);
+		zval_ptr_dtor(argv[2]);
+		zval_ptr_dtor(argv[3]);
+		zval_ptr_dtor(argv[4]);
+
+		zend_output_debug_string(1, "End of function callback");
+	}
+
+	if (pContext->CallType == MQCBCT_DEREGISTER_CALL) {
+		zend_output_debug_string(1, "Empty memory after MQCBCT_DEREGISTER_CALL");
+		zval_ptr_dtor(&cbd->func_name);
+		if (cbd->data) {
+			zval_ptr_dtor(&cbd->data);
+		}
+		efree(cbd);
+	}
+
+	if (pContext->CallType == MQCBCT_STOP_CALL) {
+		zend_output_debug_string(1, "Empty memory after MQCBCT_STOP_CALL");
+		if (pContext->ConnectionArea) {
+			zval *data = (zval *) pContext->ConnectionArea;
+			zval_ptr_dtor(&data);
+		}
+	}
+
+	return cb_return;
+}
+/* }}} */
+
+/* {{{ proto void mqseries_cb(resource hconn, int operation, array callbackDesc, resource hobj, array msgDesc, array getMsgOpts, int &compCode, int &reason)
+
+The MQCB call reregisters a callback for the specified object handle and controls activation and changes to the callback.
+
+PHP sample:
+
+	$cbDesc = array(
+    	'CallbackFunction' => 'myFunction',
+	);
+	mqseries_cb($connection, MQSERIES_MQOP_REGISTER, $cbDesc, MQSERIES_MQHO_NONE, null, null, $compCode, $reason);
+	if ($compCode !== MQSERIES_MQCC_OK) {
+		printf("CompCode:%d Reason:%d Text:%s\n", $compCode, $reason, mqseries_strerror($reason));
+	}
+
+MQ call:
+
+	MQCB (Hconn, Operation, CallbackDesc, Hobj, MsgDesc, GetMsgOpts, &CompCode, &Reason);
+
+	MQHCONN  Hconn;         -- Connection handle
+	MQLONG   Operation;     -- Operation being processed
+	MQCBD    CallbackDesc;  -- Callback descriptor
+	MQHOBJ   HObj           -- Object handle
+	MQMD     MsgDesc        -- Message descriptor attributes
+	MQGMO    GetMsgOpts     -- Message options
+	MQLONG   CompCode;      -- Completion code
+	MQLONG   Reason;        -- Reason code qualifying CompCode
+*/
+PHP_FUNCTION(mqseries_cb)
+{
+	mqseries_descriptor *mqdesc;
+	mqseries_obj *mqobj = NULL;
+
+	MQLONG z_operation, comp_code, reason;
+	zval *z_mqdesc, *z_cb_desc, *z_obj, *z_msg_desc, *z_get_msg_opts, *z_comp_code, *z_reason;
+
+	MQCBD   cbd = {MQCBD_DEFAULT};
+	MQMD msg_desc = {MQMD_DEFAULT};
+	MQGMO get_msg_opts = { MQGMO_DEFAULT };
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rlaza!a!zz", &z_mqdesc, &z_operation, &z_cb_desc, &z_obj, &z_msg_desc,&z_get_msg_opts, &z_comp_code, &z_reason) == FAILURE) {
+		return;
+	}
+
+	if (!_mqseries_is_compcode_reason_ref(z_comp_code, z_reason)) return;
+
+	ZEND_FETCH_RESOURCE(mqdesc, mqseries_descriptor *, &z_mqdesc, -1, PHP_MQSERIES_DESCRIPTOR_RES_NAME, le_mqseries_conn);
+
+	if (Z_TYPE_P(z_obj) != IS_LONG || (Z_LVAL_P(z_obj) != MQHO_UNUSABLE_HOBJ && Z_LVAL_P(z_obj) != MQHO_NONE)) {
+		ZEND_FETCH_RESOURCE(mqobj, mqseries_obj *, &z_obj, -1, PHP_MQSERIES_OBJ_RES_NAME, le_mqseries_obj);
+	}
+
+	_mqseries_set_mqcbd_from_array(z_cb_desc, &cbd TSRMLS_CC);
+	if (z_msg_desc != NULL) {
+		_mqseries_set_mqmd_from_array(z_msg_desc, &msg_desc TSRMLS_CC);
+	}
+	if (z_get_msg_opts != NULL) {
+		_mqseries_set_mqgmo_from_array(z_get_msg_opts, &get_msg_opts TSRMLS_CC);
+	}
+
+	MQCB(
+		mqdesc->conn,
+		z_operation,
+		&cbd,
+		mqobj ? mqobj->obj : Z_LVAL_P(z_obj),
+		z_msg_desc ? &msg_desc : NULL,
+		z_get_msg_opts ? &get_msg_opts : NULL,
+		&comp_code,
+		&reason
+	);
+
+	ZVAL_LONG(z_comp_code, comp_code);
+	ZVAL_LONG(z_reason, reason);
+}
+/* }}} */
+
+/* {{{ proto void mqseries_ctl(resource hconn, int operation, resource controlOpts, int &compCode, int &reason)
+
+The MQCTL call performs controlling actions on the object handles opened for a connection.
+
+PHP sample:
+
+MQ Call:
+
+	MQCTL (Hconn, Operation, ControlOpts, &CompCode, &Reason)
+
+	MQHCONN  Hconn;         -- Connection handle
+	MQLONG   Operation;     -- Operation being processed
+	MQCTLO   ControlOpts    -- Options that control the action of MQCTL
+	MQLONG   CompCode;      -- Completion code
+	MQLONG   Reason;        -- Reason code qualifying CompCode
+*/
+PHP_FUNCTION(mqseries_ctl)
+{
+	mqseries_descriptor *mqdesc;
+
+	MQLONG z_operation, comp_code, reason;
+	zval *z_mqdesc, *z_ctl_opts, *z_comp_code, *z_reason;
+
+	MQCTLO  ctlo= {MQCTLO_DEFAULT};
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rlazz", &z_mqdesc, &z_operation, &z_ctl_opts, &z_comp_code, &z_reason) == FAILURE) {
+		return;
+	}
+
+	if (!_mqseries_is_compcode_reason_ref(z_comp_code, z_reason)) return;
+
+	ZEND_FETCH_RESOURCE(mqdesc, mqseries_descriptor *, &z_mqdesc, -1, PHP_MQSERIES_DESCRIPTOR_RES_NAME, le_mqseries_conn);
+
+	_mqseries_set_mqctlo_from_array(z_ctl_opts, &ctlo);
+
+	MQCTL(mqdesc->conn, z_operation, &ctlo, &comp_code, &reason);
+
+	ZVAL_LONG(z_comp_code, comp_code);
+	ZVAL_LONG(z_reason, reason);
+}
+/* }}} */
 #endif /* HAVE_MQSERIESLIB_V7 */
 
 /******************************************************************************/

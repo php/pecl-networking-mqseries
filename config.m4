@@ -33,7 +33,7 @@ if test "$PHP_MQSERIES" != "no"; then
   dnl # --with-mqseries -> chech for lib and symbol presence
   # when using server only
   #LIBNAME=mqm     # use this when connecting directly to the server
-  LIBNAME=mqic     # use this when connecting via the mqic (client) libraries.
+  LIBNAME=mqic_r     # use this when connecting via the mqic (client) libraries.
   LIBSYMBOL=MQCONN
 
   PHP_CHECK_LIBRARY($LIBNAME,$LIBSYMBOL,

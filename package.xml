@@ -64,6 +64,7 @@ http://pear.php.net/dtd/package-2.0.xsd">
    </dir> <!-- //examples -->
    <file name="config.m4" role="src" />
    <file name="CREDITS" role="src" />
+   <file name="LICENSE" role="src" />
    <file name="mqseries.c" role="src" />
    <file name="mqseries_helper.c" role="src" />
    <file name="mqseries.dsp" role="src" />

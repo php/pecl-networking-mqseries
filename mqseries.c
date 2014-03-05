@@ -111,6 +111,14 @@ static HashTable *ht_reason_texts;
 			strncpy((MQCHAR *) s->m, Z_STRVAL_PP(tmp), sizeof(s->m)); \
 		} \
 	}
+#define MQSERIES_SETOPT_CHARV(s,m) \
+	if (zend_hash_find(ht, #m, sizeof(#m), (void**)&tmp) == SUCCESS && \
+		Z_TYPE_PP(tmp) == IS_STRING) { \
+		s->m.VSPtr = Z_STRVAL_PP(tmp); \
+		s->m.VSOffset = 0; \
+		s->m.VSLength = Z_STRLEN_PP(tmp); \
+		s->m.VSBufSize = Z_STRLEN_PP(tmp) + 1; \
+	}
 
 #define MQSERIES_ADD_ASSOC_LONG(s, m) \
 	add_assoc_long(array, #m, s->m)
@@ -126,6 +134,10 @@ static HashTable *ht_reason_texts;
 		zend_list_addref(Z_RESVAL_P(ref)); \
 		zval_ptr_dtor(&ref); \
 	} while(0)
+#define MQSERIES_ADD_ASSOC_CHARV(s, m) \
+	if (s->m.VSPtr != NULL && s->m.VSLength > 0) { \
+		add_assoc_stringl(array, #m, (char *) s->m.VSPtr, s->m.VSLength, 1); \
+	}
 
 /* }}} */
 
@@ -667,6 +679,7 @@ PHP_FUNCTION(mqseries_get)
 	set_get_msg_opts_from_array(z_get_msg_opts, &get_msg_opts TSRMLS_CC);
 
 	data = buf = (MQBYTE *) emalloc(sizeof(MQBYTE) * buf_len);
+	php_printf("WAIT : %d\n", get_msg_opts.WaitInterval);
 	MQGET(mqdesc->conn, mqobj->obj, &msg_desc, &get_msg_opts, buf_len, buf, &data_length, &comp_code, &reason);
 
 /*
@@ -674,6 +687,8 @@ PHP_FUNCTION(mqseries_get)
  * There is no other way I can think of to get this to the user.
  * TODO: Other formatting headers, if there are any
  */
+	php_printf("FORMAT: %s\n", msg_desc.Format);
+
 	if (!strncmp(msg_desc.Format, MQFMT_RF_HEADER, sizeof(msg_desc.Format))) {
 		MQRFH rfh = {MQRFH_DEFAULT};
 		memcpy(&rfh, buf, MQRFH_STRUC_LENGTH_FIXED);
@@ -1473,7 +1488,7 @@ PHP_FUNCTION(mqseries_sub)
 	MQLONG comp_code;  /* Completion code	*/
 	MQLONG reason;     /* Qualifying reason */
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rarzzz", &z_mqdesc, &z_sub_desc,
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "razzzz", &z_mqdesc, &z_sub_desc,
 		&z_obj, &z_sub, &z_comp_code, &z_reason) == FAILURE) {
 		return;
 	}
@@ -1864,22 +1879,46 @@ static void set_obj_desc_from_array(zval *array, PMQOD obj_desc)
 	zval **tmp;
 
 	MQSERIES_SETOPT_LONG(obj_desc, Version);
-	MQSERIES_SETOPT_LONG(obj_desc, ObjectType);
-	MQSERIES_SETOPT_STRING(obj_desc, ObjectName);
-	MQSERIES_SETOPT_STRING(obj_desc, ObjectQMgrName);
-	MQSERIES_SETOPT_STRING(obj_desc, DynamicQName);
-	MQSERIES_SETOPT_STRING(obj_desc, AlternateUserId);
+	switch (obj_desc->Version) {
 
-/* TODO: Implement these ?
-   MQLONG    RecsPresent;
-   MQLONG    ObjectRecOffset;
-   MQLONG    ResponseRecOffset;
-   MQPTR     ObjectRecPtr;
-   MQPTR     ResponseRecPtr;
+#ifdef MQOD_VERSION_4
+		case MQOD_VERSION_4:
+			MQSERIES_SETOPT_CHARV(obj_desc, ObjectString);
+			MQSERIES_SETOPT_CHARV(obj_desc, SelectionString);
+			MQSERIES_SETOPT_CHARV(obj_desc, ResObjectString);
+			MQSERIES_SETOPT_LONG(obj_desc, ResolvedType);
+#endif /* MQOD_VERSION_4 */
 
- Will not support this.
-  not supported MQBYTE40  AlternateSecurityId;
-*/
+#ifdef MQOD_VERSION_3
+		case MQOD_VERSION_3:
+			// AlternateSecurityId (MQBYTE40)
+			MQSERIES_SETOPT_STRING(obj_desc, ResolvedQName);
+			MQSERIES_SETOPT_STRING(obj_desc, ResolvedQMgrName);
+#endif /* MQOD_VERSION_3 */
+
+#ifdef MQOD_VERSION_2
+		case MQOD_VERSION_2:
+			MQSERIES_SETOPT_LONG(obj_desc, RecsPresent);
+			MQSERIES_SETOPT_LONG(obj_desc, KnownDestCount);
+			MQSERIES_SETOPT_LONG(obj_desc, UnknownDestCount);
+			MQSERIES_SETOPT_LONG(obj_desc, InvalidDestCount);
+			MQSERIES_SETOPT_LONG(obj_desc, ObjectRecOffset);
+			MQSERIES_SETOPT_LONG(obj_desc, ResponseRecOffset);
+			// MQPTR     ObjectRecPtr;
+			// MQPTR     ResponseRecPtr;
+#endif /* MQOD_VERSION_2 */
+
+		case MQOD_VERSION_1:
+			MQSERIES_SETOPT_LONG(obj_desc, ObjectType);
+			MQSERIES_SETOPT_STRING(obj_desc, ObjectName);
+			MQSERIES_SETOPT_STRING(obj_desc, ObjectQMgrName);
+			MQSERIES_SETOPT_STRING(obj_desc, DynamicQName);
+			MQSERIES_SETOPT_STRING(obj_desc, AlternateUserId);
+			break;
+
+		default:
+			zend_error(E_WARNING, "MQOD Version %d are not yet supported.", obj_desc->Version);
+	}
 }
 /* }}} */
 
@@ -1890,14 +1929,47 @@ static void set_array_from_obj_desc(zval *array, PMQOD obj_desc) {
 	zval_dtor(array);
 	array_init(array);
 
-	add_assoc_string(array, "ObjectQMgrName", obj_desc->ObjectQMgrName, sizeof(obj_desc->ObjectQMgrName));
-	add_assoc_string(array, "ObjectName", obj_desc->ObjectName, sizeof(obj_desc->ObjectName));
-	MQSERIES_ADD_ASSOC_LONG(obj_desc, KnownDestCount);
-	MQSERIES_ADD_ASSOC_LONG(obj_desc, UnknownDestCount);
-	MQSERIES_ADD_ASSOC_LONG(obj_desc, InvalidDestCount);
-	add_assoc_string(array, "ResolvedQName", obj_desc->ResolvedQName, sizeof(obj_desc->ResolvedQName));
-	add_assoc_string(array, "ResolvedQMgrName", obj_desc->ResolvedQMgrName, sizeof(obj_desc->ResolvedQMgrName));
+	switch(obj_desc->Version) {
 
+#ifdef MQOD_VERSION_4
+		case MQOD_VERSION_4:
+			MQSERIES_ADD_ASSOC_CHARV(obj_desc, ObjectString);
+			MQSERIES_ADD_ASSOC_CHARV(obj_desc, SelectionString);
+			MQSERIES_ADD_ASSOC_CHARV(obj_desc, ResObjectString);
+			MQSERIES_ADD_ASSOC_LONG(obj_desc, ResolvedType);
+#endif /* MQOD_VERSION_4 */
+
+#ifdef MQOD_VERSION_3
+		case MQOD_VERSION_3:
+			// AlternateSecurityId (MQBYTE40)
+			MQSERIES_ADD_ASSOC_STRING(obj_desc, ResolvedQName);
+			MQSERIES_ADD_ASSOC_STRING(obj_desc, ResolvedQMgrName);
+#endif /* MQOD_VERSION_3 */
+
+#ifdef MQOD_VERSION_2
+		case MQOD_VERSION_2:
+			MQSERIES_ADD_ASSOC_LONG(obj_desc, RecsPresent);
+			MQSERIES_ADD_ASSOC_LONG(obj_desc, KnownDestCount);
+			MQSERIES_ADD_ASSOC_LONG(obj_desc, UnknownDestCount);
+			MQSERIES_ADD_ASSOC_LONG(obj_desc, InvalidDestCount);
+			MQSERIES_ADD_ASSOC_LONG(obj_desc, ObjectRecOffset);
+			MQSERIES_ADD_ASSOC_LONG(obj_desc, ResponseRecOffset);
+			// MQPTR     ObjectRecPtr;
+			// MQPTR     ResponseRecPtr;
+#endif /* MQOD_VERSION_2 */
+
+		case MQOD_VERSION_1:
+			MQSERIES_ADD_ASSOC_LONG(obj_desc, Version);
+			MQSERIES_ADD_ASSOC_LONG(obj_desc, ObjectType);
+			MQSERIES_ADD_ASSOC_STRING(obj_desc, ObjectName);
+			MQSERIES_ADD_ASSOC_STRING(obj_desc, ObjectQMgrName);
+			MQSERIES_ADD_ASSOC_STRING(obj_desc, DynamicQName);
+			MQSERIES_ADD_ASSOC_STRING(obj_desc, AlternateUserId);
+			break;
+
+		default:
+			zend_error(E_WARNING, "MQOD Version %d are not yet supported.", obj_desc->Version);
+	}
 }
 /* }}} */
 
@@ -1912,6 +1984,7 @@ static void set_get_msg_opts_from_array(zval *array, PMQGMO get_msg_opts  TSRMLS
 	MQSERIES_SETOPT_LONG(get_msg_opts, Version);
 	MQSERIES_SETOPT_LONG(get_msg_opts, Options);
 	MQSERIES_SETOPT_LONG(get_msg_opts, WaitInterval);
+	get_msg_opts->WaitInterval = 10000;
 	MQSERIES_SETOPT_LONG(get_msg_opts, MatchOptions);
 	MQSERIES_SETOPT_LONG(get_msg_opts, Signal1);
 	MQSERIES_SETOPT_LONG(get_msg_opts, Signal2);
@@ -1973,15 +2046,16 @@ static void set_sub_desc_from_array(zval *array, PMQSD sub_desc TSRMLS_DC)
 	MQSERIES_SETOPT_STRING(sub_desc, PubApplIdentityData);
 	MQSERIES_SETOPT_LONG(sub_desc, SubLevel);
 
+	MQSERIES_SETOPT_CHARV(sub_desc, ObjectString);
+	MQSERIES_SETOPT_CHARV(sub_desc, SubName);
+	MQSERIES_SETOPT_CHARV(sub_desc, SubUserData);
+	MQSERIES_SETOPT_CHARV(sub_desc, SelectionString);
+	MQSERIES_SETOPT_CHARV(sub_desc, ResObjectString);
+
 /* TODO: Implement this ?
 
    MQBYTE40  AlternateSecurityId;
-   MQCHARV   ObjectString;
-   MQCHARV   SubName;
-   MQCHARV   SubUserData;
    MQBYTE32  PubAccountingToken;
-   MQCHARV   SelectionString;
-   MQCHARV   ResObjectString;
 */
 }
 /* }}} */
@@ -2003,6 +2077,12 @@ static void set_array_from_sub_desc(zval* array, PMQSD sub_desc TSRMLS_DC)
 	MQSERIES_ADD_ASSOC_LONG(sub_desc, PubPriority);
 	MQSERIES_ADD_ASSOC_STRING(sub_desc, PubApplIdentityData);
 	MQSERIES_ADD_ASSOC_LONG(sub_desc, SubLevel);
+
+	MQSERIES_ADD_ASSOC_CHARV(sub_desc, ObjectString);
+	MQSERIES_ADD_ASSOC_CHARV(sub_desc, SubName);
+	MQSERIES_ADD_ASSOC_CHARV(sub_desc, SubUserData);
+	MQSERIES_ADD_ASSOC_CHARV(sub_desc, SelectionString);
+	MQSERIES_ADD_ASSOC_CHARV(sub_desc, ResObjectString);
 }
 /* }}} */
 #endif /* HAVE_MQSERIESLIB_V7 */

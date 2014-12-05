@@ -1,151 +1,163 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<package packagerversion="1.4.9" version="2.0" xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0
-http://pear.php.net/dtd/tasks-1.0.xsd
-http://pear.php.net/dtd/package-2.0
-http://pear.php.net/dtd/package-2.0.xsd">
- <name>mqseries</name>
- <channel>pecl.php.net</channel>
- <summary>mqseries client library</summary>
- <description>This package provides support for IBM Websphere MQ (MQSeries).
+<package xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" packagerversion="1.4.9" version="2.0" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0 http://pear.php.net/dtd/tasks-1.0.xsd http://pear.php.net/dtd/package-2.0 http://pear.php.net/dtd/package-2.0.xsd">
+  <name>mqseries</name>
+  <channel>pecl.php.net</channel>
+  <summary>mqseries client library</summary>
+  <description>This package provides support for IBM Websphere MQ (MQSeries).
  </description>
- <lead>
-   <name>Michael Bretterklieber</name>
-   <user>mbretter</user>
-   <email>mbretter@jawa.at</email>
-   <active>no</active>
- </lead>
- <lead>
-   <name>Philippe Tjon A Hen</name>
-   <user>philippe</user>
-   <email>philippe@tjonahen.nl</email>
-   <active>no</active>
- </lead>
- <lead>
-  <name>Pierrick Charron</name>
-  <user>pierrick</user>
-  <email>pierrick@php.net</email>
-  <active>yes</active>
- </lead>
- <date>2014-12-05</date>
- <time>20:00:00</time>
- <version>
-  <release>0.14.1</release>
-  <api>0.14.1</api>
- </version>
- <stability>
-  <release>beta</release>
-  <api>beta</api>
- </stability>
- <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
- <notes>
-- Fixed bug #63563. (Segfault when using lib64)
+  <lead>
+    <name>Michael Bretterklieber</name>
+    <user>mbretter</user>
+    <email>mbretter@jawa.at</email>
+    <active>no</active>
+  </lead>
+  <lead>
+    <name>Philippe Tjon A Hen</name>
+    <user>philippe</user>
+    <email>philippe@tjonahen.nl</email>
+    <active>no</active>
+  </lead>
+  <lead>
+    <name>Pierrick Charron</name>
+    <user>pierrick</user>
+    <email>pierrick@php.net</email>
+    <active>yes</active>
+  </lead>
+  <date>XXXX-XX-XX</date>
+  <time>20:00:00</time>
+  <version>
+    <release>0.15.0</release>
+    <api>0.15.0</api>
+  </version>
+  <stability>
+    <release>beta</release>
+    <api>beta</api>
+  </stability>
+  <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
+  <notes>
  </notes>
- <contents>
-  <dir name="/">
-   <dir name="examples">
-    <file name="conn.php" role="doc" />
-    <file name="connx.php" role="doc" />
-    <file name="get.php" role="doc" />
-    <file name="mput.php" role="doc" />
-    <file name="mqclient.php" role="doc" />
-    <file name="mqing.php" role="doc" />
-    <file name="msgid.php" role="doc" />
-    <file name="msgidput.php" role="doc" />
-    <file name="mtest.php" role="doc" />
-    <file name="open.php" role="doc" />
-    <file name="put.php" role="doc" />
-    <file name="test1.php" role="doc" />
-    <file name="test2.php" role="doc" />
-    <file name="test.php" role="doc" />
-    <file name="transaction.php" role="doc" />
-   </dir> <!-- //examples -->
-   <file name="config.m4" role="src" />
-   <file name="CREDITS" role="src" />
-   <file name="LICENSE" role="src" />
-   <file name="mqseries.c" role="src" />
-   <file name="mqseries_helper.c" role="src" />
-   <file name="mqseries.dsp" role="src" />
-   <file name="mqseries_init_const.h" role="src" />
-   <file name="mqseries_reason_texts.h" role="src" />
-   <file name="php_mqseries.h" role="src" />
-   <file name="README" role="src" />
-  </dir> <!-- / -->
- </contents>
- <dependencies>
-  <required>
-   <php>
-    <min>4.0.0</min>
-   </php>
-   <pearinstaller>
-    <min>1.4.0b1</min>
-   </pearinstaller>
-  </required>
- </dependencies>
- <providesextension>mqseries</providesextension>
- <extsrcrelease />
- <changelog>
-     <release>
-		 <version>
-			 <release>0.14.1</release>
-			 <api>0.14.1</api>
-		 </version>
-		 <stability>
-			 <release>beta</release>
-			 <api>beta</api>
-		 </stability>
-		 <date>2014-12-05</date>
-		 <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
-		 <notes>
+  <contents>
+    <dir name="/">
+      <dir name="examples">
+        <file name="conn.php" role="doc"/>
+        <file name="connx.php" role="doc"/>
+        <file name="get.php" role="doc"/>
+        <file name="mput.php" role="doc"/>
+        <file name="mqclient.php" role="doc"/>
+        <file name="mqing.php" role="doc"/>
+        <file name="msgid.php" role="doc"/>
+        <file name="msgidput.php" role="doc"/>
+        <file name="mtest.php" role="doc"/>
+        <file name="open.php" role="doc"/>
+        <file name="put.php" role="doc"/>
+        <file name="test1.php" role="doc"/>
+        <file name="test2.php" role="doc"/>
+        <file name="test.php" role="doc"/>
+        <file name="transaction.php" role="doc"/>
+      </dir>
+      <!-- //examples -->
+      <file name="config.m4" role="src"/>
+      <file name="CREDITS" role="src"/>
+      <file name="LICENSE" role="src"/>
+      <file name="mqseries.c" role="src"/>
+      <file name="mqseries_helper.c" role="src"/>
+      <file name="mqseries.dsp" role="src"/>
+      <file name="mqseries_init_const.h" role="src"/>
+      <file name="mqseries_reason_texts.h" role="src"/>
+      <file name="php_mqseries.h" role="src"/>
+      <file name="README" role="src"/>
+    </dir>
+    <!-- / -->
+  </contents>
+  <dependencies>
+    <required>
+      <php>
+        <min>4.0.0</min>
+      </php>
+      <pearinstaller>
+        <min>1.4.0b1</min>
+      </pearinstaller>
+    </required>
+  </dependencies>
+  <providesextension>mqseries</providesextension>
+  <extsrcrelease/>
+  <changelog>
+    <release>
+      <version>
+        <release>0.15.0</release>
+        <api>0.15.0</api>
+      </version>
+      <stability>
+        <release>beta</release>
+        <api>beta</api>
+      </stability>
+      <date>XXXX-XX-XX</date>
+      <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
+      <notes>
+		 </notes>
+    </release>
+    <release>
+      <version>
+        <release>0.14.1</release>
+        <api>0.14.1</api>
+      </version>
+      <stability>
+        <release>beta</release>
+        <api>beta</api>
+      </stability>
+      <date>2014-12-05</date>
+      <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
+      <notes>
 - Fixed bug #63563. (Segfault when using lib64)
 		 </notes>
-	 </release>
-     <release>
-		 <version>
-			 <release>0.14.0</release>
-			 <api>0.14.0</api>
-		 </version>
-		 <stability>
-			 <release>beta</release>
-			 <api>beta</api>
-		 </stability>
-		 <date>2014-03-05</date>
-		 <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
-		 <notes>
+    </release>
+    <release>
+      <version>
+        <release>0.14.0</release>
+        <api>0.14.0</api>
+      </version>
+      <stability>
+        <release>beta</release>
+        <api>beta</api>
+      </stability>
+      <date>2014-03-05</date>
+      <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
+      <notes>
 - Add support for the MQFMT_MD_EXTENSION Format to remove the MQMDE from the message. (Pierrick)
 - Add support for the SSLCipherSpec and OCSPResponderURL. (Dieter Devlieghere, Pierrick)
 - Update all implemented mqseries_* functions to expose WebSphere v7 parameters (Pierrick)
 - Add mqseries_sub and mqseries_stat functions from WebSphere v7 (Pierrick)
 		 </notes>
-	 </release>
-	 <release>
-		 <version>
-			 <release>0.13.0</release>
-			 <api>0.13.0</api>
-		 </version>
-		 <stability>
-			 <release>beta</release>
-			 <api>beta</api>
-		 </stability>
-		 <date>2012-08-31</date>
-		 <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
-		 <notes>
+    </release>
+    <release>
+      <version>
+        <release>0.13.0</release>
+        <api>0.13.0</api>
+      </version>
+      <stability>
+        <release>beta</release>
+        <api>beta</api>
+      </stability>
+      <date>2012-08-31</date>
+      <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
+      <notes>
 - Add the mqseries_bytes_val() function. (Pierrick)
-- Add support for msg_desc->GroupId. (Pierrick)
+- Add support for msg_desc-&gt;GroupId. (Pierrick)
 - Add Version support within the msg_desc support. (Pierrick)
 		 </notes>
-	 </release>
-	 <release>
-		 <version>
-			 <release>0.12.0</release>
-			 <api>0.12.0</api>
-		 </version>
-		 <stability>
-			 <release>beta</release>
-			 <api>beta</api>
-		 </stability>
-		 <date>2012-05-26</date>
-		 <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
-		 <notes>
+    </release>
+    <release>
+      <version>
+        <release>0.12.0</release>
+        <api>0.12.0</api>
+      </version>
+      <stability>
+        <release>beta</release>
+        <api>beta</api>
+      </stability>
+      <date>2012-05-26</date>
+      <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
+      <notes>
 - Add the possibility to use --with-libdir to compile the extension in 64-bit
 - PHP5.3 and PHP5.4 Compatibilty
 - Fixed bug #59577. (mqseries_strerror causes server to drop connection)
@@ -155,82 +167,82 @@ http://pear.php.net/dtd/package-2.0.xsd">
 - Fixed segfault when unexpected variables are in options array
 - Removed compilation warnings
 		 </notes>
-	 </release>
-	 <release>
-		 <version>
-			 <release>0.11.0</release>
-			 <api>0.11.0</api>
-		 </version>
-		 <stability>
-			 <release>alpha</release>
-			 <api>alpha</api>
-		 </stability>
-		 <date>2008-01-19</date>
-		 <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
-		 <notes>Fixed php function calling deprication warnings.
+    </release>
+    <release>
+      <version>
+        <release>0.11.0</release>
+        <api>0.11.0</api>
+      </version>
+      <stability>
+        <release>alpha</release>
+        <api>alpha</api>
+      </stability>
+      <date>2008-01-19</date>
+      <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
+      <notes>Fixed php function calling deprication warnings.
 		 tested agains MQ6. Fixed some ZTS issues while compiling.</notes>
-	 </release>
-  	 <release>
-		 <version>
-			 <release>0.10.0</release>
-			 <api>0.10.0</api>
-		 </version>
-		 <stability>
-			 <release>alpha</release>
-			 <api>alpha</api>
-		 </stability>
-		 <date>2006-04-20</date>
-		 <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
-		 <notes>Made some changes to the config.m4 configuration file.
+    </release>
+    <release>
+      <version>
+        <release>0.10.0</release>
+        <api>0.10.0</api>
+      </version>
+      <stability>
+        <release>alpha</release>
+        <api>alpha</api>
+      </stability>
+      <date>2006-04-20</date>
+      <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
+      <notes>Made some changes to the config.m4 configuration file.
 			 It shoud now be possible to build the extention without the MQ Client libraries.
 			 This would enable the transaction posibilities of MQ.
 			 The MQBegin, MQCMit and MQBack function wil now work.
 			 Check the README file for additional build instructions. 
 		 </notes>
-	 </release>
-  <release>
-   <version>
-    <release>0.9.0</release>
-    <api>0.9.0</api>
-   </version>
-   <stability>
-    <release>alpha</release>
-    <api>alpha</api>
-   </stability>
-   <date>2006-04-16</date>
-   <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
-   <notes>mostly bug fixes, especially the msgId and correlId
+    </release>
+    <release>
+      <version>
+        <release>0.9.0</release>
+        <api>0.9.0</api>
+      </version>
+      <stability>
+        <release>alpha</release>
+        <api>alpha</api>
+      </stability>
+      <date>2006-04-16</date>
+      <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
+      <notes>mostly bug fixes, especially the msgId and correlId
    </notes>
-  </release>
-  <release>
-   <version>
-    <release>0.8.0</release>
-    <api>0.8.0</api>
-   </version>
-   <stability>
-    <release>alpha</release>
-    <api>alpha</api>
-   </stability>
-   <date>2005-04-07</date>
-   <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
-   <notes>Added some extra mqseries implementation. (mqconnx and mqput1)
+    </release>
+    <release>
+      <version>
+        <release>0.8.0</release>
+        <api>0.8.0</api>
+      </version>
+      <stability>
+        <release>alpha</release>
+        <api>alpha</api>
+      </stability>
+      <date>2005-04-07</date>
+      <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
+      <notes>Added some extra mqseries implementation. (mqconnx and mqput1)
 Changed all signatures. Each method now mimics the actual MQSeries api. 
     </notes>
-  </release>
-  <release>
-   <version>
-    <release>0.7.0</release>
-    <api>0.7.0</api>
-   </version>
-   <stability>
-    <release>alpha</release>
-    <api>alpha</api>
-   </stability>
-   <date>2003-05-15</date>
-   <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
-   <notes>- Release 0.7.0
+    </release>
+    <release>
+      <version>
+        <release>0.7.0</release>
+        <api>0.7.0</api>
+      </version>
+      <stability>
+        <release>alpha</release>
+        <api>alpha</api>
+      </stability>
+      <date>2003-05-15</date>
+      <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
+      <notes>- Release 0.7.0
 - Initial Release
    </notes>
-  </release>
- </changelog>
+    </release>
+  </changelog>
 </package>

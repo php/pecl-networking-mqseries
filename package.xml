@@ -26,11 +26,11 @@ http://pear.php.net/dtd/package-2.0.xsd">
   <email>pierrick@php.net</email>
   <active>yes</active>
  </lead>
- <date>2014-03-05</date>
+ <date>2014-12-05</date>
  <time>20:00:00</time>
  <version>
-  <release>0.14.0</release>
-  <api>0.14.0</api>
+  <release>0.14.1</release>
+  <api>0.14.1</api>
  </version>
  <stability>
   <release>beta</release>
@@ -38,10 +38,7 @@ http://pear.php.net/dtd/package-2.0.xsd">
  </stability>
  <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
  <notes>
-- Add support for the MQFMT_MD_EXTENSION Format to remove the MQMDE from the message. (Pierrick)
-- Add support for the SSLCipherSpec and OCSPResponderURL. (Dieter Devlieghere, Pierrick)
-- Update all implemented mqseries_* functions to expose WebSphere v7 parameters (Pierrick)
-- Add mqseries_sub and mqseries_stat functions from WebSphere v7 (Pierrick)
+- Fixed bug #63563. (Segfault when using lib64)
  </notes>
  <contents>
   <dir name="/">
@@ -87,6 +84,21 @@ http://pear.php.net/dtd/package-2.0.xsd">
  <providesextension>mqseries</providesextension>
  <extsrcrelease />
  <changelog>
+     <release>
+		 <version>
+			 <release>0.14.1</release>
+			 <api>0.14.1</api>
+		 </version>
+		 <stability>
+			 <release>beta</release>
+			 <api>beta</api>
+		 </stability>
+		 <date>2014-12-05</date>
+		 <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
+		 <notes>
+- Fixed bug #63563. (Segfault when using lib64)
+		 </notes>
+	 </release>
      <release>
 		 <version>
 			 <release>0.14.0</release>

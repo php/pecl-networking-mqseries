@@ -45,7 +45,7 @@ Author: Michael Bretterklieber <mbretter@jawa.at>
 
 #define phpext_mqseries_ptr &mqseries_module_entry
 
-#define PHP_MQSERIES_VERSION "0.14.2-dev"
+#define PHP_MQSERIES_VERSION "0.14.2"
 
 #ifdef PHP_WIN32
 #define PHP_MQSERIES_API __declspec(dllexport)

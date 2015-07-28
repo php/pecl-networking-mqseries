@@ -1142,7 +1142,7 @@ PHP_FUNCTION(mqseries_inq)
 		memset(charAttrs, 0, charAttrLength+1); // set to zero
 	}
 	if (intAttrLength > 0) { /*  Are intAttr requested */
-		intAttrs = (MQLONG *) emalloc(intAttrLength+sizeof(MQLONG));
+		intAttrs = (MQLONG *) emalloc(intAttrLength*sizeof(MQLONG));
 	}
 
 	MQINQ(mqdesc->conn, mqobj->obj, (MQLONG) selectorCount, selectors, (MQLONG) intAttrLength, intAttrs, (MQLONG) charAttrLength, charAttrs, &comp_code, &reason);
@@ -1156,6 +1156,9 @@ PHP_FUNCTION(mqseries_inq)
 		}
 		if (intAttrLength > 0) { /*  set only when intAttrs where requested */
 			/* create an indexed array of long values */
+			zval_dtor(z_intAttrs);
+			array_init(z_intAttrs);
+
 			for (i = 0; i < intAttrLength; i++) {
 				add_index_long(z_intAttrs, i, (long) intAttrs[i]);
 			}
@@ -1237,7 +1240,7 @@ PHP_FUNCTION(mqseries_set)
 	}
 
 	if (intAttrLength > 0) { /*  Are intAttr requested */
-		intAttrs = (MQLONG *) emalloc(intAttrLength+sizeof(MQLONG));
+		intAttrs = (MQLONG *) emalloc(intAttrLength*sizeof(MQLONG));
 		current = 0;
 		zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(z_intAttrs), &pos);
 		while (zend_hash_get_current_data_ex(Z_ARRVAL_P(z_intAttrs), (void **)&option_val, &pos) == SUCCESS) {

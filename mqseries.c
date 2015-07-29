@@ -1448,10 +1448,6 @@ PHP_FUNCTION(mqseries_stat)
 
 #endif /* HAVE_MQSERIESLIB_V7 */
 
-/******************************************************************************/
-/* End of conversion methods                                                  */
-/******************************************************************************/
-
 /* {{{ _mqseries_bytes
  * frees memomory previuosly allocated
  */

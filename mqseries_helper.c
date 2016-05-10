@@ -48,6 +48,78 @@ Author: Michael Bretterklieber <mbretter@jawa.at>
 #define MQSERIES_UNSUPPRTED_VERSION(n,s) \
 	zend_error(E_WARNING, #n "_VERSION_%d not supported, using " #n "_VERSION_%d instead", s->Version, n ## _CURRENT_VERSION)
 
+#ifdef ZEND_ENGINE_3
+
+#define MQSERIES_SETOPT_LONG(s,m) \
+    do { \
+        if ((tmp = zend_hash_str_find(ht, #m, sizeof(#m)-1)) != NULL) {\
+            convert_to_long(tmp); \
+            s->m = Z_LVAL_P(tmp); \
+        } \
+    } while(0)
+
+#define MQSERIES_SETOPT_STRING(s,m) \
+	do { \
+		if ((tmp = zend_hash_str_find(ht, #m, sizeof(#m)-1)) != NULL && \
+			Z_TYPE_P(tmp) == IS_STRING) { \
+			strncpy(s->m, Z_STRVAL_P(tmp), sizeof(s->m)); \
+		} \
+	} while(0)
+
+#define MQSERIES_SETOPT_CHAR(s, m) \
+	do { \
+		if ((tmp = zend_hash_str_find(ht, #m, sizeof(#m)-1)) != NULL && \
+			Z_TYPE_P(tmp) == IS_STRING && Z_STRLEN_P(tmp) > 0) { \
+			s->m = Z_STRVAL_P(tmp)[0]; \
+		} \
+	} while(0)
+
+#define MQSERIES_SETOPT_RESBYTES(s,m) \
+	do { \
+		if ((tmp = zend_hash_str_find(ht, #m, sizeof(#m)-1)) != NULL) { \
+			if (Z_TYPE_P(tmp) == IS_RESOURCE) { \
+				mqseries_bytes *mqbytes = (mqseries_bytes *) zend_fetch_resource(Z_RES_P(tmp), PHP_MQSERIES_BYTES_RES_NAME, le_mqseries_bytes); \
+				if (mqbytes != NULL) { \
+					memcpy(s->m, mqbytes->bytes, sizeof(s->m)); \
+				} \
+			} else if (Z_TYPE_P(tmp) != IS_NULL) { \
+				convert_to_string(tmp); \
+				strncpy((MQCHAR *) s->m, Z_STRVAL_P(tmp), sizeof(s->m)); \
+			} \
+		} \
+	} while(0)
+
+#define MQSERIES_SETOPT_PTR(s,m) \
+	do { \
+		if ((tmp = zend_hash_str_find(ht, #m, sizeof(#m)-1)) != NULL) {\
+			zend_error(E_WARNING, "'%s' is not yet supported.", #m); \
+		} \
+	} while(0)
+
+#define MQSERIES_SETOPT_CHARV(s,m) \
+	do { \
+		if ((tmp = zend_hash_str_find(ht, #m, sizeof(#m)-1)) != NULL && \
+			Z_TYPE_P(tmp) == IS_STRING) { \
+			s->m.VSPtr = Z_STRVAL_P(tmp); \
+			s->m.VSOffset = 0; \
+			s->m.VSLength = Z_STRLEN_P(tmp); \
+			s->m.VSBufSize = Z_STRLEN_P(tmp) + 1; \
+		} \
+	} while(0)
+
+#define MQSERIES_SETOPT_HOBJ(s,m) \
+	do { \
+		if ((tmp = zend_hash_str_find(ht, #m, sizeof(#m)-1)) != NULL && \
+			Z_TYPE_P(tmp) == IS_RESOURCE) { \
+				mqseries_obj *mqobj = (mqseries_obj *) zend_fetch_resource(Z_RES_P(tmp), PHP_MQSERIES_OBJ_RES_NAME, le_mqseries_obj); \
+				if (mqobj != NULL) { \
+					s->m = mqobj->obj; \
+				} \
+		} \
+	} while(0)
+
+#else
+
 #define MQSERIES_SETOPT_LONG(s,m) \
 	do { \
 		if (zend_hash_find(ht, #m, sizeof(#m), (void**)&tmp) == SUCCESS) {\
@@ -116,8 +188,21 @@ Author: Michael Bretterklieber <mbretter@jawa.at>
 		} \
 	} while(0)
 
+#endif
+
 #define MQSERIES_ADD_ASSOC_LONG(s, m) \
 	add_assoc_long(array, #m, s->m)
+
+#ifdef ZEND_ENGINE_3
+
+#define MQSERIES_ADD_ASSOC_STRING(s, m) \
+	do { \
+		if (s->m != NULL && strlen(s->m) > 0) { \
+			add_assoc_stringl(array, #m, s->m, sizeof(s->m)); \
+		} \
+	} while(0)
+
+#else
 
 #define MQSERIES_ADD_ASSOC_STRING(s, m) \
 	do { \
@@ -125,6 +210,20 @@ Author: Michael Bretterklieber <mbretter@jawa.at>
 			add_assoc_stringl(array, #m, s->m, sizeof(s->m), 1); \
 		} \
 	} while(0)
+
+#endif
+
+#ifdef ZEND_ENGINE_3
+
+#define MQSERIES_ADD_ASSOC_RESOURCE(s, m) \
+	do { \
+		zval *ref = create_mqseries_bytes_resource(s->m, sizeof(s->m) TSRMLS_CC); \
+		Z_ADDREF_P(ref); \
+	    add_assoc_zval(array, #m, ref); \
+		zval_ptr_dtor(ref); \
+	} while(0)
+
+#else
 
 #define MQSERIES_ADD_ASSOC_RESOURCE(s, m) \
 	do { \
@@ -134,6 +233,19 @@ Author: Michael Bretterklieber <mbretter@jawa.at>
 		zval_ptr_dtor(&ref); \
 	} while(0)
 
+#endif
+
+#ifdef ZEND_ENGINE_3
+
+#define MQSERIES_ADD_ASSOC_CHARV(s, m) \
+	do { \
+		if (s->m.VSPtr != NULL && s->m.VSLength > 0) { \
+			add_assoc_stringl(array, #m, (char *) s->m.VSPtr, s->m.VSLength); \
+		} \
+	} while(0)
+
+#else
+
 #define MQSERIES_ADD_ASSOC_CHARV(s, m) \
 	do { \
 		if (s->m.VSPtr != NULL && s->m.VSLength > 0) { \
@@ -141,12 +253,27 @@ Author: Michael Bretterklieber <mbretter@jawa.at>
 		} \
 	} while(0)
 
+#endif
+
+#ifdef ZEND_ENGINE_3
+
 #define MQSERIES_ADD_ASSOC_CHAR(s, m) \
 	do { \
 		char str[2]; \
 		sprintf(str, "%c", s->m); \
-		add_assoc_string(array, #m, str, sizeof(s->m)); \
+		add_assoc_string(array, #m, str); \
 	} while(0)
+
+#else
+
+#define MQSERIES_ADD_ASSOC_CHAR(s, m) \
+	do { \
+		char str[2]; \
+		sprintf(str, "%c", s->m); \
+		add_assoc_string(array, #m, str, 1); \
+	} while(0)
+
+#endif
 
 /* }}} */
 
@@ -179,7 +306,12 @@ static zval* create_mqseries_bytes_resource(PMQBYTE bytes, size_t size TSRMLS_DC
 static void _mqseries_set_authentication_information_record_from_array(zval *array, PMQAIR authentication_information_record, PMQCHAR LDAPUserName) /* {{{ */
 {
 	HashTable *ht = Z_ARRVAL_P(array);
+
+#ifdef ZEND_ENGINE_3
+	zval *tmp;
+#else
 	zval **tmp;
+#endif
 
 	MQSERIES_SETOPT_LONG(authentication_information_record, Version);
 	MQSERIES_SETOPT_LONG(authentication_information_record, AuthInfoType);
@@ -187,9 +319,15 @@ static void _mqseries_set_authentication_information_record_from_array(zval *arr
 	MQSERIES_SETOPT_STRING(authentication_information_record, LDAPPassword);
 	MQSERIES_SETOPT_STRING(authentication_information_record, OCSPResponderURL);
 
+#ifdef ZEND_ENGINE_3
+	if ((tmp = zend_hash_str_find(ht, "LDAPUserName", sizeof("LDAPUserName")-1)) != NULL &&
+		Z_TYPE_P(tmp) == IS_STRING) {
+		strncpy(LDAPUserName, Z_STRVAL_P(tmp), sizeof(LDAPUserName));
+#else
 	if (zend_hash_find(ht, "LDAPUserName", sizeof("LDAPUserName"), (void**)&tmp) == SUCCESS &&
 		Z_TYPE_PP(tmp) == IS_STRING) {
 		strncpy(LDAPUserName, Z_STRVAL_PP(tmp), sizeof(LDAPUserName));
+#endif
 		authentication_information_record->LDAPUserNamePtr = LDAPUserName;
 		authentication_information_record->LDAPUserNameLength = strlen(LDAPUserName);
 	}
@@ -199,15 +337,25 @@ static void _mqseries_set_authentication_information_record_from_array(zval *arr
 static void _mqseries_set_ssl_configuration_from_array(zval *array, PMQSCO ssl_configuration, PMQAIR authentication_information_record, PMQCHAR LDAPUserName) /* {{{ */
 {
 	HashTable *ht = Z_ARRVAL_P(array);
+#ifdef ZEND_ENGINE_3
+	zval *tmp;
+#else
 	zval **tmp;
+#endif
 
 	MQSERIES_SETOPT_LONG(ssl_configuration, Version);
 	MQSERIES_SETOPT_STRING(ssl_configuration, KeyRepository);
 	MQSERIES_SETOPT_STRING(ssl_configuration, CryptoHardware);
 
+#ifdef ZEND_ENGINE_3
+	if ((tmp = zend_hash_str_find(ht, "MQAIR", sizeof("MQAIR")-1)) != NULL &&
+		Z_TYPE_P(tmp) == IS_ARRAY) {
+		_mqseries_set_authentication_information_record_from_array(tmp, authentication_information_record, LDAPUserName);
+#else
 	if (zend_hash_find(ht, "MQAIR", sizeof("MQAIR"), (void**)&tmp) == SUCCESS &&
 		Z_TYPE_PP(tmp) == IS_ARRAY) {
 		_mqseries_set_authentication_information_record_from_array(*tmp, authentication_information_record, LDAPUserName);
+#endif
 		ssl_configuration->AuthInfoRecCount = 1;
 		ssl_configuration->AuthInfoRecPtr = authentication_information_record;
 	}
@@ -217,7 +365,11 @@ static void _mqseries_set_ssl_configuration_from_array(zval *array, PMQSCO ssl_c
 static void _mqseries_set_channel_definition_from_array(zval *array, PMQCD channel_definition TSRMLS_DC) /* {{{ */
 {
 	HashTable *ht = Z_ARRVAL_P(array);
+#ifdef ZEND_ENGINE_3
+	zval *tmp;
+#else
 	zval **tmp;
+#endif
 
 	MQSERIES_SETOPT_LONG(channel_definition, Version);
 
@@ -367,20 +519,36 @@ static void _mqseries_set_channel_definition_from_array(zval *array, PMQCD chann
 void _mqseries_set_mqcno_from_array(zval *array, PMQCNO connect_opts, PMQCD channel_definition, PMQSCO ssl_configuration, PMQAIR authentication_information_record, 	PMQCHAR LDAPUserName TSRMLS_DC) /* {{{ */
 {
 	HashTable *ht = Z_ARRVAL_P(array);
+#ifdef ZEND_ENGINE_3
+	zval *tmp;
+#else
 	zval **tmp;
+#endif
 
 	MQSERIES_SETOPT_LONG(connect_opts, Options);
 	MQSERIES_SETOPT_LONG(connect_opts, Version);
 
+#ifdef ZEND_ENGINE_3
+	if ((tmp = zend_hash_str_find(ht, "MQCD", sizeof("MQCD")-1)) != NULL &&
+		Z_TYPE_P(tmp) == IS_ARRAY) {
+		_mqseries_set_channel_definition_from_array(tmp, channel_definition TSRMLS_CC);
+#else
 	if (zend_hash_find(ht, "MQCD", sizeof("MQCD"), (void**)&tmp) == SUCCESS &&
 		Z_TYPE_PP(tmp) == IS_ARRAY) {
 		_mqseries_set_channel_definition_from_array(*tmp, channel_definition TSRMLS_CC);
+#endif
 		connect_opts->ClientConnPtr = channel_definition;
 	}
 
+#ifdef ZEND_ENGINE_3
+	if ((tmp = zend_hash_str_find(ht, "MQSCO", sizeof("MQSCO")-1)) != NULL &&
+		Z_TYPE_P(tmp) == IS_ARRAY) {
+		_mqseries_set_ssl_configuration_from_array(tmp, ssl_configuration, authentication_information_record, LDAPUserName);
+#else
 	if (zend_hash_find(ht, "MQSCO", sizeof("MQSCO"), (void**)&tmp) == SUCCESS &&
 		Z_TYPE_PP(tmp) == IS_ARRAY) {
 		_mqseries_set_ssl_configuration_from_array(*tmp, ssl_configuration, authentication_information_record, LDAPUserName);
+#endif
 		connect_opts->SSLConfigPtr = ssl_configuration;
 	}
 }
@@ -389,7 +557,11 @@ void _mqseries_set_mqcno_from_array(zval *array, PMQCNO connect_opts, PMQCD chan
 void _mqseries_set_mqpmo_from_array(zval *array, PMQPMO put_msg_opts TSRMLS_DC) /* {{{ */
 {
 	HashTable *ht = Z_ARRVAL_P(array);
+#ifdef ZEND_ENGINE_3
+	zval *tmp;
+#else
 	zval **tmp;
+#endif
 
 	MQSERIES_SETOPT_LONG(put_msg_opts, Version);
 
@@ -480,7 +652,11 @@ void _mqseries_set_array_from_mqpmo(zval *array, PMQPMO put_msg_opts) { /* {{{ *
 void _mqseries_set_mqmd_from_array(zval *array, PMQMD msg_desc TSRMLS_DC) /* {{{ */
 {
 	HashTable *ht = Z_ARRVAL_P(array);
+#ifdef ZEND_ENGINE_3
+	zval *tmp;
+#else
 	zval **tmp;
+#endif
 
 	MQSERIES_SETOPT_LONG(msg_desc, Version);
 	switch (msg_desc->Version) {
@@ -578,7 +754,11 @@ void _mqseries_set_array_from_mqmd(zval *array, PMQMD msg_desc TSRMLS_DC) /* {{{
 void _mqseries_set_mqod_from_array(zval *array, PMQOD obj_desc TSRMLS_DC) /* {{{ */
 {
 	HashTable *ht = Z_ARRVAL_P(array);
+#ifdef ZEND_ENGINE_3
+	zval *tmp;
+#else
 	zval **tmp;
+#endif
 
 	MQSERIES_SETOPT_LONG(obj_desc, Version);
 	switch (obj_desc->Version) {
@@ -677,7 +857,11 @@ void _mqseries_set_array_from_mqod(zval *array, PMQOD obj_desc TSRMLS_DC) /* {{{
 void _mqseries_set_mqgmo_from_array(zval *array, PMQGMO get_msg_opts  TSRMLS_DC) /* {{{ */
 {
 	HashTable *ht = Z_ARRVAL_P(array);
+#ifdef ZEND_ENGINE_3
+	zval *tmp;
+#else
 	zval **tmp;
+#endif
 
 	MQSERIES_SETOPT_LONG(get_msg_opts, Version);
 	switch (get_msg_opts->Version) {
@@ -771,7 +955,11 @@ void _mqseries_set_array_from_mqgmo(zval *array, PMQGMO get_msg_opts TSRMLS_DC) 
 void _mqseries_set_mqbo_from_array(zval *array, PMQBO mqbo) /* {{{ */
 {
 	HashTable *ht = Z_ARRVAL_P(array);
+#ifdef ZEND_ENGINE_3
+	zval *tmp;
+#else
 	zval **tmp;
+#endif
 
 	switch (mqbo->Version) {
 		default:
@@ -791,7 +979,11 @@ void _mqseries_set_mqbo_from_array(zval *array, PMQBO mqbo) /* {{{ */
 void _mqseries_set_mqsd_from_array(zval *array, PMQSD sub_desc TSRMLS_DC) /* {{{ */
 {
 	HashTable *ht = Z_ARRVAL_P(array);
+#ifdef ZEND_ENGINE_3
+	zval *tmp;
+#else
 	zval **tmp;
+#endif
 
 	MQSERIES_SETOPT_LONG(sub_desc, Version);
 	switch (sub_desc->Version) {
@@ -855,7 +1047,11 @@ void _mqseries_set_array_from_mqsd(zval *array, PMQSD sub_desc TSRMLS_DC) /* {{{
 void _mqseries_set_mqsts_from_array(zval *array, PMQSTS status) /* {{{ */
 {
 	HashTable *ht = Z_ARRVAL_P(array);
+#ifdef ZEND_ENGINE_3
+	zval *tmp;
+#else
 	zval **tmp;
+#endif
 
 	MQSERIES_SETOPT_LONG(status, Version);
 	switch (status->Version) {

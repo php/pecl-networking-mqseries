@@ -218,9 +218,8 @@ Author: Michael Bretterklieber <mbretter@jawa.at>
 #define MQSERIES_ADD_ASSOC_RESOURCE(s, m) \
 	do { \
 		zval *ref = create_mqseries_bytes_resource(s->m, sizeof(s->m) TSRMLS_CC); \
-		Z_ADDREF_P(ref); \
 	    add_assoc_zval(array, #m, ref); \
-		zval_ptr_dtor(ref); \
+		efree(ref);  \
 	} while(0)
 
 #else
@@ -284,10 +283,11 @@ static zval* create_mqseries_bytes_resource(PMQBYTE bytes, size_t size TSRMLS_DC
 {
 	mqseries_bytes *pBytes;
 
-#ifdef ZEND_ENGINE_3
-	zval z_bytes;
-#else
 	zval *z_bytes;
+
+#ifdef ZEND_ENGINE_3
+	z_bytes = (zval *) emalloc(sizeof(zval));
+#else
 	MAKE_STD_ZVAL(z_bytes);
 #endif
 
@@ -296,14 +296,14 @@ static zval* create_mqseries_bytes_resource(PMQBYTE bytes, size_t size TSRMLS_DC
 	memcpy(pBytes->bytes, bytes, size);
 
 #ifdef ZEND_ENGINE_3
-	ZVAL_RES(&z_bytes, zend_register_resource(pBytes, le_mqseries_bytes));
-	pBytes->id = Z_RES(z_bytes)->handle;
-	return &z_bytes;
+	ZVAL_RES(z_bytes, zend_register_resource(pBytes, le_mqseries_bytes));
+	pBytes->id = Z_RES_P(z_bytes)->handle;
 #else
 	ZEND_REGISTER_RESOURCE(z_bytes, pBytes, le_mqseries_bytes);
 	pBytes->id = Z_RESVAL_P(z_bytes);
-	return z_bytes;
 #endif
+
+	return z_bytes;
 }
 /* }}} */
 

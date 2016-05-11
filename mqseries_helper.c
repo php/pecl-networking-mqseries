@@ -283,17 +283,27 @@ Author: Michael Bretterklieber <mbretter@jawa.at>
 static zval* create_mqseries_bytes_resource(PMQBYTE bytes, size_t size TSRMLS_DC)
 {
 	mqseries_bytes *pBytes;
-	zval *z_bytes;
 
+#ifdef ZEND_ENGINE_3
+	zval z_bytes;
+#else
+	zval *z_bytes;
 	MAKE_STD_ZVAL(z_bytes);
+#endif
 
 	pBytes = (mqseries_bytes *) emalloc(sizeof(mqseries_bytes));
 	pBytes->bytes = (PMQBYTE) emalloc(size*sizeof(MQBYTE));
 	memcpy(pBytes->bytes, bytes, size);
+
+#ifdef ZEND_ENGINE_3
+	ZVAL_RES(&z_bytes, zend_register_resource(pBytes, le_mqseries_bytes));
+	pBytes->id = Z_RES(z_bytes)->handle;
+	return &z_bytes;
+#else
 	ZEND_REGISTER_RESOURCE(z_bytes, pBytes, le_mqseries_bytes);
 	pBytes->id = Z_RESVAL_P(z_bytes);
-
 	return z_bytes;
+#endif
 }
 /* }}} */
 

@@ -365,7 +365,11 @@ MQ call:
 PHP_FUNCTION(mqseries_conn)
 {
 	char *name;
-	int name_len;
+#ifdef ZEND_ENGINE_3
+	size_t name_len;
+#else
+	long name_len;
+#endif
 	zval *z_conn, *z_comp_code, *z_reason;
 
 	mqseries_descriptor *mqdesc;
@@ -376,7 +380,7 @@ PHP_FUNCTION(mqseries_conn)
 
 #ifdef ZEND_ENGINE_3
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sz/z/z/", &name, &name_len, &z_conn, &z_comp_code, &z_reason) == FAILURE) {
-		return
+		return;
 	}
 #else
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "szzz", &name, &name_len, &z_conn, &z_comp_code, &z_reason) == FAILURE) {
@@ -397,8 +401,13 @@ PHP_FUNCTION(mqseries_conn)
 
 	if (comp_code == MQCC_OK) {
 		zval_dtor(z_conn);
+#ifdef ZEND_ENGINE_3
+		ZVAL_RES(z_conn, zend_register_resource(mqdesc, le_mqseries_conn));
+		mqdesc->id = Z_RES_P(z_conn)->handle;
+#else
 		ZEND_REGISTER_RESOURCE(z_conn, mqdesc, le_mqseries_conn);
 		mqdesc->id = Z_RESVAL_P(z_conn);
+#endif
 	} else {
 		efree(mqdesc);
 	}
@@ -440,7 +449,11 @@ MQ call:
 PHP_FUNCTION(mqseries_connx)
 {
 	char *name;
+#ifdef ZEND_ENGINE_3
+	size_t name_len;
+#else
 	int name_len;
+#endif
 	mqseries_descriptor *mqdesc;
 	zval *z_connect_opts, *z_conn, *z_comp_code, *z_reason;
 
@@ -454,7 +467,7 @@ PHP_FUNCTION(mqseries_connx)
 
 #ifdef ZEND_ENGINE_3
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "saz/z/z/", &name, &name_len, &z_connect_opts, &z_conn, &z_comp_code, &z_reason) == FAILURE) {
-		return
+		return;
 	}
 #else
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sazzz", &name, &name_len, &z_connect_opts, &z_conn, &z_comp_code, &z_reason) == FAILURE) {
@@ -476,8 +489,13 @@ PHP_FUNCTION(mqseries_connx)
 
 	if (comp_code == MQCC_OK) {
 		zval_dtor(z_conn);
+#ifdef ZEND_ENGINE_3
+		ZVAL_RES(z_conn, zend_register_resource(mqdesc, le_mqseries_conn));
+		mqdesc->id = Z_RES_P(z_conn)->handle;
+#else
 		ZEND_REGISTER_RESOURCE(z_conn, mqdesc, le_mqseries_conn);
 		mqdesc->id = Z_RESVAL_P(z_conn);
+#endif
 	} else {
 		efree(mqdesc);
 	}
@@ -519,7 +537,12 @@ PHP_FUNCTION(mqseries_open)
 	mqseries_obj *mqobj;
 	zval *z_mqdesc, *z_obj_desc, *z_obj, *z_comp_code, *z_reason;
 
+#ifdef ZEND_ENGINE_3
+	zend_long open_options;
+#else
 	long open_options;
+#endif
+
 	MQLONG comp_code;
 	MQLONG reason;
 	MQOD obj_desc = {MQOD_DEFAULT};
@@ -563,8 +586,13 @@ PHP_FUNCTION(mqseries_open)
 	if (comp_code == MQCC_OK) {
 		zval_dtor(z_obj);
 		mqobj->conn = &mqdesc->conn;
+#ifdef ZEND_ENGINE_3
+		ZVAL_RES(z_obj, zend_register_resource(mqobj, le_mqseries_obj));
+		mqobj->id = Z_RES_P(z_obj)->handle;
+#else
 		ZEND_REGISTER_RESOURCE(z_obj, mqobj, le_mqseries_obj);
 		mqobj->id = Z_RESVAL_P(z_obj);
+#endif
 	} else {
 		/* So we don't register the ref. But we already allocated some memory lets free that */
 		efree(mqobj);
@@ -611,7 +639,13 @@ PHP_FUNCTION(mqseries_get)
 
 	MQLONG comp_code;
 	MQLONG reason;
+
+#ifdef ZEND_ENGINE_3
+	zend_long buf_len = 0L;
+#else
 	long buf_len = 0L;
+#endif
+
 	MQLONG data_length = 0L;
 	MQBYTE *buf, *data;
 	MQMD msg_desc = 	 { MQMD_DEFAULT }; 	/* Message descriptor */
@@ -619,7 +653,7 @@ PHP_FUNCTION(mqseries_get)
 
 #ifdef ZEND_ENGINE_3
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rra/a/lz/z/z/z/", &z_mqdesc, &z_mqobj, &z_msg_desc, &z_get_msg_opts, &buf_len, &z_buffer, &z_data_length, &z_comp_code, &z_reason) == FAILURE) {
-		return
+		return;
 	}
 
 	if ((mqdesc = (mqseries_descriptor *) zend_fetch_resource(Z_RES_P(z_mqdesc), PHP_MQSERIES_DESCRIPTOR_RES_NAME, le_mqseries_conn)) == NULL) {
@@ -730,7 +764,11 @@ PHP_FUNCTION(mqseries_put)
 	mqseries_obj *mqobj;
 	zval *z_mqdesc, *z_mqobj, *z_msg_desc, *z_put_msg_opts, *z_comp_code, *z_reason;
 	char  *msg;
+#ifdef ZEND_ENGINE_3
+	zend_long msg_len;
+#else
 	long msg_len;
+#endif
 
 	MQMD msg_desc = {MQMD_DEFAULT}; /* Message descriptor */
 	MQPMO put_msg_opts = {MQPMO_DEFAULT}; /* Options which control the MQPUT call */
@@ -739,7 +777,7 @@ PHP_FUNCTION(mqseries_put)
 
 #ifdef ZEND_ENGINE_3
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rra/a/sz/z/", &z_mqdesc, &z_mqobj, &z_msg_desc, &z_put_msg_opts, &msg, &msg_len, &z_comp_code, &z_reason) == FAILURE) {
-		return
+		return;
 	}
 
 	if ((mqdesc = (mqseries_descriptor *) zend_fetch_resource(Z_RES_P(z_mqdesc), PHP_MQSERIES_DESCRIPTOR_RES_NAME, le_mqseries_conn)) == NULL) {
@@ -814,7 +852,7 @@ PHP_FUNCTION(mqseries_begin)
 
 #ifdef ZEND_ENGINE_3
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "raz/z/", &z_mqdesc, &z_array, &z_comp_code, &z_reason) == FAILURE) {
-		return
+		return;
 	}
 
 	if ((mqdesc = (mqseries_descriptor *) zend_fetch_resource(Z_RES_P(z_mqdesc), PHP_MQSERIES_DESCRIPTOR_RES_NAME, le_mqseries_conn)) == NULL) {
@@ -866,7 +904,7 @@ PHP_FUNCTION(mqseries_cmit)
 
 #ifdef ZEND_ENGINE_3
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rz/z/", &z_mqdesc, &z_comp_code, &z_reason) == FAILURE) {
-		return
+		return;
 	}
 
 	if ((mqdesc = (mqseries_descriptor *) zend_fetch_resource(Z_RES_P(z_mqdesc), PHP_MQSERIES_DESCRIPTOR_RES_NAME, le_mqseries_conn)) == NULL) {
@@ -915,7 +953,7 @@ PHP_FUNCTION(mqseries_back)
 
 #ifdef ZEND_ENGINE_3
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rz/z/", &z_mqdesc, &z_comp_code, &z_reason) == FAILURE) {
-		return
+		return;
 	}
 
 	if ((mqdesc = (mqseries_descriptor *) zend_fetch_resource(Z_RES_P(z_mqdesc), PHP_MQSERIES_DESCRIPTOR_RES_NAME, le_mqseries_conn)) == NULL) {
@@ -960,7 +998,11 @@ PHP_FUNCTION(mqseries_close)
 {
 	MQLONG comp_code;
 	MQLONG reason;
+#ifdef ZEND_ENGINE_3
+	zend_long close_options;
+#else
 	long close_options;
+#endif
 
 	mqseries_obj *mqobj;
 	mqseries_descriptor *mqdesc;
@@ -1157,10 +1199,11 @@ PHP_FUNCTION(mqseries_strerror)
 {
 #ifdef ZEND_ENGINE_3
 	char *text;
+	zend_long reason_code;
 #else
 	char **text;
+	long reason_code;
 #endif
-	int reason_code;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l", &reason_code) == FAILURE) {
 		return;
@@ -1206,7 +1249,11 @@ PHP_FUNCTION(mqseries_put1)
 	mqseries_descriptor *mqdesc;
 	zval *z_mqdesc, *z_msg_desc, *z_put_msg_opts, *z_obj_desc, *z_comp_code, *z_reason;
 	char  *msg;
+#ifdef ZEND_ENGINE_3
+	zend_long msg_len;
+#else
 	long msg_len;
+#endif
 	MQMD msg_desc = {MQMD_DEFAULT}; 	/* Message descriptor */
 	MQOD obj_desc = {MQOD_DEFAULT}; 	/* Object descriptor */
 	MQPMO put_msg_opts = {MQPMO_DEFAULT}; 	/* Options which control the MQPUT call */
@@ -1285,9 +1332,19 @@ PHP_FUNCTION(mqseries_inq)
 {
 	mqseries_descriptor *mqdesc;
 	mqseries_obj *mqobj;
-	zval *z_mqdesc, *z_mqobj, *z_selectors, **option_val, *z_intAttrs, *z_charAttrs, *z_comp_code, *z_reason;
+#ifdef ZEND_ENGINE_3
+	zval *option_val;
+#else
+	zval **option_val;
+#endif
+	zval *z_mqdesc, *z_mqobj, *z_selectors, *z_intAttrs, *z_charAttrs, *z_comp_code, *z_reason;
 	HashPosition pos;
-	long current=0, selectorCount, intAttrLength, i, charAttrLength;
+	long current=0;
+#ifdef ZEND_ENGINE_3
+	zend_long selectorCount, intAttrLength, i, charAttrLength;
+#else
+	long selectorCount, intAttrLength, i, charAttrLength;
+#endif
 	MQLONG *selectors;
 	MQCHAR *charAttrs = NULL;
 	MQLONG *intAttrs = NULL;
@@ -1296,7 +1353,7 @@ PHP_FUNCTION(mqseries_inq)
 
 #ifdef ZEND_ENGINE_3
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rrlalz/lz/z/z/", &z_mqdesc, &z_mqobj, &selectorCount, &z_selectors, &intAttrLength, &z_intAttrs, &charAttrLength, &z_charAttrs, &z_comp_code, &z_reason)	== FAILURE) {
-		return
+		return;
 	}
 
 	if ((mqdesc = (mqseries_descriptor *) zend_fetch_resource(Z_RES_P(z_mqdesc), PHP_MQSERIES_DESCRIPTOR_RES_NAME, le_mqseries_conn)) == NULL) {
@@ -1321,9 +1378,9 @@ PHP_FUNCTION(mqseries_inq)
 	selectors = (MQLONG *) emalloc(selectorCount * sizeof(MQLONG));
 
 #ifdef ZEND_ENGINE_3
-	ZEND_HASH_FOREACH_PTR(Z_ARRVAL_P(z_selectors), option_val) {
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(z_selectors), option_val) {
 		if (current < selectorCount) {
-			selectors[current++] = Z_LVAL_PP(option_val);
+			selectors[current++] = Z_LVAL_P(option_val);
 		}
 	} ZEND_HASH_FOREACH_END();
 #else
@@ -1403,9 +1460,18 @@ PHP_FUNCTION(mqseries_set)
 {
 	mqseries_descriptor *mqdesc;
 	mqseries_obj *mqobj;
-	zval *z_mqdesc, *z_mqobj, *z_selectors, **option_val, *z_intAttrs, *z_charAttrs, *z_comp_code, *z_reason;
+#ifdef ZEND_ENGINE_3
+	zval *option_val;
+#else
+	zval **option_val;
+#endif
+	zval *z_mqdesc, *z_mqobj, *z_selectors, *z_intAttrs, *z_charAttrs, *z_comp_code, *z_reason;
 	HashPosition pos;
+#ifdef ZEND_ENGINE_3
+	zend_long selectorCount, intAttrLength, charAttrLength;
+#else
 	long selectorCount, intAttrLength, charAttrLength;
+#endif
 	MQLONG current=0, *selectors;
 	MQCHAR *charAttrs = NULL;
 	MQLONG *intAttrs = NULL;
@@ -1439,9 +1505,9 @@ PHP_FUNCTION(mqseries_set)
 	current = 0;
 
 #ifdef ZEND_ENGINE_3
-	ZEND_HASH_FOREACH_PTR(Z_ARRVAL_P(z_selectors), option_val) {
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(z_selectors), option_val) {
 		if (current < selectorCount) {
-			selectors[current++] = Z_LVAL_PP(option_val);
+			selectors[current++] = Z_LVAL_P(option_val);
 		}
 	} ZEND_HASH_FOREACH_END();
 #else
@@ -1459,9 +1525,9 @@ PHP_FUNCTION(mqseries_set)
 		current = 0;
 
 #ifdef ZEND_ENGINE_3
-		ZEND_HASH_FOREACH_PTR(Z_ARRVAL_P(z_intAttrs), option_val) {
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(z_intAttrs), option_val) {
 			if (current < intAttrLength) {
-				intAttrs[current++] = (MQLONG) Z_LVAL_PP(option_val);
+				intAttrs[current++] = (MQLONG) Z_LVAL_P(option_val);
 			}
 		} ZEND_HASH_FOREACH_END();
 #else
@@ -1481,9 +1547,9 @@ PHP_FUNCTION(mqseries_set)
 		current = 0;
 
 #ifdef ZEND_ENGINE_3
-		ZEND_HASH_FOREACH_PTR(Z_ARRVAL_P(z_charAttrs), option_val) {
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(z_charAttrs), option_val) {
 			if (current < charAttrLength) {
-				charAttrs[current++] = Z_LVAL_PP(option_val); /* hoe helen we char uit een array? */
+				charAttrs[current++] = Z_LVAL_P(option_val); /* hoe helen we char uit een array? */
 			}
 		} ZEND_HASH_FOREACH_END();
 #else
@@ -1643,14 +1709,24 @@ PHP_FUNCTION(mqseries_sub)
 		if (Z_TYPE_P(z_obj) != IS_RESOURCE) {
 			zval_dtor(z_obj);
 			mqobj->conn = &mqdesc->conn;
+#ifdef ZEND_ENGINE_3
+			ZVAL_RES(z_obj, zend_register_resource(mqobj, le_mqseries_obj));
+			mqobj->id = Z_RES_P(z_obj)->handle;
+#else
 			ZEND_REGISTER_RESOURCE(z_obj, mqobj, le_mqseries_obj);
 			mqobj->id = Z_RESVAL_P(z_obj);
+#endif
 		}
 
 		zval_dtor(z_sub);
 		mqsub->conn = &mqdesc->conn;
+#ifdef ZEND_ENGINE_3
+		ZVAL_RES(z_sub, zend_register_resource(mqsub, le_mqseries_obj));
+		mqsub->id = Z_RES_P(z_sub)->handle;
+#else
 		ZEND_REGISTER_RESOURCE(z_sub, mqsub, le_mqseries_obj);
 		mqsub->id = Z_RESVAL_P(z_sub);
+#endif
 	} else {
 		/* So we don't register the ref. But we already allocated some memory lets free that */
 		if (Z_TYPE_P(z_obj) != IS_RESOURCE) {
@@ -1686,7 +1762,11 @@ MQ call:
 PHP_FUNCTION(mqseries_stat)
 {
 	mqseries_descriptor *mqdesc;
+#ifdef ZEND_ENGINE_3
+	zend_long type;
+#else
 	long type;
+#endif
 	MQLONG comp_code, reason;
 	zval *z_mqdesc,
 		 *z_status,
@@ -1697,7 +1777,7 @@ PHP_FUNCTION(mqseries_stat)
 
 #ifdef ZEND_ENGINE_3
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rlaz/z/", &z_mqdesc, &type, &z_status, &z_comp_code, &z_reason) == FAILURE) {
-		return
+		return;
 	}
 
 	if ((mqdesc = (mqseries_descriptor *) zend_fetch_resource(Z_RES_P(z_mqdesc), PHP_MQSERIES_DESCRIPTOR_RES_NAME, le_mqseries_conn)) == NULL) {

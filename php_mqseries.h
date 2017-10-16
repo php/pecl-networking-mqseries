@@ -31,8 +31,8 @@ any other GPL-like (LGPL, GPL2) License.
     $Id$
 
 Author: Michael Bretterklieber <mbretter@jawa.at>
-		philippe Tjon A Hen <tjonahen@zonnet.nl>
-		Pierrick Charron <pierrick@php.net>
+    philippe Tjon A Hen <tjonahen@zonnet.nl>
+    Pierrick Charron <pierrick@php.net>
 */
 
 #ifndef PHP_MQSERIES_H
@@ -60,29 +60,53 @@ Author: Michael Bretterklieber <mbretter@jawa.at>
 extern zend_module_entry mqseries_module_entry;
 
 typedef struct {
-	int id;
-	MQHCONN conn;
+  int id;
+  MQHCONN conn;
 } mqseries_descriptor;
 extern int le_mqseries_conn;
 #define PHP_MQSERIES_DESCRIPTOR_RES_NAME "mqseries_conn"
 
 typedef struct {
-	int id;
-	MQHOBJ obj;
-	MQHCONN *conn;
+  int id;
+  MQHOBJ obj;
+  MQHCONN *conn;
 } mqseries_obj;
 extern int le_mqseries_obj;
 #define PHP_MQSERIES_OBJ_RES_NAME "mqseries_obj"
 
 typedef struct {
-	int id;
-	PMQBYTE bytes;
+  int id;
+  int size;
+  PMQBYTE bytes;
 } mqseries_bytes;
 extern int le_mqseries_bytes;
 #define PHP_MQSERIES_BYTES_RES_NAME "mqseries_bytes"
 
+
+typedef struct {
+  int id;
+  MQHMSG  handle;
+} mqseries_message;
+extern int le_mqseries_message;
+#define PHP_MQSERIES_MESSAGE_RES_NAME "mqseries_message"
+
+
 /* {{{ Helper */
 void _mqseries_set_mqcno_from_array(zval *, PMQCNO, PMQCD, PMQSCO, PMQAIR, PMQCHAR TSRMLS_DC);
+void _mqseries_set_mqcmho_from_array(zval *array, PMQCMHO handle TSRMLS_DC);
+void _mqseries_set_mqdmpo_from_array(zval *array, PMQDMPO handle TSRMLS_DC);
+
+
+void _mqseries_set_array_from_mqpd(zval *array, PMQPD handle TSRMLS_DC);
+void _mqseries_set_mqpd_from_array(zval *array, PMQPD handle TSRMLS_DC);
+
+
+void _mqseries_set_mqdmho_from_array(zval *array, PMQDMHO handle TSRMLS_DC);
+void _mqseries_set_mqbmho_from_array(zval *array, PMQBMHO handle TSRMLS_DC);
+void _mqseries_set_mqmhbo_from_array(zval *array, PMQMHBO handle TSRMLS_DC);
+void _mqseries_set_mqsmpo_from_array(zval *array, PMQSMPO handle TSRMLS_DC);
+void _mqseries_set_mqimpo_from_array(zval *array, PMQIMPO handle TSRMLS_DC);
+
 
 void _mqseries_set_mqpmo_from_array(zval *, PMQPMO TSRMLS_DC);
 void _mqseries_set_array_from_mqpmo(zval *, PMQPMO);
@@ -133,16 +157,16 @@ PHP_FUNCTION(mqseries_strerror);
 PHP_FUNCTION(mqseries_bytes_val);
 
 #ifdef HAVE_MQSERIESLIB_V7
-// PHP_FUNCTION(mqseries_bufmh);
+PHP_FUNCTION(mqseries_bufmh);
 // PHP_FUNCTION(mqseries_cb);
 // PHP_FUNCTION(mqseries_cb_function);
-// PHP_FUNCTION(mqseries_crtmh);
+PHP_FUNCTION(mqseries_crtmh);
 // PHP_FUNCTION(mqseries_ctl);
-// PHP_FUNCTION(mqseries_dltmh);
-// PHP_FUNCTION(mqseries_dltmp);
-// PHP_FUNCTION(mqseries_inqmp);
-// PHP_FUNCTION(mqseries_mhbuf);
-// PHP_FUNCTION(mqseries_setmp);
+PHP_FUNCTION(mqseries_dltmh);
+PHP_FUNCTION(mqseries_dltmp);
+PHP_FUNCTION(mqseries_inqmp);
+PHP_FUNCTION(mqseries_mhbuf);
+PHP_FUNCTION(mqseries_setmp);
 PHP_FUNCTION(mqseries_stat);
 PHP_FUNCTION(mqseries_sub);
 // PHP_FUNCTION(mqseries_subrq);
@@ -154,7 +178,7 @@ PHP_FUNCTION(mqseries_sub);
 #define MQSERIES_G(v) (mqseries_globals.v)
 #endif
 
-#endif	/* PHP_MQSERIES_H */
+#endif  /* PHP_MQSERIES_H */
 
 /*
  * Local variables:

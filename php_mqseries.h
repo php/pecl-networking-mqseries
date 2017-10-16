@@ -98,7 +98,7 @@ void _mqseries_set_mqdmpo_from_array(zval *array, PMQDMPO handle TSRMLS_DC);
 
 
 void _mqseries_set_array_from_mqpd(zval *array, PMQPD handle TSRMLS_DC);
-void _mqseries_set_mqpd_from_array(zval *array, PMQPD handle TSRMLS_DC);
+void _mqseries_set_mqpd_from_oarray(zval *array, PMQPD handle TSRMLS_DC);
 
 
 void _mqseries_set_mqdmho_from_array(zval *array, PMQDMHO handle TSRMLS_DC);

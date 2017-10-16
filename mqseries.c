@@ -228,7 +228,7 @@ ZEND_ARG_INFO(1, reason)        /* OR: Reason code qualifying CompCode */
 ZEND_END_ARG_INFO()
 
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_bufmh, 0, 0, 9)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_bufmh, 0, 0, 8)
 ZEND_ARG_INFO(0, hconn)         /* I: Connection handle */
 ZEND_ARG_INFO(1, hmsg)
 ZEND_ARG_ARRAY_INFO(1, bufMsgHOpts, 0)
@@ -272,17 +272,18 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_inqmp, 0, 0, 11)
 ZEND_ARG_INFO(0, hconn)             /* I: Connection handle */
 ZEND_ARG_INFO(1, hmsg)
 ZEND_ARG_ARRAY_INFO(1, inqPropOpts, 0)
-ZEND_ARG_INFO(0, name)                /* I: Name  */
+ZEND_ARG_INFO(1, name)                /* I: Name  */
 ZEND_ARG_ARRAY_INFO(1, propDesc, 0)       /* IO: Message descriptor */
 ZEND_ARG_INFO(1, type)              /* I: Status information type */
-ZEND_ARG_INFO(0, value)        /* IB: Message data */
+ZEND_ARG_INFO(0, bufferlength)      /* IL: Length in bytes of the Buffer area */
+ZEND_ARG_INFO(1, value)        /* IB: Message data */
 ZEND_ARG_INFO(1, dataLength)          /* O: Length of the message */
 ZEND_ARG_INFO(1, compCode)            /* OC: Completion code */
 ZEND_ARG_INFO(1, reason)            /* OR: Reason code qualifying CompCode */
 ZEND_END_ARG_INFO()
 
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_mhbuf, 0, 0, 10)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_mhbuf, 0, 0, 9)
 ZEND_ARG_INFO(0, hconn)             /* I: Connection handle */
 ZEND_ARG_INFO(1, hmsg)
 ZEND_ARG_ARRAY_INFO(1, msgHBufOpts, 0)
@@ -2223,22 +2224,26 @@ PHP_FUNCTION(mqseries_inqmp) {
        *z_reason,
        *z_data_length,
        *z_value,
-       *z_type;
+       *z_type,
+       *z_name;
   MQPD pd = { MQPD_DEFAULT };
   MQCHARV  prop_name = { MQPROP_INQUIRE_ALL };
   MQLONG data_length = 0, buffer_size = 0;
   MQBYTE *data;
-  char *name = NULL;
-  size_t name_len = 0;
+  //char *name = NULL;
+  //size_t name_len = 0;
 
   MQIMPO inq_prop_opts = { MQIMPO_DEFAULT};
 
-  if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rrasaz/lz/z/z/z/",
+  MQCHARV tmp_name_property = { MQPROP_INQUIRE_ALL };
+
+
+  if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rraz/a/z/lz/z/z/z/",
                             &z_mqdesc,
                             &z_hmsg,
                             &z_inq_prop_opts,
-                            &name,
-                            &name_len,
+                            &z_name,
+                            //&name_len,
                             &z_proc_desc,
                             &z_type,
                             &buffer_size,
@@ -2260,18 +2265,28 @@ PHP_FUNCTION(mqseries_inqmp) {
   _mqseries_set_mqpd_from_array(z_proc_desc, &pd);
   _mqseries_set_mqimpo_from_array(z_inq_prop_opts, &inq_prop_opts);
 
-  if (memcmp(name, "-3", name_len) != 0) {
-    prop_name.VSPtr = name;
-    prop_name.VSLength = MQVS_NULL_TERMINATED;
-  }
+  //if (memcmp(name, "-3", name_len) != 0) {
+  //  prop_name.VSPtr = name;
+  //  prop_name.VSLength = MQVS_NULL_TERMINATED;
+  //}
   //MQPROP_INQUIRE_ALL
-
+  if (Z_TYPE_P(z_name) != IS_NULL) {
+    prop_name.VSPtr = Z_STRVAL_P(z_name);
+    prop_name.VSLength = Z_STRLEN_P(z_name); //MQVS_NULL_TERMINATED;
+  }
   data = (MQBYTE *)emalloc(sizeof(MQBYTE) * buffer_size);
   MQBYTE *tmp_buffer = (MQBYTE *)emalloc(sizeof(MQBYTE) * buffer_size);
   memset(tmp_buffer, 0, (sizeof(MQBYTE) * buffer_size));
   //type = z_type->value.lval;
+
+  tmp_name_property.VSPtr = (MQBYTE *)emalloc(sizeof(MQBYTE) * MQ_MAX_PROPERTY_NAME_LENGTH);
+  tmp_name_property.VSBufSize = MQ_MAX_PROPERTY_NAME_LENGTH;
+  inq_prop_opts.ReturnedName = tmp_name_property;
+
   MQINQMP(mqdesc->conn, mqhandle->handle, &inq_prop_opts, &prop_name, &pd, &type, (MQLONG)buffer_size, data, &data_length, &comp_code, &reason);
   if (comp_code == MQCC_OK) {
+    zval_dtor(z_name);
+    ZVAL_STRINGL(z_name, (char *)inq_prop_opts.ReturnedName.VSPtr, inq_prop_opts.ReturnedName.VSLength);
     zval_dtor(z_value);
     // Конвертируем в строку
     MQINT8     value_int8;
@@ -2352,10 +2367,11 @@ PHP_FUNCTION(mqseries_inqmp) {
     ZVAL_LONG(z_type, (long)type);
     _mqseries_set_array_from_mqpd(z_proc_desc, &pd);
   }
-  ZVAL_LONG(z_comp_code, (long)comp_code);
-  ZVAL_LONG(z_reason, (long)reason);
+  efree(tmp_name_property.VSPtr);
   efree(data);
   efree(tmp_buffer);
+  ZVAL_LONG(z_comp_code, (long)comp_code);
+  ZVAL_LONG(z_reason, (long)reason);
 }
 
 /*

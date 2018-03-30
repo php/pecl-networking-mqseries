@@ -2297,7 +2297,7 @@ PHP_FUNCTION(mqseries_inqmp) {
     switch (type) {
       case MQTYPE_BOOLEAN: /* 4 bytes */
         memcpy(&value_int32, data, data_length);
-        sprintf(tmp_buffer, "%d", value_int32);
+        //sprintf(tmp_buffer, "%d", value_int32);
         ZVAL_BOOL(z_value, value_int32);
         break;
       case MQTYPE_BYTE_STRING: /* zero size allowed */

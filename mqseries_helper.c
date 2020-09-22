@@ -84,7 +84,9 @@ Author: Michael Bretterklieber <mbretter@jawa.at>
 				} \
 			} else if (Z_TYPE_P(tmp) != IS_NULL) { \
 				convert_to_string(tmp); \
-				strncpy((MQCHAR *) s->m, Z_STRVAL_P(tmp), sizeof(s->m)); \
+				char *tmp_val = Z_STRVAL_P(tmp); \
+				size_t i;  \
+				for (i = 0; i < sizeof(s->m); i++) s->m[i] = tmp_val[i]; \
 			} \
 		} \
 	} while(0)
@@ -888,7 +890,7 @@ void _mqseries_set_mqgmo_from_array(zval *array, PMQGMO get_msg_opts  TSRMLS_DC)
 #ifdef MQGMO_VERSION_3
 		case MQGMO_VERSION_3:
 			MQSERIES_SETOPT_LONG(get_msg_opts, ReturnedLength);
-			MQSERIES_SETOPT_RESBYTES(get_msg_opts, MsgToken);
+			MQSERIES_SETOPT_RESBYTES(get_msg_opts, MsgToken); 
 			// no break intentional
 #endif /* MQGMO_VERSION_3 */
 

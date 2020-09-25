@@ -890,7 +890,7 @@ void _mqseries_set_mqgmo_from_array(zval *array, PMQGMO get_msg_opts  TSRMLS_DC)
 #ifdef MQGMO_VERSION_3
 		case MQGMO_VERSION_3:
 			MQSERIES_SETOPT_LONG(get_msg_opts, ReturnedLength);
-			MQSERIES_SETOPT_RESBYTES(get_msg_opts, MsgToken); 
+			MQSERIES_SETOPT_RESBYTES(get_msg_opts, MsgToken);
 			// no break intentional
 #endif /* MQGMO_VERSION_3 */
 

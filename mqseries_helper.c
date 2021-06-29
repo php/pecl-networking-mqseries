@@ -128,7 +128,7 @@ Author: Michael Bretterklieber <mbretter@jawa.at>
 
 #define MQSERIES_ADD_ASSOC_RESOURCE(s, m) \
 	do { \
-		zval *ref = create_mqseries_bytes_resource(s->m, sizeof(s->m) TSRMLS_CC); \
+		zval *ref = create_mqseries_bytes_resource(s->m, sizeof(s->m)); \
 	    add_assoc_zval(array, #m, ref); \
 		efree(ref);  \
 	} while(0)
@@ -152,7 +152,7 @@ Author: Michael Bretterklieber <mbretter@jawa.at>
 /* {{{ create_mqseries_bytes_resource
  * makes an mqseries_bytes reference, needed when returning message and correlation id's
  */
-static zval* create_mqseries_bytes_resource(PMQBYTE bytes, size_t size TSRMLS_DC)
+static zval* create_mqseries_bytes_resource(PMQBYTE bytes, size_t size)
 {
 	mqseries_bytes *pBytes;
 
@@ -216,7 +216,7 @@ static void _mqseries_set_ssl_configuration_from_array(zval *array, PMQSCO ssl_c
 }
 /* }}} */
 
-static void _mqseries_set_channel_definition_from_array(zval *array, PMQCD channel_definition TSRMLS_DC) /* {{{ */
+static void _mqseries_set_channel_definition_from_array(zval *array, PMQCD channel_definition) /* {{{ */
 {
 	HashTable *ht = Z_ARRVAL_P(array);
 	zval *tmp;
@@ -366,7 +366,7 @@ static void _mqseries_set_channel_definition_from_array(zval *array, PMQCD chann
 }
 /* }}} */
 
-void _mqseries_set_mqcno_from_array(zval *array, PMQCNO connect_opts, PMQCD channel_definition, PMQSCO ssl_configuration, PMQAIR authentication_information_record, 	PMQCHAR LDAPUserName TSRMLS_DC) /* {{{ */
+void _mqseries_set_mqcno_from_array(zval *array, PMQCNO connect_opts, PMQCD channel_definition, PMQSCO ssl_configuration, PMQAIR authentication_information_record, 	PMQCHAR LDAPUserName) /* {{{ */
 {
 	HashTable *ht = Z_ARRVAL_P(array);
 	zval *tmp;
@@ -376,7 +376,7 @@ void _mqseries_set_mqcno_from_array(zval *array, PMQCNO connect_opts, PMQCD chan
 
 	if ((tmp = zend_hash_str_find(ht, "MQCD", sizeof("MQCD")-1)) != NULL &&
 		Z_TYPE_P(tmp) == IS_ARRAY) {
-		_mqseries_set_channel_definition_from_array(tmp, channel_definition TSRMLS_CC);
+		_mqseries_set_channel_definition_from_array(tmp, channel_definition);
 		connect_opts->ClientConnPtr = channel_definition;
 	}
 
@@ -388,7 +388,7 @@ void _mqseries_set_mqcno_from_array(zval *array, PMQCNO connect_opts, PMQCD chan
 }
 /* }}} */
 
-void _mqseries_set_mqpmo_from_array(zval *array, PMQPMO put_msg_opts TSRMLS_DC) /* {{{ */
+void _mqseries_set_mqpmo_from_array(zval *array, PMQPMO put_msg_opts) /* {{{ */
 {
 	HashTable *ht = Z_ARRVAL_P(array);
 	zval *tmp;
@@ -479,7 +479,7 @@ void _mqseries_set_array_from_mqpmo(zval *array, PMQPMO put_msg_opts) { /* {{{ *
 }
 /* }}} */
 
-void _mqseries_set_mqmd_from_array(zval *array, PMQMD msg_desc TSRMLS_DC) /* {{{ */
+void _mqseries_set_mqmd_from_array(zval *array, PMQMD msg_desc) /* {{{ */
 {
 	HashTable *ht = Z_ARRVAL_P(array);
 	zval *tmp;
@@ -529,7 +529,7 @@ void _mqseries_set_mqmd_from_array(zval *array, PMQMD msg_desc TSRMLS_DC) /* {{{
 }
 /* }}} */
 
-void _mqseries_set_array_from_mqmd(zval *array, PMQMD msg_desc TSRMLS_DC) /* {{{ */
+void _mqseries_set_array_from_mqmd(zval *array, PMQMD msg_desc) /* {{{ */
 {
 	zval_dtor(array);
 	array_init(array);
@@ -577,7 +577,7 @@ void _mqseries_set_array_from_mqmd(zval *array, PMQMD msg_desc TSRMLS_DC) /* {{{
 }
 /* }}} */
 
-void _mqseries_set_mqod_from_array(zval *array, PMQOD obj_desc TSRMLS_DC) /* {{{ */
+void _mqseries_set_mqod_from_array(zval *array, PMQOD obj_desc) /* {{{ */
 {
 	HashTable *ht = Z_ARRVAL_P(array);
 	zval *tmp;
@@ -627,7 +627,7 @@ void _mqseries_set_mqod_from_array(zval *array, PMQOD obj_desc TSRMLS_DC) /* {{{
 }
 /* }}} */
 
-void _mqseries_set_array_from_mqod(zval *array, PMQOD obj_desc TSRMLS_DC) /* {{{ */
+void _mqseries_set_array_from_mqod(zval *array, PMQOD obj_desc) /* {{{ */
 {
 	zval_dtor(array);
 	array_init(array);
@@ -676,7 +676,7 @@ void _mqseries_set_array_from_mqod(zval *array, PMQOD obj_desc TSRMLS_DC) /* {{{
 }
 /* }}} */
 
-void _mqseries_set_mqgmo_from_array(zval *array, PMQGMO get_msg_opts  TSRMLS_DC) /* {{{ */
+void _mqseries_set_mqgmo_from_array(zval *array, PMQGMO get_msg_opts) /* {{{ */
 {
 	HashTable *ht = Z_ARRVAL_P(array);
 	zval *tmp;
@@ -723,7 +723,7 @@ void _mqseries_set_mqgmo_from_array(zval *array, PMQGMO get_msg_opts  TSRMLS_DC)
 }
 /* }}} */
 
-void _mqseries_set_array_from_mqgmo(zval *array, PMQGMO get_msg_opts TSRMLS_DC) /* {{{ */
+void _mqseries_set_array_from_mqgmo(zval *array, PMQGMO get_msg_opts) /* {{{ */
 {
 	zval_dtor(array);
 	array_init(array);
@@ -790,7 +790,7 @@ void _mqseries_set_mqbo_from_array(zval *array, PMQBO mqbo) /* {{{ */
 
 #ifdef HAVE_MQSERIESLIB_V7
 
-void _mqseries_set_mqsd_from_array(zval *array, PMQSD sub_desc TSRMLS_DC) /* {{{ */
+void _mqseries_set_mqsd_from_array(zval *array, PMQSD sub_desc) /* {{{ */
 {
 	HashTable *ht = Z_ARRVAL_P(array);
 	zval *tmp;
@@ -822,7 +822,7 @@ void _mqseries_set_mqsd_from_array(zval *array, PMQSD sub_desc TSRMLS_DC) /* {{{
 }
 /* }}} */
 
-void _mqseries_set_array_from_mqsd(zval *array, PMQSD sub_desc TSRMLS_DC) /* {{{ */
+void _mqseries_set_array_from_mqsd(zval *array, PMQSD sub_desc) /* {{{ */
 {
 	zval_dtor(array);
 	array_init(array);

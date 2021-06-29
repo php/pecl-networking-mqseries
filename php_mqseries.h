@@ -82,26 +82,26 @@ extern int le_mqseries_bytes;
 #define PHP_MQSERIES_BYTES_RES_NAME "mqseries_bytes"
 
 /* {{{ Helper */
-void _mqseries_set_mqcno_from_array(zval *, PMQCNO, PMQCD, PMQSCO, PMQAIR, PMQCHAR TSRMLS_DC);
+void _mqseries_set_mqcno_from_array(zval *, PMQCNO, PMQCD, PMQSCO, PMQAIR, PMQCHAR);
 
-void _mqseries_set_mqpmo_from_array(zval *, PMQPMO TSRMLS_DC);
+void _mqseries_set_mqpmo_from_array(zval *, PMQPMO);
 void _mqseries_set_array_from_mqpmo(zval *, PMQPMO);
 
-void _mqseries_set_mqmd_from_array(zval *, PMQMD TSRMLS_DC);
-void _mqseries_set_array_from_mqmd(zval *, PMQMD TSRMLS_DC);
+void _mqseries_set_mqmd_from_array(zval *, PMQMD);
+void _mqseries_set_array_from_mqmd(zval *, PMQMD);
 
-void _mqseries_set_mqod_from_array(zval *, PMQOD TSRMLS_DC);
-void _mqseries_set_array_from_mqod(zval *, PMQOD TSRMLS_DC);
+void _mqseries_set_mqod_from_array(zval *, PMQOD);
+void _mqseries_set_array_from_mqod(zval *, PMQOD);
 
-void _mqseries_set_mqgmo_from_array(zval *, PMQGMO TSRMLS_DC);
-void _mqseries_set_array_from_mqgmo(zval *, PMQGMO TSRMLS_DC);
+void _mqseries_set_mqgmo_from_array(zval *, PMQGMO);
+void _mqseries_set_array_from_mqgmo(zval *, PMQGMO);
 
 void _mqseries_set_mqbo_from_array(zval *, PMQBO);
 
 #ifdef HAVE_MQSERIESLIB_V7
 
-void _mqseries_set_mqsd_from_array(zval *, PMQSD TSRMLS_DC);
-void _mqseries_set_array_from_mqsd(zval *, PMQSD TSRMLS_DC);
+void _mqseries_set_mqsd_from_array(zval *, PMQSD);
+void _mqseries_set_array_from_mqsd(zval *, PMQSD);
 
 void _mqseries_set_mqsts_from_array(zval *, PMQSTS);
 void _mqseries_set_array_from_mqsts(zval *, PMQSTS);

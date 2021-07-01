@@ -1606,9 +1606,9 @@ PHP_FUNCTION(mqseries_bytes_val)
 
 	if (bytes && bytes->bytes) {
 #ifdef ZEND_ENGINE_3
-		RETVAL_STRING((char *) bytes->bytes);
+		RETVAL_STRINGL((char *) bytes->bytes, 24); /* MQBYTE24 */
 #else
-		RETVAL_STRING((char *) bytes->bytes, 1);
+		RETVAL_STRING((char *) bytes->bytes, 24, 1); /* MQBYTE24 */
 #endif
 	} else {
 		RETVAL_NULL();

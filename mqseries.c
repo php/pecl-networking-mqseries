@@ -1278,7 +1278,7 @@ PHP_FUNCTION(mqseries_bytes_val)
 	}
 
 	if (bytes && bytes->bytes) {
-		RETVAL_STRING((char *) bytes->bytes);
+		RETVAL_STRINGL((char *) bytes->bytes, 24); /* MQBYTE24 */
 	} else {
 		RETVAL_NULL();
 	}

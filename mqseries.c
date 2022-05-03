@@ -437,7 +437,7 @@ PHP_FUNCTION(mqseries_connx)
 		return;
 	}
 
-	_mqseries_set_mqcno_from_array(z_connect_opts, &connect_opts, &channel_definition, &ssl_configuration, &authentication_information_record, LDAPUserName, &security_parms, &CSPUserId, &CSPPassword);
+	_mqseries_set_mqcno_from_array(z_connect_opts, &connect_opts, &channel_definition, &ssl_configuration, &authentication_information_record, LDAPUserName, &security_parms, CSPUserId, CSPPassword);
 
 	mqdesc = (mqseries_descriptor *) emalloc(sizeof(mqseries_descriptor));
 

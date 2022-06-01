@@ -430,7 +430,7 @@ PHP_FUNCTION(mqseries_connx)
 	MQSCO ssl_configuration     = {MQSCO_DEFAULT};
 	MQAIR authentication_information_record = {MQAIR_DEFAULT}; /* Only 1 (one) record is supported for now. */
 	MQCHAR LDAPUserName[MQ_DISTINGUISHED_NAME_LENGTH];
-	MQCHAR CSPUserId[1024]; // https://www.ibm.com/docs/en/ibm-mq/9.2?topic=application-user-ids
+	MQCHAR CSPUserId[MQ_CLIENT_USER_ID_LENGTH]; // https://www.ibm.com/docs/en/ibm-mq/9.2?topic=application-user-ids
 	MQCHAR CSPPassword[MQ_CSP_PASSWORD_LENGTH]; // https://www.ibm.com/docs/en/ibm-mq/9.2?topic=mqcsp-csppasswordlength-mqlong
 	MQCSP security_parms = {MQCSP_DEFAULT}; // https://www.ibm.com/docs/en/ibm-mq/9.2?topic=mqi-mqcsp-security-parameters
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "saz/z/z/", &name, &name_len, &z_connect_opts, &z_conn, &z_comp_code, &z_reason) == FAILURE) {

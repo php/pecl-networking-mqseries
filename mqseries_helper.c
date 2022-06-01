@@ -193,7 +193,7 @@ static void _mqseries_set_authentication_information_record_from_array(zval *arr
 
 	if ((tmp = zend_hash_str_find(ht, "LDAPUserName", sizeof("LDAPUserName")-1)) != NULL &&
 		Z_TYPE_P(tmp) == IS_STRING) {
-		strncpy(LDAPUserName, Z_STRVAL_P(tmp), sizeof(LDAPUserName));
+		strncpy(LDAPUserName, Z_STRVAL_P(tmp), MQ_DISTINGUISHED_NAME_LENGTH);
 		authentication_information_record->LDAPUserNamePtr = LDAPUserName;
 		authentication_information_record->LDAPUserNameLength = strlen(LDAPUserName);
 	}
@@ -403,13 +403,13 @@ void _mqseries_set_mqcsp_from_array(zval *array, PMQCSP security_params, PMQCHAR
 	MQSERIES_SETOPT_LONG(security_params, AuthenticationType);
 
 	if ((tmp = zend_hash_str_find(ht, "CSPUserId", sizeof("CSPUserId")-1)) != NULL && Z_TYPE_P(tmp) == IS_STRING) {
-		strncpy(CSPUserId, Z_STRVAL_P(tmp), sizeof(CSPUserId));
+		strncpy(CSPUserId, Z_STRVAL_P(tmp), MQ_CLIENT_USER_ID_LENGTH);
 		security_params->CSPUserIdPtr = CSPUserId;
 		security_params->CSPUserIdLength = strlen(CSPUserId);
 	}
 
 	if ((tmp = zend_hash_str_find(ht, "CSPPassword", sizeof("CSPPassword")-1)) != NULL && Z_TYPE_P(tmp) == IS_STRING) {
-		strncpy(CSPPassword, Z_STRVAL_P(tmp),sizeof(CSPPassword));
+		strncpy(CSPPassword, Z_STRVAL_P(tmp), MQ_CSP_PASSWORD_LENGTH);
 		security_params->CSPPasswordPtr = CSPPassword;
 		security_params->CSPPasswordLength = strlen(CSPPassword);
 	}

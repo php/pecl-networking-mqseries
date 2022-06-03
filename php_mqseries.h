@@ -45,7 +45,7 @@ Author: Michael Bretterklieber <mbretter@jawa.at>
 
 #define phpext_mqseries_ptr &mqseries_module_entry
 
-#define PHP_MQSERIES_VERSION "0.15.0"
+#define PHP_MQSERIES_VERSION "0.16.0"
 
 #ifdef PHP_WIN32
 #define PHP_MQSERIES_API __declspec(dllexport)
@@ -82,10 +82,11 @@ extern int le_mqseries_bytes;
 #define PHP_MQSERIES_BYTES_RES_NAME "mqseries_bytes"
 
 /* {{{ Helper */
-void _mqseries_set_mqcno_from_array(zval *, PMQCNO, PMQCD, PMQSCO, PMQAIR, PMQCHAR);
+void _mqseries_set_mqcno_from_array(zval *, PMQCNO, PMQCD, PMQSCO, PMQAIR, PMQCHAR, PMQCSP, PMQCHAR, PMQCHAR);
 
 void _mqseries_set_mqpmo_from_array(zval *, PMQPMO);
 void _mqseries_set_array_from_mqpmo(zval *, PMQPMO);
+void _mqseries_set_mqcsp_from_array(zval *, PMQCSP, PMQCHAR, PMQCHAR);
 
 void _mqseries_set_mqmd_from_array(zval *, PMQMD);
 void _mqseries_set_array_from_mqmd(zval *, PMQMD);

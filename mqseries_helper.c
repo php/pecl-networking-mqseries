@@ -193,7 +193,7 @@ static void _mqseries_set_authentication_information_record_from_array(zval *arr
 
 	if ((tmp = zend_hash_str_find(ht, "LDAPUserName", sizeof("LDAPUserName")-1)) != NULL &&
 		Z_TYPE_P(tmp) == IS_STRING) {
-		strncpy(LDAPUserName, Z_STRVAL_P(tmp), sizeof(LDAPUserName));
+		strncpy(LDAPUserName, Z_STRVAL_P(tmp), MQ_DISTINGUISHED_NAME_LENGTH);
 		authentication_information_record->LDAPUserNamePtr = LDAPUserName;
 		authentication_information_record->LDAPUserNameLength = strlen(LDAPUserName);
 	}
@@ -208,6 +208,7 @@ static void _mqseries_set_ssl_configuration_from_array(zval *array, PMQSCO ssl_c
 	MQSERIES_SETOPT_LONG(ssl_configuration, Version);
 	MQSERIES_SETOPT_STRING(ssl_configuration, KeyRepository);
 	MQSERIES_SETOPT_STRING(ssl_configuration, CryptoHardware);
+	MQSERIES_SETOPT_STRING(ssl_configuration, CertificateLabel);	/* vaimo.stefan 2020-02-03 */
 
 	if ((tmp = zend_hash_str_find(ht, "MQAIR", sizeof("MQAIR")-1)) != NULL &&
 		Z_TYPE_P(tmp) == IS_ARRAY) {
@@ -368,7 +369,7 @@ static void _mqseries_set_channel_definition_from_array(zval *array, PMQCD chann
 }
 /* }}} */
 
-void _mqseries_set_mqcno_from_array(zval *array, PMQCNO connect_opts, PMQCD channel_definition, PMQSCO ssl_configuration, PMQAIR authentication_information_record, 	PMQCHAR LDAPUserName) /* {{{ */
+void _mqseries_set_mqcno_from_array(zval *array, PMQCNO connect_opts, PMQCD channel_definition, PMQSCO ssl_configuration, PMQAIR authentication_information_record, PMQCHAR LDAPUserName, PMQCSP security_params, PMQCHAR CSPUserId, PMQCHAR CSPPassword) /* {{{ */
 {
 	HashTable *ht = Z_ARRVAL_P(array);
 	zval *tmp;
@@ -387,8 +388,32 @@ void _mqseries_set_mqcno_from_array(zval *array, PMQCNO connect_opts, PMQCD chan
 		_mqseries_set_ssl_configuration_from_array(tmp, ssl_configuration, authentication_information_record, LDAPUserName);
 		connect_opts->SSLConfigPtr = ssl_configuration;
 	}
+	if ((tmp = zend_hash_str_find(ht, "MQCSP", sizeof("MSCSP")-1)) != NULL &&
+		Z_TYPE_P(tmp) == IS_ARRAY) {
+		_mqseries_set_mqcsp_from_array(tmp, security_params, CSPUserId, CSPPassword);
+		connect_opts->SecurityParmsPtr = security_params;
+	}
 }
 /* }}} */
+
+void _mqseries_set_mqcsp_from_array(zval *array, PMQCSP security_params, PMQCHAR CSPUserId, PMQCHAR CSPPassword) {
+	HashTable *ht = Z_ARRVAL_P(array);
+	zval *tmp;
+	MQSERIES_SETOPT_LONG(security_params, Version);
+	MQSERIES_SETOPT_LONG(security_params, AuthenticationType);
+
+	if ((tmp = zend_hash_str_find(ht, "CSPUserId", sizeof("CSPUserId")-1)) != NULL && Z_TYPE_P(tmp) == IS_STRING) {
+		strncpy(CSPUserId, Z_STRVAL_P(tmp), MQ_CLIENT_USER_ID_LENGTH);
+		security_params->CSPUserIdPtr = CSPUserId;
+		security_params->CSPUserIdLength = strlen(CSPUserId);
+	}
+
+	if ((tmp = zend_hash_str_find(ht, "CSPPassword", sizeof("CSPPassword")-1)) != NULL && Z_TYPE_P(tmp) == IS_STRING) {
+		strncpy(CSPPassword, Z_STRVAL_P(tmp), MQ_CSP_PASSWORD_LENGTH);
+		security_params->CSPPasswordPtr = CSPPassword;
+		security_params->CSPPasswordLength = strlen(CSPPassword);
+	}
+}
 
 void _mqseries_set_mqpmo_from_array(zval *array, PMQPMO put_msg_opts) /* {{{ */
 {

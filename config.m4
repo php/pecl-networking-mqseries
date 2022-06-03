@@ -36,6 +36,7 @@ if test "$PHP_MQSERIES" != "no"; then
   LIBNAME=mqic     # use this when connecting via the mqic (client) libraries.
   LIBSYMBOL=MQCONN
 
+  PHP_LIBDIR=lib64
   PHP_CHECK_LIBRARY($LIBNAME,$LIBSYMBOL,
   [
      PHP_ADD_LIBRARY_WITH_PATH($LIBNAME, $MQSERIES_DIR/$PHP_LIBDIR, MQSERIES_SHARED_LIBADD)

@@ -89,6 +89,22 @@ Author: Michael Bretterklieber <mbretter@jawa.at>
 		} \
 	} while(0)
 
+
+#define MQSERIES_SETOPT_RESBYTES_MEMCPY(s,m) \
+  do { \
+    if ((tmp = zend_hash_str_find(ht, #m, sizeof(#m)-1)) != NULL) { \
+      if (Z_TYPE_P(tmp) == IS_RESOURCE) { \
+        mqseries_bytes *mqbytes = (mqseries_bytes *) zend_fetch_resource(Z_RES_P(tmp), PHP_MQSERIES_BYTES_RES_NAME, le_mqseries_bytes); \
+        if (mqbytes != NULL) { \
+          memcpy(s->m, mqbytes->bytes, sizeof(s->m)); \
+        } \
+      } else if (Z_TYPE_P(tmp) != IS_NULL) { \
+        convert_to_string(tmp); \
+        memcpy((MQCHAR *) s->m, Z_STRVAL_P(tmp), sizeof(s->m)); \
+      } \
+    } \
+  } while(0)
+
 #define MQSERIES_SETOPT_PTR(s,m) \
 	do { \
 		if ((tmp = zend_hash_str_find(ht, #m, sizeof(#m)-1)) != NULL) {\
@@ -114,6 +130,17 @@ Author: Michael Bretterklieber <mbretter@jawa.at>
 				mqseries_obj *mqobj = (mqseries_obj *) zend_fetch_resource(Z_RES_P(tmp), PHP_MQSERIES_OBJ_RES_NAME, le_mqseries_obj); \
 				if (mqobj != NULL) { \
 					s->m = mqobj->obj; \
+				} \
+		} \
+	} while(0)
+
+#define MQSERIES_SETOPT_HMSG(s,m) \
+	do { \
+		if ((tmp = zend_hash_str_find(ht, #m, sizeof(#m)-1)) != NULL && \
+			Z_TYPE_P(tmp) == IS_RESOURCE) { \
+				mqseries_message *mqhmsg = (mqseries_message *) zend_fetch_resource(Z_RES_P(tmp), PHP_MQSERIES_MESSAGE_RES_NAME, le_mqseries_message); \
+				if (mqhmsg != NULL) { \
+					s->m = mqhmsg->handle; \
 				} \
 		} \
 	} while(0)
@@ -164,6 +191,7 @@ static zval* create_mqseries_bytes_resource(PMQBYTE bytes, size_t size)
 
 	pBytes = (mqseries_bytes *) emalloc(sizeof(mqseries_bytes));
 	pBytes->bytes = (PMQBYTE) emalloc(size*sizeof(MQBYTE));
+	pBytes->size = size;
 	memcpy(pBytes->bytes, bytes, size);
 
 	ZVAL_RES(z_bytes, zend_register_resource(pBytes, le_mqseries_bytes));
@@ -368,6 +396,14 @@ static void _mqseries_set_channel_definition_from_array(zval *array, PMQCD chann
 }
 /* }}} */
 
+void _mqseries_set_mqcmho_from_array(zval *array, PMQCMHO handle ) { /* {{{ */
+	HashTable *ht = Z_ARRVAL_P(array);
+	zval *tmp;
+
+	MQSERIES_SETOPT_LONG(handle, Options);
+	MQSERIES_SETOPT_LONG(handle, Version);
+}
+
 void _mqseries_set_mqcno_from_array(zval *array, PMQCNO connect_opts, PMQCD channel_definition, PMQSCO ssl_configuration, PMQAIR authentication_information_record, 	PMQCHAR LDAPUserName) /* {{{ */
 {
 	HashTable *ht = Z_ARRVAL_P(array);
@@ -390,8 +426,62 @@ void _mqseries_set_mqcno_from_array(zval *array, PMQCNO connect_opts, PMQCD chan
 }
 /* }}} */
 
-void _mqseries_set_mqpmo_from_array(zval *array, PMQPMO put_msg_opts) /* {{{ */
-{
+void _mqseries_set_mqdmpo_from_array(zval *array, PMQDMPO handle) {
+  HashTable *ht = Z_ARRVAL_P(array);
+  zval *tmp;
+  MQSERIES_SETOPT_LONG(handle, Version);
+  MQSERIES_SETOPT_LONG(handle, Options);
+}
+
+void _mqseries_set_mqdmho_from_array(zval *array, PMQDMHO handle) {
+  HashTable *ht = Z_ARRVAL_P(array);
+  zval *tmp;
+  MQSERIES_SETOPT_LONG(handle, Version);
+  MQSERIES_SETOPT_LONG(handle, Options);
+}
+
+void _mqseries_set_mqbmho_from_array(zval *array, PMQBMHO handle) {
+  HashTable *ht = Z_ARRVAL_P(array);
+  zval *tmp;
+  MQSERIES_SETOPT_LONG(handle, Version);
+  MQSERIES_SETOPT_LONG(handle, Options);
+}
+
+void _mqseries_set_mqmhbo_from_array(zval *array, PMQMHBO handle) {
+  HashTable *ht = Z_ARRVAL_P(array);
+  zval *tmp;
+  MQSERIES_SETOPT_LONG(handle, Version);
+  MQSERIES_SETOPT_LONG(handle, Options);
+
+}
+
+void _mqseries_set_mqsmpo_from_array(zval *array, PMQSMPO handle) {
+  HashTable *ht = Z_ARRVAL_P(array);
+  zval *tmp;
+  MQSERIES_SETOPT_LONG(handle, Version);
+  MQSERIES_SETOPT_LONG(handle, Options);
+  MQSERIES_SETOPT_LONG(handle, ValueEncoding);
+  MQSERIES_SETOPT_LONG(handle, ValueCCSID);
+}
+
+void _mqseries_set_mqimpo_from_array(zval *array, PMQIMPO handle) {
+  HashTable *ht = Z_ARRVAL_P(array);
+  zval *tmp;
+  MQSERIES_SETOPT_LONG(handle, Version);
+  MQSERIES_SETOPT_LONG(handle, Options);
+
+  MQSERIES_SETOPT_LONG(handle, RequestedEncoding);
+  MQSERIES_SETOPT_LONG(handle, RequestedCCSID);
+
+  MQSERIES_SETOPT_LONG(handle, ReturnedEncoding);
+  MQSERIES_SETOPT_LONG(handle, ReturnedCCSID);
+
+  MQSERIES_SETOPT_CHAR(handle, Reserved1);
+  MQSERIES_SETOPT_CHARV(handle, ReturnedName);
+  MQSERIES_SETOPT_STRING(handle, TypeString);
+}
+
+void _mqseries_set_mqpmo_from_array(zval *array, PMQPMO put_msg_opts) { /* {{{ */
 	HashTable *ht = Z_ARRVAL_P(array);
 	zval *tmp;
 
@@ -403,8 +493,8 @@ void _mqseries_set_mqpmo_from_array(zval *array, PMQPMO put_msg_opts) /* {{{ */
 
 #ifdef MQPMO_VERSION_3
 		case MQPMO_VERSION_3:
-			// MQHMSG    OriginalMsgHandle;
-			// MQHMSG    NewMsgHandle;
+			MQSERIES_SETOPT_HMSG(put_msg_opts, OriginalMsgHandle);
+			MQSERIES_SETOPT_HMSG(put_msg_opts, NewMsgHandle);
 			MQSERIES_SETOPT_LONG(put_msg_opts, Action);
 			MQSERIES_SETOPT_LONG(put_msg_opts, PubLevel);
 			// no break intentional
@@ -447,8 +537,8 @@ void _mqseries_set_array_from_mqpmo(zval *array, PMQPMO put_msg_opts) { /* {{{ *
 
 #ifdef MQPMO_VERSION_3
 		case MQPMO_VERSION_3:
-			// MQHMSG    OriginalMsgHandle;
-			// MQHMSG    NewMsgHandle;
+			MQSERIES_ADD_ASSOC_LONG(put_msg_opts, OriginalMsgHandle);
+			MQSERIES_ADD_ASSOC_LONG(put_msg_opts, NewMsgHandle);
 			MQSERIES_ADD_ASSOC_LONG(put_msg_opts, Action);
 			MQSERIES_ADD_ASSOC_LONG(put_msg_opts, PubLevel);
 			// no break intentional
@@ -512,8 +602,8 @@ void _mqseries_set_mqmd_from_array(zval *array, PMQMD msg_desc) /* {{{ */
 			MQSERIES_SETOPT_STRING(msg_desc, Format);
 			MQSERIES_SETOPT_LONG(msg_desc, Priority);
 			MQSERIES_SETOPT_LONG(msg_desc, Persistence);
-			MQSERIES_SETOPT_RESBYTES(msg_desc, MsgId);
-			MQSERIES_SETOPT_RESBYTES(msg_desc, CorrelId);
+			MQSERIES_SETOPT_RESBYTES_MEMCPY(msg_desc, MsgId);
+			MQSERIES_SETOPT_RESBYTES_MEMCPY(msg_desc, CorrelId);
 			MQSERIES_SETOPT_LONG(msg_desc, BackoutCount);
 			MQSERIES_SETOPT_STRING(msg_desc, ReplyToQ);
 			MQSERIES_SETOPT_STRING(msg_desc, ReplyToQMgr);
@@ -690,7 +780,7 @@ void _mqseries_set_mqgmo_from_array(zval *array, PMQGMO get_msg_opts) /* {{{ */
 
 #ifdef MQGMO_VERSION_4
 		case MQGMO_VERSION_4:
-			// MQHMSG    MsgHandle;
+			MQSERIES_SETOPT_HMSG(get_msg_opts, MsgHandle);
 			MQSERIES_SETOPT_LONG(get_msg_opts, Reserved2);
 			// no break intentional
 #endif /* MQGMO_VERSION_4 */
@@ -834,30 +924,70 @@ void _mqseries_set_array_from_mqsd(zval *array, PMQSD sub_desc) /* {{{ */
 			MQSERIES_UNSUPPRTED_VERSION(MQSD, sub_desc);
 
 #ifdef MQSD_VERSION_1
-		case MQSD_VERSION_1:
-			MQSERIES_ADD_ASSOC_LONG(sub_desc, Version);
-			MQSERIES_ADD_ASSOC_LONG(sub_desc, Options);
-			MQSERIES_ADD_ASSOC_STRING(sub_desc, ObjectName);
-			MQSERIES_ADD_ASSOC_STRING(sub_desc, AlternateUserId);
-			MQSERIES_ADD_ASSOC_RESOURCE(sub_desc, AlternateSecurityId);
-			MQSERIES_ADD_ASSOC_LONG(sub_desc, SubExpiry);
-			MQSERIES_ADD_ASSOC_CHARV(sub_desc, ObjectString);
-			MQSERIES_ADD_ASSOC_CHARV(sub_desc, SubName);
-			MQSERIES_ADD_ASSOC_CHARV(sub_desc, SubUserData);
-			MQSERIES_ADD_ASSOC_RESOURCE(sub_desc, SubCorrelId);
-			MQSERIES_ADD_ASSOC_LONG(sub_desc, PubPriority);
-			MQSERIES_ADD_ASSOC_RESOURCE(sub_desc, PubAccountingToken);
-			MQSERIES_ADD_ASSOC_STRING(sub_desc, PubApplIdentityData);
-			MQSERIES_ADD_ASSOC_CHARV(sub_desc, SelectionString);
-			MQSERIES_ADD_ASSOC_LONG(sub_desc, SubLevel);
-			MQSERIES_ADD_ASSOC_CHARV(sub_desc, ResObjectString);
+    case MQSD_VERSION_1:
+      MQSERIES_ADD_ASSOC_LONG(sub_desc, Version);
+      MQSERIES_ADD_ASSOC_LONG(sub_desc, Options);
+      MQSERIES_ADD_ASSOC_STRING(sub_desc, ObjectName);
+      MQSERIES_ADD_ASSOC_STRING(sub_desc, AlternateUserId);
+      MQSERIES_ADD_ASSOC_RESOURCE(sub_desc, AlternateSecurityId);
+      MQSERIES_ADD_ASSOC_LONG(sub_desc, SubExpiry);
+      MQSERIES_ADD_ASSOC_CHARV(sub_desc, ObjectString);
+      MQSERIES_ADD_ASSOC_CHARV(sub_desc, SubName);
+      MQSERIES_ADD_ASSOC_CHARV(sub_desc, SubUserData);
+      MQSERIES_ADD_ASSOC_RESOURCE(sub_desc, SubCorrelId);
+      MQSERIES_ADD_ASSOC_LONG(sub_desc, PubPriority);
+      MQSERIES_ADD_ASSOC_RESOURCE(sub_desc, PubAccountingToken);
+      MQSERIES_ADD_ASSOC_STRING(sub_desc, PubApplIdentityData);
+      MQSERIES_ADD_ASSOC_CHARV(sub_desc, SelectionString);
+      MQSERIES_ADD_ASSOC_LONG(sub_desc, SubLevel);
+      MQSERIES_ADD_ASSOC_CHARV(sub_desc, ResObjectString);
 #endif /* MQSD_VERSION_1 */
 	}
 }
 /* }}} */
 
-void _mqseries_set_mqsts_from_array(zval *array, PMQSTS status) /* {{{ */
-{
+
+void _mqseries_set_array_from_mqpd(zval *array, PMQPD pd ) {
+  HashTable *ht = Z_ARRVAL_P(array);
+  zval *tmp;
+
+  switch (pd->Version) {
+    default:
+      MQSERIES_UNSUPPRTED_VERSION(MQPD, pd);
+
+#ifdef MQSD_VERSION_1
+    case MQSD_VERSION_1:
+      MQSERIES_ADD_ASSOC_CHAR(pd, StrucId);
+      MQSERIES_ADD_ASSOC_LONG(pd, Version);
+      MQSERIES_ADD_ASSOC_LONG(pd, Options);
+      MQSERIES_ADD_ASSOC_LONG(pd, Support);
+      MQSERIES_ADD_ASSOC_LONG(pd, Context);
+      MQSERIES_ADD_ASSOC_LONG(pd, CopyOptions);
+#endif /* MQSD_VERSION_1 */
+  }
+}
+
+void _mqseries_set_mqpd_from_array(zval *array, PMQPD pd ) {
+  HashTable *ht = Z_ARRVAL_P(array);
+  zval *tmp;
+
+  switch (pd->Version) {
+    default:
+      MQSERIES_UNSUPPRTED_VERSION(MQPD, pd);
+
+#ifdef MQSD_VERSION_1
+    case MQSD_VERSION_1:
+      MQSERIES_SETOPT_LONG(pd, Version);
+      MQSERIES_SETOPT_LONG(pd, Options);
+      MQSERIES_SETOPT_LONG(pd, Support);
+      MQSERIES_SETOPT_LONG(pd, Context);
+      MQSERIES_SETOPT_LONG(pd, CopyOptions);
+#endif /* MQSD_VERSION_1 */
+  }
+}
+
+
+void _mqseries_set_mqsts_from_array(zval *array, PMQSTS status) {
 	HashTable *ht = Z_ARRVAL_P(array);
 	zval *tmp;
 

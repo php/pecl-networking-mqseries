@@ -76,13 +76,36 @@ extern int le_mqseries_obj;
 
 typedef struct {
 	int id;
+	int size;
 	PMQBYTE bytes;
 } mqseries_bytes;
 extern int le_mqseries_bytes;
 #define PHP_MQSERIES_BYTES_RES_NAME "mqseries_bytes"
 
+
+typedef struct {
+	int id;
+	MQHMSG  handle;
+} mqseries_message;
+extern int le_mqseries_message;
+#define PHP_MQSERIES_MESSAGE_RES_NAME "mqseries_message"
+
+
 /* {{{ Helper */
 void _mqseries_set_mqcno_from_array(zval *, PMQCNO, PMQCD, PMQSCO, PMQAIR, PMQCHAR);
+void _mqseries_set_mqcmho_from_array(zval *array, PMQCMHO handle);
+void _mqseries_set_mqdmpo_from_array(zval *array, PMQDMPO handle);
+
+
+void _mqseries_set_array_from_mqpd(zval *array, PMQPD handle);
+void _mqseries_set_mqpd_from_oarray(zval *array, PMQPD handle);
+
+
+void _mqseries_set_mqdmho_from_array(zval *array, PMQDMHO handle);
+void _mqseries_set_mqbmho_from_array(zval *array, PMQBMHO handle);
+void _mqseries_set_mqmhbo_from_array(zval *array, PMQMHBO handle);
+void _mqseries_set_mqsmpo_from_array(zval *array, PMQSMPO handle);
+void _mqseries_set_mqimpo_from_array(zval *array, PMQIMPO handle);
 
 void _mqseries_set_mqpmo_from_array(zval *, PMQPMO);
 void _mqseries_set_array_from_mqpmo(zval *, PMQPMO);
@@ -101,6 +124,7 @@ void _mqseries_set_mqbo_from_array(zval *, PMQBO);
 #ifdef HAVE_MQSERIESLIB_V7
 
 void _mqseries_set_mqsd_from_array(zval *, PMQSD);
+void _mqseries_set_mqpd_from_array(zval *, PMQPD)
 void _mqseries_set_array_from_mqsd(zval *, PMQSD);
 
 void _mqseries_set_mqsts_from_array(zval *, PMQSTS);
@@ -133,16 +157,16 @@ PHP_FUNCTION(mqseries_strerror);
 PHP_FUNCTION(mqseries_bytes_val);
 
 #ifdef HAVE_MQSERIESLIB_V7
-// PHP_FUNCTION(mqseries_bufmh);
+PHP_FUNCTION(mqseries_bufmh);
 // PHP_FUNCTION(mqseries_cb);
 // PHP_FUNCTION(mqseries_cb_function);
-// PHP_FUNCTION(mqseries_crtmh);
+PHP_FUNCTION(mqseries_crtmh);
 // PHP_FUNCTION(mqseries_ctl);
-// PHP_FUNCTION(mqseries_dltmh);
-// PHP_FUNCTION(mqseries_dltmp);
-// PHP_FUNCTION(mqseries_inqmp);
-// PHP_FUNCTION(mqseries_mhbuf);
-// PHP_FUNCTION(mqseries_setmp);
+PHP_FUNCTION(mqseries_dltmh);
+PHP_FUNCTION(mqseries_dltmp);
+PHP_FUNCTION(mqseries_inqmp);
+PHP_FUNCTION(mqseries_mhbuf);
+PHP_FUNCTION(mqseries_setmp);
 PHP_FUNCTION(mqseries_stat);
 PHP_FUNCTION(mqseries_sub);
 // PHP_FUNCTION(mqseries_subrq);

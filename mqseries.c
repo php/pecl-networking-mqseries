@@ -31,8 +31,8 @@ any other GPL-like (LGPL, GPL2) License.
     $Id$
 
 Author: Michael Bretterklieber <mbretter@jawa.at>
-	    Philippe Tjon A Hen <philippe@tjonahen.nl>
-		Pierrick Charron <pierrick@php.net>
+        Philippe Tjon A Hen <philippe@tjonahen.nl>
+        Pierrick Charron <pierrick@php.net>
 
 */
 
@@ -49,6 +49,7 @@ Author: Michael Bretterklieber <mbretter@jawa.at>
 static void _mqseries_disc(zend_resource *rsrc);
 static void _mqseries_close(zend_resource *rsrc);
 static void _mqseries_bytes(zend_resource *rsrc);
+static void _mqseries_hmsg(zend_resource *rsrc);
 
 static int _mqseries_is_compcode_reason_ref(zval *, zval *);
 static int _mqseries_is_called_by_ref(zval *, char *);
@@ -63,6 +64,7 @@ ZEND_DECLARE_MODULE_GLOBALS(mqseries)
 int le_mqseries_conn;
 int le_mqseries_obj;
 int le_mqseries_bytes;
+int le_mqseries_message;
 
 static HashTable *ht_reason_texts;
 
@@ -217,6 +219,85 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_stat, 0, 0, 5)
 	ZEND_ARG_INFO(1, reason)				/* OR: Reason code qualifying CompCode */
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_bufmh, 0, 0, 8)
+	ZEND_ARG_INFO(0, hconn)         /* I: Connection handle */
+	ZEND_ARG_INFO(1, hmsg)
+	ZEND_ARG_ARRAY_INFO(1, bufMsgHOpts, 0)
+	ZEND_ARG_ARRAY_INFO(1, msgDesc, 0)    /* IO: Message descriptor */
+	ZEND_ARG_INFO(0, buffer)        /* IB: Message data */
+	ZEND_ARG_INFO(1, dataLength)      /* O: Length of the message */
+	ZEND_ARG_INFO(1, compCode)        /* OC: Completion code */
+	ZEND_ARG_INFO(1, reason)        /* OR: Reason code qualifying CompCode */
+ZEND_END_ARG_INFO()
+
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_crtmh, 0, 0, 5)
+	ZEND_ARG_INFO(0, hconn)         /* I: Connection handle */
+	ZEND_ARG_ARRAY_INFO(1, crtMsgHOpt, 0)
+	ZEND_ARG_INFO(1, hmsg)
+	ZEND_ARG_INFO(1, compCode)        /* OC: Completion code */
+	ZEND_ARG_INFO(1, reason)        /* OR: Reason code qualifying CompCode */
+ZEND_END_ARG_INFO()
+
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_dltmh, 0, 0, 5)
+	ZEND_ARG_INFO(0, hconn)          /* I: Connection handle */
+	ZEND_ARG_INFO(1, hmsg)
+	ZEND_ARG_ARRAY_INFO(1, dltMsgHOpt, 0)
+	ZEND_ARG_INFO(1, compCode)       /* OC: Completion code */
+	ZEND_ARG_INFO(1, reason)           /* OR: Reason code qualifying CompCode */
+ZEND_END_ARG_INFO()
+
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_dltmp, 0, 0, 6)
+	ZEND_ARG_INFO(0, hconn)             /* I: Connection handle */
+	ZEND_ARG_INFO(1, hmsg)
+	ZEND_ARG_ARRAY_INFO(1, dltPropOpts, 0)
+	ZEND_ARG_INFO(0, name)                /* I: Name  */
+	ZEND_ARG_INFO(1, compCode)            /* OC: Completion code */
+	ZEND_ARG_INFO(1, reason)            /* OR: Reason code qualifying CompCode */
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_inqmp, 0, 0, 11)
+	ZEND_ARG_INFO(0, hconn)             /* I: Connection handle */
+	ZEND_ARG_INFO(1, hmsg)
+	ZEND_ARG_ARRAY_INFO(1, inqPropOpts, 0)
+	ZEND_ARG_INFO(1, name)                /* I: Name  */
+	ZEND_ARG_ARRAY_INFO(1, propDesc, 0)       /* IO: Message descriptor */
+	ZEND_ARG_INFO(1, type)              /* I: Status information type */
+	ZEND_ARG_INFO(0, bufferlength)      /* IL: Length in bytes of the Buffer area */
+	ZEND_ARG_INFO(1, value)        /* IB: Message data */
+	ZEND_ARG_INFO(1, dataLength)          /* O: Length of the message */
+	ZEND_ARG_INFO(1, compCode)            /* OC: Completion code */
+	ZEND_ARG_INFO(1, reason)            /* OR: Reason code qualifying CompCode */
+ZEND_END_ARG_INFO()
+
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_mhbuf, 0, 0, 9)
+	ZEND_ARG_INFO(0, hconn)             /* I: Connection handle */
+	ZEND_ARG_INFO(1, hmsg)
+	ZEND_ARG_ARRAY_INFO(1, msgHBufOpts, 0)
+	ZEND_ARG_INFO(0, name)                /* I: Name  */
+	ZEND_ARG_ARRAY_INFO(1, msgDesc, 0)        /* IO: Message descriptor */
+	ZEND_ARG_INFO(0, buffer)        /* IB: Message data */
+	ZEND_ARG_INFO(1, dataLength)          /* O: Length of the message */
+	ZEND_ARG_INFO(1, compCode)            /* OC: Completion code */
+	ZEND_ARG_INFO(1, reason)            /* OR: Reason code qualifying CompCode */
+ZEND_END_ARG_INFO()
+
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_setmp, 0, 0, 10)
+	ZEND_ARG_INFO(0, hconn)             /* I: Connection handle */
+	ZEND_ARG_INFO(1, hmsg)
+	ZEND_ARG_ARRAY_INFO(1, setPropOpts, 0)
+	ZEND_ARG_INFO(0, name)                /* I: Name  */
+	ZEND_ARG_ARRAY_INFO(1, propDesc, 0)       /* IO: Message descriptor */
+	ZEND_ARG_INFO(0, type)              /* I: Status information type */
+	ZEND_ARG_INFO(0, value)        /* IB: Message data */
+	ZEND_ARG_INFO(1, compCode)            /* OC: Completion code */
+	ZEND_ARG_INFO(1, reason)            /* OR: Reason code qualifying CompCode */
+ZEND_END_ARG_INFO()
+
 #endif /* HAVE_MQSERIESLIB_V7 */
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_mqseries_strerror, 0, 0, 1)
@@ -251,6 +332,13 @@ zend_function_entry mqseries_functions[] = {
 #ifdef HAVE_MQSERIESLIB_V7
 	PHP_FE(mqseries_sub,        arginfo_mqseries_sub)
 	PHP_FE(mqseries_stat,       arginfo_mqseries_stat)
+	PHP_FE(mqseries_bufmh,      arginfo_mqseries_bufmh)
+	PHP_FE(mqseries_crtmh,      arginfo_mqseries_crtmh)
+	PHP_FE(mqseries_dltmh,      arginfo_mqseries_dltmh)
+	PHP_FE(mqseries_dltmp,      arginfo_mqseries_dltmp)
+	PHP_FE(mqseries_inqmp,      arginfo_mqseries_inqmp)
+	PHP_FE(mqseries_mhbuf,      arginfo_mqseries_mhbuf)
+	PHP_FE(mqseries_setmp,      arginfo_mqseries_setmp)
 #endif /* HAVE_MQSERIESLIB_V7 */
 	{NULL, NULL, NULL}	/* Must be the last line in mqseries_functions[] */
 };
@@ -293,6 +381,8 @@ PHP_MINIT_FUNCTION(mqseries)
 	le_mqseries_conn = zend_register_list_destructors_ex(_mqseries_disc, NULL, PHP_MQSERIES_DESCRIPTOR_RES_NAME, module_number);
 
 	le_mqseries_bytes = zend_register_list_destructors_ex(_mqseries_bytes, NULL, PHP_MQSERIES_BYTES_RES_NAME, module_number);
+
+	le_mqseries_message = zend_register_list_destructors_ex(_mqseries_hmsg, NULL, PHP_MQSERIES_MESSAGE_RES_NAME, module_number);
 
 #include "mqseries_init_const.h"
 
@@ -350,17 +440,16 @@ MQ call:
 	MQLONG    Reason;    -- Reason code qualifying CompCode
 
 */
-PHP_FUNCTION(mqseries_conn)
-{
-	char *name;
-	size_t name_len;
+PHP_FUNCTION(mqseries_conn) {
+	char *name = NULL;
+	size_t name_len= 0;
 	zval *z_conn, *z_comp_code, *z_reason;
 
 	mqseries_descriptor *mqdesc;
 
 	MQCHAR48 qManagerName;
-	MQLONG comp_code;
-	MQLONG reason;
+	MQLONG comp_code = 0;
+	MQLONG reason = 0;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "sz/z/z/", &name, &name_len, &z_conn, &z_comp_code, &z_reason) == FAILURE) {
 		return;
@@ -1278,7 +1367,12 @@ PHP_FUNCTION(mqseries_bytes_val)
 	}
 
 	if (bytes && bytes->bytes) {
-		RETVAL_STRINGL((char *) bytes->bytes, 24); /* MQBYTE24 */
+			if (bytes->size > 0) {
+				RETVAL_STRINGL((char *)bytes->bytes, bytes->size);
+			} else {
+			  RETVAL_STRINGL((char *) bytes->bytes, 24); /* MQBYTE24 */
+			}
+
 	} else {
 		RETVAL_NULL();
 	}
@@ -1423,6 +1517,610 @@ PHP_FUNCTION(mqseries_stat)
 
 	_mqseries_set_array_from_mqsts(z_status, &status);
 }
+
+/* 21.07.2017 */
+/*
+ MQ call:
+
+ MQBUFMH (Hconn, Hmsg, &BufMsgHOpts, &MsgDesc, BufferLength, Buffer, &DataLength, &CompCode, &Reason);
+
+    MQHCONN Hconn;       -- Connection handle
+    MQHMSG  Hmsg;         -- Message handle
+    MQBMHO  BufMsgHOpts;  -- Options that control the action of MQBUFMH
+    MQMD    MsgDesc;      -- Message descriptor
+    MQLONG  BufferLength; -- Length in bytes of the Buffer area
+    MQBYTE  Buffer[n];    -- Area to contain the message buffer
+    MQLONG  DataLength;   -- Length of the output buffer
+    MQLONG  CompCode;     -- Completion code
+    MQLONG  Reason;       -- Reason code qualifying CompCode
+*/
+PHP_FUNCTION(mqseries_bufmh) {
+  mqseries_descriptor *mqdesc;
+  mqseries_message *mqhandle;
+  MQCHARV  prop_name = { MQCHARV_DEFAULT };
+  zend_long type;
+  MQLONG comp_code = 0, reason = 0;
+  zval *z_mqdesc,
+       *z_hmsg,
+       *z_msg_desc,
+       *z_buf_msg_hopts,
+       *z_buffer,
+       *z_data_length,
+       *z_comp_code,
+       *z_reason;
+
+  MQLONG data_length = 0, buffer_size = 0;
+  MQBYTE *data;
+
+  zend_long buf_len = 0L;
+  MQBYTE *buf;
+
+  MQBMHO  buf_msg_hopts = { MQBMHO_DEFAULT };
+  MQMD msg_desc = { MQMD_DEFAULT };
+
+  if (zend_parse_parameters(ZEND_NUM_ARGS(), "rraaslz/z/", &z_mqdesc, &z_hmsg, &z_buf_msg_hopts, &z_msg_desc,  &data, &data_length, &buf_len, &z_comp_code, &z_reason) == FAILURE) {
+    return;
+  }
+
+  if ((mqdesc = (mqseries_descriptor *)zend_fetch_resource(Z_RES_P(z_mqdesc), PHP_MQSERIES_DESCRIPTOR_RES_NAME, le_mqseries_conn)) == NULL) {
+    RETURN_FALSE;
+  }
+  if ((mqhandle = (mqseries_message *)zend_fetch_resource(Z_RES_P(z_hmsg), PHP_MQSERIES_MESSAGE_RES_NAME, le_mqseries_message)) == NULL) {
+    RETURN_FALSE;
+  }
+
+  _mqseries_set_mqmd_from_array(z_msg_desc, &msg_desc);
+  _mqseries_set_mqbmho_from_array(z_buf_msg_hopts, &buf_msg_hopts);
+
+  //data = buf = (MQBYTE *)emalloc(sizeof(MQBYTE) * buf_len);
+  MQBUFMH(mqdesc->conn, mqhandle->handle, &buf_msg_hopts, &msg_desc, (MQLONG)buf_len, data, &data_length, &comp_code, &reason);
+
+  ZVAL_LONG(z_comp_code, (long)comp_code);
+  ZVAL_LONG(z_reason, (long)reason);
+  _mqseries_set_array_from_mqmd(z_msg_desc, &msg_desc);
+}
+
+/*
+MQ call:
+
+MQMHBUF (Hconn, Hmsg, &MsgHBufOpts, &Name, &MsgDesc, BufferLength, Buffer, &DataLength, &CompCode, &Reason);
+
+MQHCONN Hconn;        -- Connection handle
+MQHMSG  Hmsg;         -- Message handle
+MQMHBO  MsgHBufOpts;  -- Options that control the action of MQMHBUF
+MQCHARV Name;         -- Property name
+MQMD    MsgDesc;      -- Message descriptor
+MQLONG  BufferLength; -- Length in bytes of the Buffer area
+MQBYTE  Buffer[n];    -- Area to contain the properties
+MQLONG  DataLength;   -- Length of the properties
+MQLONG  CompCode;     -- Completion code
+MQLONG  Reason;       -- Reason code qualifying CompCode
+*/
+PHP_FUNCTION(mqseries_mhbuf) {
+  mqseries_descriptor *mqdesc;
+  mqseries_message *mqhandle;
+  MQLONG comp_code, reason;
+  MQCHARV  prop_name = { MQCHARV_DEFAULT };
+  zval *z_mqdesc,
+       *z_hmsg,
+       *z_msg_desc,
+       *z_buffer,
+       *z_data_length,
+       *z_buf_msg_hopts,
+       *z_comp_code,
+       *z_reason;
+
+  char *name = NULL;
+  size_t name_len = 0;
+  zend_long buf_len = 0L;
+  MQLONG data_length = 0L;
+  MQBYTE *buf, *data;
+  MQMHBO buf_msg_hopts = { MQMHBO_DEFAULT };
+  MQMD  msg_desc = { MQMD_DEFAULT };
+
+  if (zend_parse_parameters(ZEND_NUM_ARGS(), "rra/s/al/z/z/z/z/", &z_mqdesc, &z_hmsg, &z_buf_msg_hopts, &name,  &name_len, &z_msg_desc, &buf_len, &z_buffer, &z_data_length, &z_comp_code, &z_reason) == FAILURE) {
+    return;
+  }
+
+  if ((mqdesc = (mqseries_descriptor *)zend_fetch_resource(Z_RES_P(z_mqdesc), PHP_MQSERIES_DESCRIPTOR_RES_NAME, le_mqseries_conn)) == NULL) {
+    RETURN_FALSE;
+  }
+  if ((mqhandle = (mqseries_message *)zend_fetch_resource(Z_RES_P(z_hmsg), PHP_MQSERIES_MESSAGE_RES_NAME, le_mqseries_message)) == NULL) {
+    RETURN_FALSE;
+  }
+
+  _mqseries_set_mqmhbo_from_array(z_buf_msg_hopts, &buf_msg_hopts);
+  _mqseries_set_mqmd_from_array(z_msg_desc, &msg_desc);
+
+  data = buf = (MQBYTE *)emalloc(sizeof(MQBYTE) * buf_len);
+  prop_name.VSPtr = name;
+  prop_name.VSLength = name_len;
+  MQMHBUF(mqdesc->conn, mqhandle->handle, &buf_msg_hopts, &prop_name, &msg_desc, (MQLONG)buf_len, buf, &data_length, &comp_code, &reason);
+
+  if (comp_code == MQCC_OK) {
+    ZVAL_LONG(z_data_length, (long)data_length);
+    zval_dtor(z_buffer);
+    ZVAL_STRINGL(z_buffer, (char *)data, (buf_len > 0) ? (buf_len < (long)data_length ? buf_len : (long)data_length) : 0);
+  }
+  _mqseries_set_array_from_mqmd(z_msg_desc, &msg_desc);
+  ZVAL_LONG(z_comp_code, (long)comp_code);
+  ZVAL_LONG(z_reason, (long)reason);
+  efree(buf);
+}
+
+/*
+MQ call:
+
+MQCRTMH (Hconn, &CrtMsgHOpts, &Hmsg, &CompCode, &Reason);
+
+MQHCONN  Hconn;       -- Connection handle
+MQCMHO   CrtMsgHOpts; -- Options that control the action of MQCRTMH
+MQHMSG   Hmsg;        -- Message handle
+MQLONG   CompCode;    -- Completion code
+MQLONG   Reason;      -- Reason code qualifying CompCode
+*/
+PHP_FUNCTION(mqseries_crtmh) {
+  mqseries_descriptor *mqdesc;
+  mqseries_message *mqmsg;
+  MQLONG comp_code, reason;
+  zval *z_mqdesc,
+       *z_mhandle,
+       *z_crt_msg_opts,
+       *z_comp_code,
+       *z_reason;
+
+  MQCMHO   crt_msg_opts = { MQCMHO_DEFAULT };
+
+  if (zend_parse_parameters(ZEND_NUM_ARGS(), "z/a/z/z/z/", &z_mqdesc, &z_crt_msg_opts, &z_mhandle, &z_comp_code, &z_reason) == FAILURE) {
+    return;
+  }
+  if ((mqdesc = (mqseries_descriptor *)zend_fetch_resource(Z_RES_P(z_mqdesc), PHP_MQSERIES_DESCRIPTOR_RES_NAME, le_mqseries_conn)) == NULL) {
+    RETURN_FALSE;
+  }
+  _mqseries_set_mqcmho_from_array(z_crt_msg_opts, &crt_msg_opts);
+
+  mqmsg = (mqseries_message *)emalloc(sizeof(mqseries_message));
+  MQCRTMH(mqdesc->conn, &crt_msg_opts, &mqmsg->handle, &comp_code, &reason);
+  ZVAL_LONG(z_comp_code, (long)comp_code);
+  ZVAL_LONG(z_reason, (long)reason);
+  if (comp_code == MQCC_OK) {
+    zval_dtor(z_mhandle);
+    ZVAL_RES(z_mhandle, zend_register_resource(mqmsg, le_mqseries_message));
+    mqmsg->id = Z_RES_P(z_mhandle)->handle;
+  }
+  else {
+    efree(mqmsg);
+  }
+}
+
+/*
+MQ call:
+
+MQDLTMH (Hconn, &Hmsg, &DltMsgHOpts, &CompCode, &Reason);
+
+MQHCONN  Hconn;       -- Connection handle
+MQHMSG   Hmsg;        -- Message handle
+MQDMHO   DltMsgHOpts; -- Options that control the action of MQDLTMH
+MQLONG   CompCode;    -- Completion code
+MQLONG   Reason;      -- Reason code qualifying CompCode
+*/
+
+PHP_FUNCTION(mqseries_dltmh) {
+  mqseries_descriptor *mqdesc;
+  mqseries_message *mqhandle;
+  MQLONG comp_code, reason;
+  zval *z_mqdesc,
+       *z_hmsg,
+       *z_dlt_msg_hopts,
+       *z_comp_code,
+       *z_reason;
+
+  MQDMHO dmho = { MQDMHO_DEFAULT };
+
+  if (zend_parse_parameters(ZEND_NUM_ARGS(), "rra/z/z/", &z_mqdesc, &z_hmsg, &z_dlt_msg_hopts, &z_comp_code, &z_reason) == FAILURE) {
+    return;
+  }
+
+  if ((mqdesc = (mqseries_descriptor *)zend_fetch_resource(Z_RES_P(z_mqdesc), PHP_MQSERIES_DESCRIPTOR_RES_NAME, le_mqseries_conn)) == NULL) {
+    RETURN_FALSE;
+  }
+  if ((mqhandle = (mqseries_message *)zend_fetch_resource(Z_RES_P(z_hmsg), PHP_MQSERIES_MESSAGE_RES_NAME, le_mqseries_message)) == NULL) {
+    RETURN_FALSE;
+  }
+
+  _mqseries_set_mqdmho_from_array(z_dlt_msg_hopts, &dmho);
+
+  MQDLTMH(mqdesc->conn, &mqhandle->handle, &dmho, &comp_code, &reason);
+
+  ZVAL_LONG(z_comp_code, (long)comp_code);
+  ZVAL_LONG(z_reason, (long)reason);
+  if (comp_code == MQCC_OK) {
+    zend_list_close(Z_RES_P(z_hmsg));
+  }
+}
+
+/*
+MQ call:
+
+MQDLTMP (Hconn, Hmsg, &DltPropOpts, &Name, &CompCode, &Reason)
+
+MQHCONN Hconn;       -- Connection handle
+MQHMSG  Hmsg;        -- Message handle
+MQDMPO  DltPropOpts; -- Options that control the action of MQDLTMP
+MQCHARV Name;        -- Property name
+MQLONG  CompCode;    -- Completion code
+MQLONG  Reason;      -- Reason code qualifying CompCode
+*/
+PHP_FUNCTION(mqseries_dltmp) {
+  mqseries_descriptor *mqdesc;
+  mqseries_message *mqhandle;
+  char *name = NULL;
+  size_t name_len = 0;
+  MQCHARV  prop_name = { MQCHARV_DEFAULT };
+  MQLONG comp_code, reason;
+  zval *z_mqdesc,
+       *z_hmsg,
+       *z_dlt_prop_opts,
+       *z_comp_code,
+       *z_reason;
+
+  MQDMPO dlt_prop_opts = { MQDMPO_DEFAULT};
+
+  if (zend_parse_parameters(ZEND_NUM_ARGS(), "rra/s/z/z/", &z_mqdesc, &z_hmsg, &z_dlt_prop_opts, &name, &name_len, &z_comp_code, &z_reason) == FAILURE) {
+    return;
+  }
+  if ((mqdesc = (mqseries_descriptor *)zend_fetch_resource(Z_RES_P(z_mqdesc), PHP_MQSERIES_DESCRIPTOR_RES_NAME, le_mqseries_conn)) == NULL) {
+    RETURN_FALSE;
+  }
+  if ((mqhandle = (mqseries_message *)zend_fetch_resource(Z_RES_P(z_hmsg), PHP_MQSERIES_MESSAGE_RES_NAME, le_mqseries_message)) == NULL) {
+    RETURN_FALSE;
+  }
+  _mqseries_set_mqdmpo_from_array(z_dlt_prop_opts, &dlt_prop_opts);
+
+  prop_name.VSPtr = name;
+  prop_name.VSLength = name_len;
+
+
+  MQDLTMP(mqdesc->conn, mqhandle->handle, &dlt_prop_opts, &prop_name, &comp_code, &reason);
+
+  ZVAL_LONG(z_comp_code, (long)comp_code);
+  ZVAL_LONG(z_reason, (long)reason);
+}
+
+/*
+MQ call:
+
+MQINQMP (Hconn, Hmsg, &InqPropOpts, &Name, &PropDesc, &Type, ValueLength, Value, &DataLength, &CompCode, &Reason);
+
+MQHCONN Hconn;       -- Connection handle
+MQHMSG  Hmsg;        -- Message handle
+MQIMPO InqPropOpts;  -- Options that control the action of MQINQMP
+MQCHARV Name;        -- Property name
+MQPD    PropDesc;    -- Property descriptor
+MQLONG  Type;        -- Property data type
+MQLONG  ValueLength; -- Length in bytes of the Value area
+MQBYTE  Value[n];    -- Area to contain the property value
+MQLONG  DataLength;  -- Length of the property value
+MQLONG  CompCode;    -- Completion code
+MQLONG  Reason;      -- Reason code qualifying CompCode
+*/
+PHP_FUNCTION(mqseries_inqmp) {
+  mqseries_descriptor *mqdesc;
+  mqseries_message *mqhandle;
+  MQLONG type = 0;
+  MQLONG comp_code, reason;
+  zval *z_mqdesc,
+       *z_hmsg,
+       *z_inq_prop_opts,
+       *z_proc_desc,
+       *z_comp_code,
+       *z_reason,
+       *z_data_length,
+       *z_value,
+       *z_type,
+       *z_name;
+  MQPD pd = { MQPD_DEFAULT };
+  MQCHARV  prop_name = { MQPROP_INQUIRE_ALL };
+  MQLONG data_length = 0, buffer_size = 0;
+  MQBYTE *data;
+  //char *name = NULL;
+  //size_t name_len = 0;
+
+  MQIMPO inq_prop_opts = { MQIMPO_DEFAULT};
+
+  MQCHARV tmp_name_property = { MQPROP_INQUIRE_ALL };
+
+
+  if (zend_parse_parameters(ZEND_NUM_ARGS(), "rraz/a/z/lz/z/z/z/",
+                            &z_mqdesc,
+                            &z_hmsg,
+                            &z_inq_prop_opts,
+                            &z_name,
+                            //&name_len,
+                            &z_proc_desc,
+                            &z_type,
+                            &buffer_size,
+                            &z_value,
+                            &z_data_length,
+                            &z_comp_code,
+                            &z_reason) == FAILURE) {
+    return;
+  }
+
+  if ((mqdesc = (mqseries_descriptor *)zend_fetch_resource(Z_RES_P(z_mqdesc), PHP_MQSERIES_DESCRIPTOR_RES_NAME, le_mqseries_conn)) == NULL) {
+    RETURN_FALSE;
+  }
+  if ((mqhandle = (mqseries_message *)zend_fetch_resource(Z_RES_P(z_hmsg), PHP_MQSERIES_MESSAGE_RES_NAME, le_mqseries_message)) == NULL) {
+    RETURN_FALSE;
+  }
+
+  _mqseries_set_mqpd_from_array(z_proc_desc, &pd);
+  _mqseries_set_mqimpo_from_array(z_inq_prop_opts, &inq_prop_opts);
+
+  //if (memcmp(name, "-3", name_len) != 0) {
+  //  prop_name.VSPtr = name;
+  //  prop_name.VSLength = MQVS_NULL_TERMINATED;
+  //}
+  //MQPROP_INQUIRE_ALL
+  if (Z_TYPE_P(z_name) != IS_NULL) {
+    prop_name.VSPtr = Z_STRVAL_P(z_name);
+    prop_name.VSLength = Z_STRLEN_P(z_name); //MQVS_NULL_TERMINATED;
+  }
+  data = (MQBYTE *)emalloc(sizeof(MQBYTE) * buffer_size);
+  MQBYTE *tmp_buffer = (MQBYTE *)emalloc(sizeof(MQBYTE) * buffer_size);
+  memset(tmp_buffer, 0, (sizeof(MQBYTE) * buffer_size));
+  //type = z_type->value.lval;
+
+  tmp_name_property.VSPtr = (MQBYTE *)emalloc(sizeof(MQBYTE) * MQ_MAX_PROPERTY_NAME_LENGTH);
+  tmp_name_property.VSBufSize = MQ_MAX_PROPERTY_NAME_LENGTH;
+  inq_prop_opts.ReturnedName = tmp_name_property;
+
+  MQINQMP(mqdesc->conn, mqhandle->handle, &inq_prop_opts, &prop_name, &pd, &type, (MQLONG)buffer_size, data, &data_length, &comp_code, &reason);
+  if (comp_code == MQCC_OK) {
+    zval_dtor(z_name);
+    ZVAL_STRINGL(z_name, (char *)inq_prop_opts.ReturnedName.VSPtr, inq_prop_opts.ReturnedName.VSLength);
+    zval_dtor(z_value);
+
+    MQINT8     value_int8;
+    MQINT16    value_int16;
+    MQINT32    value_int32;
+    MQINT64    value_int64;
+
+    switch (type) {
+      case MQTYPE_BOOLEAN: /* 4 bytes */
+        memcpy(&value_int32, data, data_length);
+        //sprintf(tmp_buffer, "%d", value_int32);
+        ZVAL_BOOL(z_value, value_int32);
+        break;
+      case MQTYPE_BYTE_STRING: /* zero size allowed */
+      case MQTYPE_STRING: /* zero size allowed */
+        if (buffer_size > 0) {
+          memcpy(tmp_buffer, data, MIN(data_length, buffer_size));
+          data_length = MIN(data_length, buffer_size);
+        }
+        ZVAL_STRINGL(z_value, (char *)tmp_buffer, (buffer_size > 0) ? (buffer_size < (long)data_length ? buffer_size : (long)data_length) : 0);
+        break;
+      case MQTYPE_INT8:
+        if (buffer_size > 0) {
+          memcpy(&value_int8, data, data_length);
+          //sprintf(tmp_buffer, "%d", value_int8);
+          ZVAL_LONG(z_value, value_int8);
+        }
+        break;
+      case MQTYPE_INT16:
+        if (buffer_size > 0) {
+          memcpy(&value_int16, data, data_length);
+          //sprintf(tmp_buffer, "%d", value_int16);
+          ZVAL_LONG(z_value, value_int16);
+        }
+        break;
+      case MQTYPE_INT32:
+        if (buffer_size > 0) {
+          memcpy(&value_int32, data, data_length);
+          //sprintf(tmp_buffer, "%d", value_int32);
+          ZVAL_LONG(z_value, value_int32);
+        }
+        break;
+      case MQTYPE_INT64:
+        if (buffer_size > 0) {
+          memcpy(&value_int64, data, data_length);
+          //sprintf(tmp_buffer, "%ld", value_int64);
+          ZVAL_LONG(z_value, value_int64);
+        }
+        break;
+      case MQTYPE_FLOAT32: {
+        MQFLOAT32  value_float32;
+        if (buffer_size > 0) {
+          memcpy(&value_float32, data, data_length);
+          sprintf(tmp_buffer, "%g", value_float32);
+          ZVAL_DOUBLE(z_value, atof(tmp_buffer));
+        }
+        break;
+      }
+      case MQTYPE_FLOAT64: {
+        MQFLOAT64  value_float64;
+        if (buffer_size > 0) {
+          memcpy(&value_float64, data, data_length);
+          sprintf(tmp_buffer, "%g", value_float64);
+          ZVAL_DOUBLE(z_value, atof(tmp_buffer));
+        }
+        break;
+      }
+      case MQTYPE_NULL: /* Must be zero bytes */
+        data_length = 0;
+        break;
+      default:
+        break;
+    }
+
+    //
+
+    ZVAL_LONG(z_data_length, (long)data_length);
+    ZVAL_LONG(z_type, (long)type);
+    _mqseries_set_array_from_mqpd(z_proc_desc, &pd);
+  }
+  efree(tmp_name_property.VSPtr);
+  efree(data);
+  efree(tmp_buffer);
+  ZVAL_LONG(z_comp_code, (long)comp_code);
+  ZVAL_LONG(z_reason, (long)reason);
+}
+
+/*
+MQ call:
+
+MQSETMP (Hconn, Hmsg, &SetPropOpts, &Name, &PropDesc, Type, ValueLength, &Value, &CompCode, &Reason);
+
+MQHCONN  Hconn;       -- Connection handle
+MQHMSG   Hmsg;        -- Message handle
+MQSMPO   SetPropOpts; -- Options that control the action of MQSETMP
+MQCHARV  Name;        -- Property name
+MQPD     PropDesc;    -- Property descriptor
+MQLONG   Type;        -- Property data type
+MQLONG   ValueLength; -- Length of property value in Value
+MQBYTE   Value[n];    -- Property value
+MQLONG   CompCode;    -- Completion code
+MQLONG   Reason;      -- Reason code qualifying CompCode
+*/
+
+PHP_FUNCTION(mqseries_setmp) {
+  mqseries_descriptor *mqdesc;
+  mqseries_message *mqhandle;
+  zend_long type = 0;
+  char *name = NULL;
+  size_t name_len = 0;
+  char  *value;
+  zend_long value_len;
+
+  MQLONG comp_code, reason;
+  zval *z_mqdesc,
+       *z_hmsg,
+       *z_set_prop_opts,
+       *z_proc_desc,
+       *z_comp_code,
+       *z_reason;
+
+  MQSMPO msg_po = { MQSMPO_DEFAULT };
+  MQSTS status = { MQSTS_DEFAULT };
+  MQPD pd = { MQPD_DEFAULT};
+  MQCHARV  prop_name = { MQCHARV_DEFAULT };
+
+  if (zend_parse_parameters(ZEND_NUM_ARGS(), "rra/s/a/ls/z/z/",
+                            &z_mqdesc,
+                            &z_hmsg,
+                            &z_set_prop_opts,
+                            &name,
+                            &name_len,
+                            &z_proc_desc,
+                            &type,
+                            &value,
+                            &value_len,
+                            &z_comp_code,
+                            &z_reason) == FAILURE) {
+    return;
+  }
+
+  if ((mqdesc = (mqseries_descriptor *)zend_fetch_resource(Z_RES_P(z_mqdesc), PHP_MQSERIES_DESCRIPTOR_RES_NAME, le_mqseries_conn)) == NULL) {
+    RETURN_FALSE;
+  }
+
+  if ((mqhandle = (mqseries_message *)zend_fetch_resource(Z_RES_P(z_hmsg), PHP_MQSERIES_MESSAGE_RES_NAME, le_mqseries_message)) == NULL) {
+    RETURN_FALSE;
+  }
+
+  void      *value_ptr = NULL;
+  MQINT8     value_int8;
+  MQINT16    value_int16;
+  MQINT32    value_int32;
+  MQINT64    value_int64;
+  MQFLOAT32  value_float32;
+  MQFLOAT64  value_float64;
+
+  /* Convert value, based on declared type*/
+
+  switch (type) {
+    case MQTYPE_BOOLEAN: /* 4 bytes */
+      if (value[0] == '1') {
+        value_int32 = 1;
+      }
+      else {
+        value_int32 = 0;
+      }
+      value_ptr = &value_int32;
+      value_len = sizeof(MQINT32);
+      break;
+    case MQTYPE_BYTE_STRING: /* zero size allowed */
+    case MQTYPE_STRING: /* zero size allowed */
+      if (value_len) {
+        value_ptr = value;
+      }
+      else {
+        value_ptr = NULL;
+        value_len = 0;
+      }
+      break;
+    case MQTYPE_INT8:
+      if (!sscanf(value, "%d", &value_int8)) {
+        RETURN_FALSE;
+      }
+      value_ptr = &value_int8;
+      value_len = sizeof(MQTYPE_INT8);
+      break;
+    case MQTYPE_INT16:
+      if (!sscanf(value, "%d", &value_int16)) {
+        RETURN_FALSE;
+      }
+      value_ptr = &value_int16;
+      value_len = sizeof(MQTYPE_INT16);
+      break;
+    case MQTYPE_INT32:
+      if (!sscanf(value, "%d", &value_int32)) {
+        RETURN_FALSE;
+      }
+      value_ptr = &value_int32;
+      value_len = sizeof(MQTYPE_INT32);
+      break;
+    case MQTYPE_INT64:
+      if (!sscanf(value, "%ld", &value_int64)) {
+        RETURN_FALSE;
+      }
+      value_ptr = &value_int64;
+      value_len = sizeof(MQTYPE_INT64);
+      break;
+    case MQTYPE_FLOAT32:
+      if (!sscanf(value, "%f", &value_float32)) {
+        RETURN_FALSE;
+      }
+      value_ptr = &value_float32;
+      value_len = sizeof(MQTYPE_FLOAT32);
+      break;
+    case MQTYPE_FLOAT64:
+      if (!sscanf(value, "%lf", &value_float64)) {
+        RETURN_FALSE;
+      }
+      value_ptr = &value_float64;
+      value_len = sizeof(MQTYPE_FLOAT64);
+    // break;
+    case MQTYPE_NULL: /* Must be zero bytes */
+      value_len = 0;
+      break;
+    default:
+      break;
+  }
+  _mqseries_set_array_from_mqpd(z_proc_desc, &pd);
+  _mqseries_set_mqsmpo_from_array(z_set_prop_opts, &msg_po);
+  prop_name.VSPtr = name;
+  prop_name.VSLength = name_len;
+
+  MQSETMP(mqdesc->conn, mqhandle->handle, &msg_po, &prop_name, &pd, type, (MQLONG)value_len, value_ptr, &comp_code, &reason);
+
+  ZVAL_LONG(z_comp_code, (long)comp_code);
+  ZVAL_LONG(z_reason, (long)reason);
+
+}
+
+
+////////////////////////////////////////////////
 /* }}} */
 
 #endif /* HAVE_MQSERIESLIB_V7 */
@@ -1434,6 +2132,13 @@ void _mqseries_bytes(zend_resource *rsrc)
 {
 	efree(((mqseries_bytes *)rsrc->ptr)->bytes);
 	efree(rsrc->ptr);
+}
+
+void _mqseries_hmsg(zend_resource *rsrc) {
+  //if (((mqseries_bytes *)rsrc->ptr)->bytes) {
+  //efree(((mqseries_message *)rsrc->ptr)->handle);
+  //}
+  efree(rsrc->ptr);
 }
 /* }}} */
 
